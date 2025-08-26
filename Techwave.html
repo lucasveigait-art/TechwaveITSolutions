@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Techwave IT Solutions - 15 anos transformando empresas através da tecnologia. Soluções completas em TI, segurança da informação, infraestrutura e consultoria.">
+    <meta name="keywords" content="TI, tecnologia da informação, segurança cibernética, infraestrutura, consultoria, suporte técnico, transformação digital">
+    <meta name="author" content="Techwave IT Solutions">
+    <meta property="og:title" content="Techwave IT Solutions - Transformando Tecnologia em Vantagem Competitiva">
+    <meta property="og:description" content="15 anos de experiência em soluções completas de TI para grandes empresas">
+    <meta property="og:type" content="website">
+    <title>Techwave IT Solutions - Transformando Tecnologia em Vantagem Competitiva há 15 Anos</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
+    
+    <!-- Font Awesome with defer loading -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #004499;
+            --accent-color: #ff6b35;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-light: #ffffff;
+            --background-light: #ffffff;
+            --background-gray: #f8fafc;
+            --background-dark: #0f172a;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05 );
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --gradient-primary: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            --gradient-accent: linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: \'Inter\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background-color: var(--background-light);
+            font-size: 16px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Performance optimizations */
+        img {
+            max-width: 100%;
+            height: auto;
+            loading: lazy;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Header with improved performance */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-sm);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, box-shadow;
+        }
+
+        header.scrolled {
+            box-shadow: var(--shadow-lg);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: \'\';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background: var(--primary-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .cta-button {
+            background: var(--gradient-primary);
+            color: var(--text-light);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            will-change: transform;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Mobile menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Hero Section with optimized animations */
+        .hero {
+            background: var(--gradient-primary);
+            color: var(--text-light);
+            padding: 140px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: \'\';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(255,255,255,0.1 )" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>\');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 24px;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .hero .highlight {
+            color: var(--accent-color);
+            position: relative;
+        }
+
+        .hero .subtitle {
+            font-size: 20px;
+            margin-bottom: 48px;
+            opacity: 0.9;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 48px;
+            margin: 64px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+
+        .stat:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat h3 {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .stat p {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 48px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: var(--text-light);
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            will-change: transform;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            padding: 16px 32px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            will-change: transform;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
+        /* Sections with improved spacing */
+        section {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 64px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        /* About Section */
+        .about {
+            background: var(--background-gray);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+            margin-bottom: 64px;
+        }
+
+        .about-text {
+            font-size: 18px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .about-text p {
+            margin-bottom: 24px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+
+        .feature {
+            background: var(--background-light);
+            padding: 40px 32px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-color);
+            will-change: transform;
+        }
+
+        .feature:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: var(--text-light);
+            font-size: 24px;
+        }
+
+        .feature h4 {
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .feature p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Services with improved cards */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            margin-bottom: 64px;
+        }
+
+        .service-card {
+            background: var(--background-light);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        .service-card::before {
+            content: \'\';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .service-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-accent);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        .service-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .service-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* CTA Section with better styling */
+        .cta-section {
+            background: var(--background-gray);
+            text-align: center;
+            padding: 80px 0;
+            border-radius: 24px;
+            margin: 64px 0;
+        }
+
+        .cta-section h3 {
+            font-size: 28px;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+
+        .cta-section .btn-primary {
+            margin-top: 32px;
+        }
+
+        /* Methodology Section */
+        .methodology {
+            background: var(--background-light);
+        }
+
+        .methodology-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 48px;
+            margin-top: 64px;
+        }
+
+        .methodology-step {
+            text-align: center;
+            position: relative;
+            padding-top: 60px;
+        }
+
+        .methodology-step .step-number {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            opacity: 0.1;
+            line-height: 1;
+        }
+
+        .methodology-step h4 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .methodology-step p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Cases Section */
+        .cases {
+            background: var(--background-gray);
+        }
+
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 48px;
+            margin-top: 64px;
+        }
+
+        .case-card {
+            background: var(--background-light);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-color);
+            will-change: transform;
+        }
+
+        .case-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .case-card-content {
+            padding: 32px;
+        }
+
+        .case-card h4 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .case-card h5 {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .case-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .case-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 24px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+        }
+
+        .case-stat {
+            text-align: center;
+        }
+
+        .case-stat .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+
+        .case-stat .label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Sectors Section */
+        .sectors {
+            background: var(--background-light);
+        }
+
+        .sectors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 64px;
+        }
+
+        .sector-card {
+            background: var(--background-gray);
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-color);
+            will-change: transform;
+        }
+
+        .sector-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sector-card i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .sector-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .sector-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact {
+            background: var(--background-dark);
+            color: var(--text-light);
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: flex-start;
+        }
+
+        .contact-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--text-light);
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .contact-detail i {
+            font-size: 24px;
+            color: var(--accent-color);
+        }
+
+        .contact-detail p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .contact-detail a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-detail a:hover {
+            color: var(--accent-color);
+        }
+
+        .next-steps {
+            margin-top: 48px;
+        }
+
+        .next-steps h4 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-light);
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .step-number-circle {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            min-height: 32px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .step-content h5 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .step-content p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .contact-form {
+            background: var(--background-light);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .contact-form h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            color: var(--text-primary);
+            background: var(--background-gray);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-submit-button {
+            width: 100%;
+            background: var(--gradient-primary);
+            color: var(--text-light);
+            padding: 16px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--background-dark);
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            padding: 40px 0;
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer p {
+            margin-bottom: 16px;
+        }
+
+        .social-links a {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 20px;
+            margin: 0 12px;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .nav-links {
+                gap: 24px;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .about-image {
+                order: -1;
+                margin-bottom: 48px;
+            }
+
+            .contact-content {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-form {
+                margin-top: 48px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: var(--shadow-lg);
+                padding: 20px 0;
+                border-radius: 0 0 10px 10px;
+                z-index: 999;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 12px 24px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-links a::after {
+                display: none;
+            }
+
+            .hero {
+                padding: 120px 0 80px;
+            }
+
+            .hero h1 {
+                font-size: clamp(2rem, 8vw, 3.5rem);
+            }
+
+            .hero .subtitle {
+                font-size: 18px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .section-title {
+                font-size: clamp(1.8rem, 6vw, 2.5rem);
+            }
+
+            .section-subtitle {
+                font-size: 16px;
+            }
+
+            .features,
+            .services-grid,
+            .methodology-grid,
+            .cases-grid,
+            .sectors-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .case-stats {
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .contact-info,
+            .contact-form {
+                padding: 32px;
+            }
+
+            .contact-info h3,
+            .contact-form h3 {
+                font-size: 24px;
+            }
+
+            .contact-detail p {
+                font-size: 16px;
+            }
+
+            .step-content h5 {
+                font-size: 16px;
+            }
+
+            .step-content p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .hero h1 {
+                font-size: clamp(1.8rem, 9vw, 3rem);
+            }
+
+            .hero .subtitle {
+                font-size: 16px;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                padding: 14px 28px;
+                font-size: 15px;
+            }
+
+            .section-title {
+                font-size: clamp(1.6rem, 7vw, 2.2rem);
+            }
+
+            .section-subtitle {
+                font-size: 15px;
+            }
+
+            .feature,
+            .service-card,
+            .case-card,
+            .sector-card {
+                padding: 24px;
+            }
+
+            .contact-info,
+            .contact-form {
+                padding: 24px;
+            }
+
+            .contact-info h3,
+            .contact-form h3 {
+                font-size: 22px;
+            }
+
+            .contact-detail p {
+                font-size: 15px;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                padding: 12px 16px;
+                font-size: 15px;
+            }
+
+            .form-submit-button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#hero" class="logo" aria-label="Techwave IT Solutions Home">
+                    <i class="fas fa-bolt"></i> Techwave IT Solutions
+                </a>
+                <button class="mobile-menu-toggle" aria-label="Abrir menu de navegação">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-links">
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#about">Sobre</a></li>
+                    <li><a href="#services">Serviços</a></li>
+                    <li><a href="#cases">Cases</a></li>
+                    <li><a href="#sectors">Clientes</a></li>
+                    <li><a href="#contact">Contato</a></li>
+                    <li><a href="#contact" class="cta-button">Fale Conosco</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="hero">
+            <div class="container hero-content">
+                <h1>Transformando Tecnologia em Vantagem Competitiva há <span class="highlight">15 Anos</span></h1>
+                <p class="subtitle">Parceiros estratégicos de grandes empresas em soluções completas de TI</p>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <h3>15+</h3>
+                        <p>Anos de Experiência</p>
+                    </div>
+                    <div class="stat">
+                        <h3>100+</h3>
+                        <p>Projetos Entregues</p>
+                    </div>
+                    <div class="stat">
+                        <h3>50+</h3>
+                        <p>Clientes Atendidos</p>
+                    </div>
+                    <div class="stat">
+                        <h3>6</h3>
+                        <p>Setores Atendidos</p>
+                    </div>
+                </div>
+
+                <div class="hero-buttons">
+                    <a href="#contact" class="btn-primary">
+                        <i class="fas fa-rocket"></i> Descubra Como Podemos Transformar Sua TI
+                    </a>
+                    <a href="#about" class="btn-secondary">
+                        <i class="fas fa-info-circle"></i> Conheça Nossa História
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <h2 class="section-title">15 Anos Transformando Empresas Através da Tecnologia</h2>
+                <p class="section-subtitle">A Techwave IT Solutions é uma empresa consolidada no mercado brasileiro de tecnologia da informação, com 15 anos de experiência sólida no atendimento a grandes empresas de diversos setores.</p>
+                
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>Nossa trajetória é marcada por parcerias estratégicas duradouras, onde não apenas fornecemos soluções técnicas, mas nos tornamos verdadeiros aliados no crescimento e transformação digital de nossos clientes.</p>
+                        <p>Construímos nossa reputação através de inovação constante, compromisso inabalável com a satisfação do cliente e excelência técnica com foco em resultados de negócio.</p>
+                    </div>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+                            <h4>Inovação Constante</h4>
+                            <p>Pesquisamos e desenvolvemos soluções inovadoras</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-users"></i></div>
+                            <h4>Foco no Cliente</h4>
+                            <p>Soluções personalizadas para seus objetivos</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-award"></i></div>
+                            <h4>Expertise e Qualidade</h4>
+                            <p>15 anos de experiência e certificações técnicas</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                            <h4>Resultados Concretos</h4>
+                            <p>Resultados tangíveis e mensuráveis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="services">
+            <div class="container">
+                <h2 class="section-title">Nossos Serviços</h2>
+                <p class="section-subtitle">Soluções completas em tecnologia da informação para impulsionar seu negócio</p>
+                
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Segurança da Informação</h3>
+                        <p>Proteção robusta contra ameaças cibernéticas com monitoramento 24/7 e compliance LGPD.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-server"></i></div>
+                        <h3>Infraestrutura de TI</h3>
+                        <p>Gestão completa e modernização de infraestrutura para máxima disponibilidade.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-comments"></i></div>
+                        <h3>Consultoria em Tecnologia</h3>
+                        <p>Análise estratégica e implementação de soluções sob medida para seu negócio.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon"><i class="fas fa-headset"></i></div>
+                        <h3>Suporte Técnico Premium</h3>
+                        <p>Atendimento ágil e especializado para resolver problemas críticos rapidamente.</p>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <h3>Precisa de uma solução personalizada?</h3>
+                    <p>Nossa equipe de especialistas está pronta para desenvolver a solução ideal para seu negócio</p>
+                    <a href="#contact" class="btn-primary"><i class="fas fa-handshake"></i> Falar com Especialista</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="methodology" class="methodology">
+            <div class="container">
+                <h2 class="section-title">Nossa Metodologia</h2>
+                <p class="section-subtitle">Abordagem estruturada para resultados consistentes e transformação real</p>
+                
+                <div class="methodology-grid">
+                    <div class="methodology-step">
+                        <span class="step-number">01</span>
+                        <h4>Diagnóstico Estratégico</h4>
+                        <p>Mergulhamos no seu negócio para entender cenário, desafios e metas.</p>
+                    </div>
+                    <div class="methodology-step">
+                        <span class="step-number">02</span>
+                        <h4>Planejamento Personalizado</h4>
+                        <p>Desenhamos um roadmap tecnológico sob medida para suas necessidades.</p>
+                    </div>
+                    <div class="methodology-step">
+                        <span class="step-number">03</span>
+                        <h4>Implementação Ágil</h4>
+                        <p>Executamos com excelência, comunicação transparente e monitoramento contínuo.</p>
+                    </div>
+                    <div class="methodology-step">
+                        <span class="step-number">04</span>
+                        <h4>Evolução Contínua</h4>
+                        <p>Acompanhamos seu crescimento, otimizando e adaptando as soluções.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cases" class="cases">
+            <div class="container">
+                <h2 class="section-title">Cases de Sucesso</h2>
+                <p class="section-subtitle">Transformações reais em parceria com nossos clientes, demonstrando nossa expertise em diferentes setores e tipos de projeto</p>
+                
+                <div class="cases-grid">
+                    <div class="case-card">
+                        <div class="case-card-content">
+                            <h4>Sediver Isoladores</h4>
+                            <h5>Gestão Estratégica de TI e Integração Global</h5>
+                            <p><strong>Desafio:</strong> Dificuldades na organização e efetividade do suporte de TI no Brasil, com alta demanda de usuários e ausência de processos definidos.</p>
+                            <p><strong>Solução:</strong> Gestão estratégica de TI nacional integrada à equipe global, suporte proativo com SLAs definidos e integração sistêmica com SAP, Comply e CE+.</p>
+                            <div class="case-stats">
+                                <div class="case-stat">
+                                    <div class="number">60%</div>
+                                    <div class="label">Redução de chamados recorrentes</div>
+                                </div>
+                                <div class="case-stat">
+                                    <div class="number">70%</div>
+                                    <div class="label">Redução no tempo de resposta</div>
+                                </div>
+                                <div class="case-stat">
+                                    <div class="number">100%</div>
+                                    <div class="label">Aderência ao portal de chamados</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-card-content">
+                            <h4>Sinergas GNV</h4>
+                            <h5>Migração Completa de ERP</h5>
+                            <p><strong>Desafio:</strong> ERP Senior on-premises com limitações nos processos internos, baixa eficiência em relatórios e suporte inadequado.</p>
+                            <p><strong>Solução:</strong> Migração para solução SaaS moderna com levantamento completo de processos, planejamento detalhado e treinamento especializado.</p>
+                            <div class="case-stats">
+                                <div class="case-stat">
+                                    <div class="number">90%</div>
+                                    <div class="label">Melhoria em relatórios</div>
+                                </div>
+                                <div class="case-stat">
+                                    <div class="number">100%</div>
+                                    <div class="label">Taxa de adaptação dos usuários</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-card-content">
+                            <h4>Talita Gloria Advocacia</h4>
+                            <h5>Sistemas de Gestão e Automação</h5>
+                            <p><strong>Desafio:</strong> Ausência de sistema integrado para gestão de contatos, atendimento e processos internos, dificultando o controle operacional.</p>
+                            <p><strong>Solução:</strong> Implantação de sistema de gestão com automação via WhatsApp, sistema jurídico integrado e suporte proativo contínuo.</p>
+                            <div class="case-stats">
+                                <div class="case-stat">
+                                    <div class="number">95%</div>
+                                    <div class="label">Melhoria no controle de atendimento</div>
+                                </div>
+                                <div class="case-stat">
+                                    <div class="number">100%</div>
+                                    <div class="label">Integração financeira e jurídica</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-card-content">
+                            <h4>Attual Contabilidade</h4>
+                            <h5>Modernização Completa da Infraestrutura Contábil</h5>
+                            <p><strong>Desafio:</strong> Sistema contábil desatualizado, processos manuais demorados e falta de integração entre departamentos, comprometendo a eficiência e a qualidade dos serviços prestados aos clientes.</p>
+                            <p><strong>Solução:</strong> Implementação de sistema contábil integrado, automação de processos fiscais e tributários, migração para nuvem e treinamento especializado da equipe.</p>
+                            <div class="case-stats">
+                                <div class="case-stat">
+                                    <div class="number">80%</div>
+                                    <div class="label">Redução no tempo de processamento</div>
+                                </div>
+                                <div class="case-stat">
+                                    <div class="number">95%</div>
+                                    <div class="label">Automação de processos fiscais</div>
+                                </div>
+                                <div class="case-stat">
+                                    <div class="number">100%</div>
+                                    <div class="label">Integração entre departamentos</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <h3>Quer conhecer mais cases de sucesso da sua área?</h3>
+                    <p>Solicite uma apresentação personalizada e veja como podemos ajudar seu negócio.</p>
+                    <a href="#contact" class="btn-primary"><i class="fas fa-file-alt"></i> Solicitar Apresentação Personalizada</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="sectors" class="sectors">
+            <div class="container">
+                <h2 class="section-title">Setores que Confiam na Techwave</h2>
+                <p class="section-subtitle">Atendemos empresas de diversos portes e segmentos, cada cliente representa uma história de parceria e resultados</p>
+                
+                <div class="sectors-grid">
+                    <div class="sector-card">
+                        <i class="fas fa-industry"></i>
+                        <h3>Indústria e Manufatura</h3>
+                        <p>Soluções para otimização produtiva</p>
+                    </div>
+                    <div class="sector-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <h3>Serviços Financeiros</h3>
+                        <p>Segurança e compliance bancário</p>
+                    </div>
+                    <div class="sector-card">
+                        <i class="fas fa-heartbeat"></i>
+                        <h3>Saúde e Ciências</h3>
+                        <p>Tecnologia para dados sensíveis</p>
+                    </div>
+                    <div class="sector-card">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>Varejo e E-commerce</h3>
+                        <p>Plataformas robustas de vendas</p>
+                    </div>
+                    <div class="sector-card">
+                        <i class="fas fa-truck"></i>
+                        <h3>Logística e Transporte</h3>
+                        <p>Eficiência na cadeia de suprimentos</p>
+                    </div>
+                    <div class="sector-card">
+                        <i class="fas fa-briefcase"></i>
+                        <h3>Serviços Profissionais</h3>
+                        <p>Suporte para escritórios especializados</p>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <h3>Pronto para Transformar sua TI?</h3>
+                    <p>Estamos prontos para iniciar quando você estiver! Entre em contato e descubra como podemos impulsionar seu negócio.</p>
+                    <a href="#contact" class="btn-primary"><i class="fas fa-comments"></i> Iniciar Conversa</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2 class="section-title">Entre em Contato</h2>
+                <p class="section-subtitle">Vamos conversar sobre seu projeto e descobrir como podemos transformar sua TI</p>
+                
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <h3>Informações de Contato</h3>
+                        <div class="contact-detail">
+                            <i class="fas fa-phone-alt"></i>
+                            <p>Telefone / WhatsApp: <a href="tel:+5522997467783">(22) 99746-7783</a></p>
+                        </div>
+                        <div class="contact-detail">
+                            <i class="fas fa-envelope"></i>
+                            <p>Email: <a href="mailto:contato@techwave.tec.br">contato@techwave.tec.br</a></p>
+                        </div>
+
+                        <div class="next-steps">
+                            <h4>Próximos Passos</h4>
+                            <div class="step-item">
+                                <div class="step-number-circle">1</div>
+                                <div class="step-content">
+                                    <h5>Workshop de Descoberta <span style="font-weight: normal;">(Sem Compromisso)</span></h5>
+                                    <p>Entendimento dos seus desafios e objetivos</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number-circle">2</div>
+                                <div class="step-content">
+                                    <h5>Diagnóstico Preliminar</h5>
+                                    <p>Análise técnica do ambiente atual</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number-circle">3</div>
+                                <div class="step-content">
+                                    <h5>Proposta de Parceria</h5>
+                                    <p>Apresentação de soluções customizadas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-form">
+                        <h3>Envie sua Mensagem</h3>
+                        <form action="#" method="POST">
+                            <div class="form-group">
+                                <label for="name">Nome Completo</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telefone (Opcional)</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Sua Mensagem</label>
+                                <textarea id="message" name="message" required></textarea>
+                            </div>
+                            <button type="submit" class="form-submit-button">Enviar Mensagem</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Techwave IT Solutions. Todos os direitos reservados.</p>
+            <div class="social-links">
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener(\'DOMContentLoaded\', function() {
+            // Smooth scrolling for navigation links
+            document.querySelectorAll(\'a[href^="#"]\[class!="cta-button"]\[class!="btn-primary"]\[class!="btn-secondary"]\[class!="form-submit-button"]\[class!="logo"]\[class!="mobile-menu-toggle"]\[class!="social-links"]\]\').forEach(anchor => {
+                anchor.addEventListener(\'click\', function (e) {
+                    e.preventDefault();
+
+                    document.querySelector(this.getAttribute(\'href\')).scrollIntoView({
+                        behavior: \'smooth\'
+                    });
+                });
+            });
+
+            // Header scroll effect
+            const header = document.querySelector(\'header\');
+            window.addEventListener(\'scroll\', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add(\'scrolled\');
+                } else {
+                    header.classList.remove(\'scrolled\');
+                }
+            });
+
+            // Mobile menu toggle
+            const mobileMenuToggle = document.querySelector(\'.mobile-menu-toggle\');
+            const navLinks = document.querySelector(\'.nav-links\');
+
+            mobileMenuToggle.addEventListener(\'click\', () => {
+                navLinks.classList.toggle(\'active\');
+                mobileMenuToggle.querySelector(\'i\').classList.toggle(\'fa-bars\');
+                mobileMenuToggle.querySelector(\'i\').classList.toggle(\'fa-times\');
+            });
+
+            // Close mobile menu when a link is clicked
+            navLinks.querySelectorAll(\'a\').forEach(link => {
+                link.addEventListener(\'click\', () => {
+                    if (navLinks.classList.contains(\'active\')) {
+                        navLinks.classList.remove(\'active\');
+                        mobileMenuToggle.querySelector(\'i\').classList.remove(\'fa-times\');
+                        mobileMenuToggle.querySelector(\'i\').classList.add(\'fa-bars\');
+                    }
+                });
+            });
+
+            // Form submission (example - replace with actual backend logic)
+            const contactForm = document.querySelector(\'.contact-form form\');
+            if (contactForm) {
+                contactForm.addEventListener(\'submit\', function(e) {
+                    e.preventDefault();
+                    alert(\'Mensagem enviada com sucesso! (Funcionalidade de envio real requer backend)\');
+                    this.reset();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

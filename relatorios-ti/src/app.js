@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import express from 'express';
 import cookieSession from 'cookie-session';
 
@@ -11,9 +10,6 @@ import clientRoutes from './routes/clients.js';
 import reportRoutes from './routes/reports.js';
 import dashboardRoutes from './routes/dashboard.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 export async function createApp() {
   await ensureSchema();
   await ensureAdminUser();
@@ -22,7 +18,9 @@ export async function createApp() {
 
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
-  app.use(express.static(path.join(__dirname, '..', 'public')));
+  // Em produção o Netlify serve os arquivos de public/ direto pelo CDN
+  // (não passam pela function); isto aqui só é usado no `npm run dev` local.
+  app.use(express.static(path.join(process.cwd(), 'public')));
 
   // Sessão sem estado no servidor (dados assinados no próprio cookie),
   // necessário porque funções serverless não compartilham memória entre

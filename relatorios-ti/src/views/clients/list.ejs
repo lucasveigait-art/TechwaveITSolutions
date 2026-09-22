@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> · Techwave IT Solutions</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/nav') %>
+  <main class="container">
+    <div class="page-header">
+      <h1>Clientes</h1>
+      <a href="/clients/new" class="btn btn-primary">+ Novo Cliente</a>
+    </div>
+
+    <% if (clients.length === 0) { %>
+      <p class="empty-state">Nenhum cliente cadastrado ainda. Clique em "Novo Cliente" para começar.</p>
+    <% } else { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Setor</th>
+            <th>Contato</th>
+            <th>E-mail</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% clients.forEach(c => { %>
+            <tr>
+              <td><%= c.name %></td>
+              <td><%= c.sector || '—' %></td>
+              <td><%= c.contact_name || '—' %></td>
+              <td><%= c.contact_email %></td>
+              <td>
+                <span class="badge <%= c.active ? 'badge-green' : 'badge-gray' %>">
+                  <%= c.active ? 'Ativo' : 'Inativo' %>
+                </span>
+              </td>
+              <td class="table-actions">
+                <a href="/clients/<%= c.id %>/edit">Editar</a>
+                <a href="/reports/new?client_id=<%= c.id %>">Novo Relatório</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </main>
+</body>
+</html>

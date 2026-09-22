@@ -1,0 +1,23 @@
+{
+  "name": "techwave-relatorios-ti",
+  "version": "1.0.0",
+  "description": "Sistema Techwave IT Solutions para geracao e envio automatico de relatorios mensais de TI para clientes",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "setup:admin": "node src/scripts/create-admin.js"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "nodemailer": "^6.9.16",
+    "pdfkit": "^0.15.2"
+  }
+}

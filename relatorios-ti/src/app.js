@@ -4,6 +4,7 @@ import express from 'express';
 import cookieSession from 'cookie-session';
 
 import { requireAuth } from './middleware/auth.js';
+import { ensureSchema } from './services/ensureSchema.js';
 import { ensureAdminUser } from './services/ensureAdmin.js';
 import authRoutes from './routes/auth.js';
 import clientRoutes from './routes/clients.js';
@@ -14,6 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function createApp() {
+  await ensureSchema();
   await ensureAdminUser();
 
   const app = express();

@@ -2,7 +2,7 @@
 
 Sistema interno da **Techwave IT Solutions** para cadastrar clientes e gerar/enviar por
 e-mail, com um clique, o relatório mensal de TI de cada um deles. Hospedado no **Netlify**
-(Functions + Netlify DB/Postgres, ambos no plano gratuito).
+(Functions) com banco de dados **Postgres gratuito no Neon**.
 
 ## Por que este formato de relatório
 
@@ -45,9 +45,11 @@ catch-all (`netlify/functions/api.js`), que hospeda a aplicação Express inteir
 `serverless-http`. Duas decisões seguem diretamente dessa escolha:
 
 - **Sem SQLite/arquivo local.** Funções serverless não têm disco persistente entre
-  invocações, então os dados ficam no **Netlify DB** (Postgres via Neon), provisionado
-  automaticamente ao instalar `@netlify/database` e fazer deploy — nada para configurar
-  manualmente, nenhuma connection string para copiar.
+  invocações, então os dados ficam num **Postgres hospedado (Neon)**, acessado via HTTP
+  (`@neondatabase/serverless`) usando a connection string em `DATABASE_URL`. As tabelas
+  são criadas automaticamente pelo próprio app na primeira requisição (`ensureSchema.js`),
+  sem passo de migração separado — funciona com qualquer Postgres (Neon, Supabase, etc.),
+  não depende de nenhum recurso específico do Netlify.
 - **Sem EJS/arquivos de template lidos em disco.** As páginas (`src/views/*.js`) são
   funções JavaScript que retornam o HTML diretamente, para que o *bundler* de funções do
   Netlify consiga incluir tudo automaticamente seguindo os `import`s, sem depender de
@@ -59,6 +61,7 @@ catch-all (`netlify/functions/api.js`), que hospeda a aplicação Express inteir
 ## Requisitos
 
 - Conta gratuita no [Netlify](https://netlify.com) (você já tem).
+- Conta gratuita no [Neon](https://neon.tech) para o banco de dados Postgres.
 - Uma conta de e-mail com acesso SMTP para enviar os relatórios (Gmail/Workspace,
   Outlook/Microsoft 365, SendGrid, Amazon SES, Zoho, etc.).
 
@@ -69,6 +72,8 @@ catch-all (`netlify/functions/api.js`), que hospeda a aplicação Express inteir
    **Base directory** como `relatorios-ti`. O `netlify.toml` já configura o resto
    (build, diretório de functions, redirecionamento das rotas).
 2. Em **Site configuration → Environment variables**, configure:
+   - `DATABASE_URL` — connection string do Postgres (copiada do painel do Neon, projeto
+     → Connection string).
    - `SESSION_SECRET` — qualquer string aleatória longa.
    - `ADMIN_EMAIL` / `ADMIN_PASSWORD` — login do painel administrativo (o usuário é
      criado automaticamente no primeiro acesso).
@@ -80,25 +85,15 @@ catch-all (`netlify/functions/api.js`), que hospeda a aplicação Express inteir
      - **Outlook/Microsoft 365**: `smtp.office365.com`, porta `587`, `SMTP_SECURE=false`.
    - `MAIL_FROM_NAME` / `MAIL_FROM_EMAIL` — remetente que o cliente vê.
    - `COMPANY_SITE_URL` / `COMPANY_PHONE` — aparecem no rodapé dos relatórios e e-mails.
-   - **Não precisa** configurar nada de banco de dados — o Netlify injeta
-     `NETLIFY_DB_URL` sozinho assim que o Netlify DB é provisionado no primeiro deploy.
-3. Deploy. Acesse a URL do site e entre com o `ADMIN_EMAIL` / `ADMIN_PASSWORD` definidos.
+3. Deploy. As tabelas do banco são criadas automaticamente na primeira requisição. Acesse
+   a URL do site e entre com o `ADMIN_EMAIL` / `ADMIN_PASSWORD` definidos.
 
 ## Desenvolvimento local
 
 ```bash
 cd relatorios-ti
 npm install
-netlify dev
-```
-
-O `netlify dev` (CLI do Netlify) emula as Functions e injeta automaticamente a
-`NETLIFY_DB_URL` de um branch de desenvolvimento do banco. Alternativamente, para rodar
-só o servidor Express sem emular o Netlify (não terá banco de dados a menos que você
-defina `NETLIFY_DB_URL` manualmente no `.env`):
-
-```bash
-cp .env.example .env
+cp .env.example .env   # preencha DATABASE_URL com a connection string do Neon
 npm run dev
 ```
 
@@ -108,11 +103,10 @@ npm run dev
 relatorios-ti/
   netlify.toml                      → build, functions e redirecionamentos
   netlify/functions/api.js          → entrypoint serverless (Express via serverless-http)
-  netlify/database/migrations/      → schema do Postgres, aplicado automaticamente no deploy
   src/
     app.js                          → fábrica do app Express (sem .listen)
     server.js                       → entrypoint local (`npm run dev`)
-    db/index.js                     → conexão com o Netlify DB (Postgres)
+    db/index.js                     → conexão com o Postgres (Neon) via DATABASE_URL
     middleware/auth.js              → protege as rotas por sessão de login
     routes/                         → clientes, relatórios, dashboard, login
     services/
@@ -120,6 +114,7 @@ relatorios-ti/
       renderReport.js                → gera o HTML do relatório (preview e corpo do e-mail)
       pdf.js                        → gera o PDF do relatório (pdfkit, sem depender de navegador)
       email.js                      → envia o e-mail via SMTP (nodemailer)
+      ensureSchema.js               → cria as tabelas automaticamente no boot
       ensureAdmin.js                → cria o usuário admin automaticamente no boot
     views/                          → páginas do painel administrativo (funções JS → HTML)
   public/css/style.css              → estilo com a identidade visual da Techwave
@@ -129,5 +124,5 @@ relatorios-ti/
 
 - Acesso ao painel protegido por login (cookie de sessão assinado).
 - Senha do administrador armazenada com hash bcrypt.
-- Dados de clientes ficam apenas no seu Postgres (Netlify DB) — nenhuma informação é
+- Dados de clientes ficam apenas no seu Postgres (Neon) — nenhuma informação é
   enviada a terceiros além do envio do e-mail ao próprio cliente.

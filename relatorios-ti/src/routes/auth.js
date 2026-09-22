@@ -1,29 +1,36 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const db = require('../db');
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import { sql } from '../db/index.js';
+import { loginPage } from '../views/authView.js';
 
 const router = express.Router();
 
 router.get('/login', (req, res) => {
   if (req.session.userId) return res.redirect('/');
-  res.render('login', { error: null });
+  res.send(loginPage({ error: null }));
 });
 
-router.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get((email || '').trim().toLowerCase());
+router.post('/login', async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const rows = await sql`SELECT * FROM users WHERE email = ${(email || '').trim().toLowerCase()}`;
+    const user = rows[0];
 
-  if (!user || !bcrypt.compareSync(password || '', user.password_hash)) {
-    return res.status(401).render('login', { error: 'E-mail ou senha invalidos.' });
+    if (!user || !bcrypt.compareSync(password || '', user.password_hash)) {
+      return res.status(401).send(loginPage({ error: 'E-mail ou senha inválidos.' }));
+    }
+
+    req.session.userId = user.id;
+    req.session.userEmail = user.email;
+    res.redirect('/');
+  } catch (err) {
+    next(err);
   }
-
-  req.session.userId = user.id;
-  req.session.userEmail = user.email;
-  res.redirect('/');
 });
 
 router.post('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/login'));
+  req.session = null;
+  res.redirect('/login');
 });
 
-module.exports = router;
+export default router;

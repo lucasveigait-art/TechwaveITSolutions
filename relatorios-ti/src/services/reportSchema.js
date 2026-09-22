@@ -94,4 +94,4 @@ function suggestStatus(data) {
   return suggestions;
 }
 
-module.exports = { RAG_OPTIONS, FIELDS, GROUPS, TEXT_FIELDS, STATUS_AREAS, suggestStatus };
+export { RAG_OPTIONS, FIELDS, GROUPS, TEXT_FIELDS, STATUS_AREAS, suggestStatus };

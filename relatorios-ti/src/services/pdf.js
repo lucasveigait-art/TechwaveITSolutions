@@ -1,6 +1,6 @@
-const PDFDocument = require('pdfkit');
-const schema = require('./reportSchema');
-const { formatPeriod, RAG_LABELS } = require('./renderReport');
+import PDFDocument from 'pdfkit';
+import * as schema from './reportSchema.js';
+import { formatPeriod, RAG_LABELS } from './renderReport.js';
 
 const RAG_COLORS = { green: '#16a34a', amber: '#d97706', red: '#dc2626' };
 const PRIMARY = '#0066cc';
@@ -91,4 +91,4 @@ function ensureSpace(doc, y, needed) {
   return y;
 }
 
-module.exports = { generateReportPdf };
+export { generateReportPdf };

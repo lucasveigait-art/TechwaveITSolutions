@@ -1,4 +1,4 @@
-const schema = require('./reportSchema');
+import * as schema from './reportSchema.js';
 
 const RAG_COLORS = { green: '#16a34a', amber: '#d97706', red: '#dc2626' };
 const RAG_LABELS = { green: 'No prazo', amber: 'Atenção', red: 'Crítico' };
@@ -114,4 +114,4 @@ function renderReportHtml({ client, report, companySiteUrl, companyPhone }) {
 </html>`;
 }
 
-module.exports = { renderReportHtml, formatPeriod, RAG_LABELS };
+export { renderReportHtml, formatPeriod, RAG_LABELS };

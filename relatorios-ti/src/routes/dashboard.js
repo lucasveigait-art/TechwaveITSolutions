@@ -1,19 +1,22 @@
-const express = require('express');
-const db = require('../db');
-const { formatPeriod } = require('../services/renderReport');
+import express from 'express';
+import { sql } from '../db/index.js';
+import { asyncHandler } from '../services/asyncHandler.js';
+import { formatPeriod } from '../services/renderReport.js';
+import { dashboardPage } from '../views/dashboardView.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  const clients = db.prepare('SELECT * FROM clients WHERE active = 1 ORDER BY name ASC').all();
-  const reports = db.prepare(`
+router.get('/', asyncHandler(async (req, res) => {
+  const clients = await sql`SELECT * FROM clients WHERE active = TRUE ORDER BY name ASC`;
+  const reports = await sql`
     SELECT r.*, c.name as client_name
     FROM reports r JOIN clients c ON c.id = r.client_id
     ORDER BY r.period DESC, c.name ASC
-  `).all();
+  `;
 
   const now = new Date();
-  const refPeriod = `${now.getFullYear()}-${String(now.getMonth()).padStart(2, '0')}`; // mês anterior (padrão de referência)
+  now.setMonth(now.getMonth() - 1);
+  const refPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
   const pendingClients = clients.filter(
     (c) => !reports.some((r) => r.client_id === c.id && r.period === refPeriod && r.status === 'sent')
@@ -26,15 +29,15 @@ router.get('/', (req, res) => {
     draftReports: reports.filter((r) => r.status === 'draft').length,
   };
 
-  res.render('dashboard', {
-    title: 'Dashboard',
+  res.send(dashboardPage({
     clients,
     reports: reports.slice(0, 30),
     pendingClients,
-    refPeriod,
+    refPeriodLabel: formatPeriod(refPeriod),
     stats,
     formatPeriod,
-  });
-});
+    userEmail: req.session.userEmail,
+  }));
+}));
 
-module.exports = router;
+export default router;

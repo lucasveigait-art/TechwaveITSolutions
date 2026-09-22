@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+import { escapeHtml, alertHtml } from './layout.js';
+
+export function loginPage({ error }) {
+  return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -10,9 +13,7 @@
   <main class="auth-card">
     <h1>Techwave IT Solutions</h1>
     <p class="auth-subtitle">Relatórios Mensais de TI</p>
-    <% if (error) { %>
-      <p class="alert alert-error"><%= error %></p>
-    <% } %>
+    ${alertHtml('error', error)}
     <form method="POST" action="/login">
       <div class="form-group">
         <label for="email">E-mail</label>
@@ -26,4 +27,5 @@
     </form>
   </main>
 </body>
-</html>
+</html>`;
+}

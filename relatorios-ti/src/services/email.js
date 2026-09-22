@@ -1,5 +1,5 @@
-const nodemailer = require('nodemailer');
-const { formatPeriod } = require('./renderReport');
+import nodemailer from 'nodemailer';
+import { formatPeriod } from './renderReport.js';
 
 let cachedTransporter = null;
 
@@ -18,9 +18,12 @@ function getTransporter() {
     port: Number(SMTP_PORT) || 587,
     secure: String(SMTP_SECURE).toLowerCase() === 'true',
     auth: { user: SMTP_USER, pass: SMTP_PASS },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 20000,
+    // Timeouts curtos: a função serverless tem um limite total de execução
+    // (10s no plano gratuito do Netlify), então falhar rápido é melhor do
+    // que deixar a requisição travada até o Netlify encerrar a função.
+    connectionTimeout: 6000,
+    greetingTimeout: 6000,
+    socketTimeout: 7000,
   });
 
   return cachedTransporter;
@@ -57,4 +60,4 @@ async function sendReportEmail({ client, report, html, pdfBuffer }) {
   });
 }
 
-module.exports = { sendReportEmail, getTransporter };
+export { sendReportEmail, getTransporter };

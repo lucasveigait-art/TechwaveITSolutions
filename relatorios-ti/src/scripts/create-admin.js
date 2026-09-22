@@ -1,22 +1,25 @@
-require('dotenv').config();
-const bcrypt = require('bcryptjs');
-const db = require('../db');
+import 'dotenv/config';
+import bcrypt from 'bcryptjs';
+import { sql } from '../db/index.js';
 
 const email = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
 const password = process.env.ADMIN_PASSWORD;
 
 if (!email || !password) {
-  console.error('Defina ADMIN_EMAIL e ADMIN_PASSWORD no arquivo .env antes de rodar este comando.');
+  console.error('Defina ADMIN_EMAIL e ADMIN_PASSWORD (no .env ou nas variáveis de ambiente do Netlify) antes de rodar este comando.');
   process.exit(1);
 }
 
 const hash = bcrypt.hashSync(password, 10);
 
-const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
-if (existing) {
-  db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hash, existing.id);
-  console.log(`Senha atualizada para o usuario ${email}.`);
+const existing = await sql`SELECT id FROM users WHERE email = ${email}`;
+
+if (existing.length > 0) {
+  await sql`UPDATE users SET password_hash = ${hash} WHERE id = ${existing[0].id}`;
+  console.log(`Senha atualizada para o usuário ${email}.`);
 } else {
-  db.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)').run(email, hash);
-  console.log(`Usuario administrador ${email} criado com sucesso.`);
+  await sql`INSERT INTO users (email, password_hash) VALUES (${email}, ${hash})`;
+  console.log(`Usuário administrador ${email} criado com sucesso.`);
 }
+
+process.exit(0);

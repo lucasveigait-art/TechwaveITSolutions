@@ -59,9 +59,7 @@ function generateReportPdf({ client, report }) {
       y = doc.y + 8;
 
       fields.forEach((f) => {
-        const raw = data[f.key];
-        const suffix = f.key.includes('pct') ? '%' : f.key.includes('hours') ? 'h' : '';
-        const value = raw === undefined || raw === null || raw === '' ? '—' : `${raw}${suffix}`;
+        const value = schema.formatFieldValue(f.key, data[f.key]);
 
         doc.fontSize(10).font('Helvetica').fillColor(MUTED).text(f.label, 50, y, { width: 320 });
         doc.font('Helvetica-Bold').fillColor(TEXT).text(value, 380, y, { width: doc.page.width - 100 - 330, align: 'right' });

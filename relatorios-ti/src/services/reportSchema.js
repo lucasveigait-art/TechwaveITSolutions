@@ -32,6 +32,17 @@ const FIELDS = [
   { key: 'backup_restore_tested', label: 'Teste de restauracao de backup realizado?', type: 'select', options: ['Sim', 'Nao', 'Nao aplicavel'], group: 'security' },
 
   { key: 'csat_score', label: 'Satisfacao do cliente / CSAT (0 a 10, opcional)', type: 'number', step: '0.1', group: 'satisfaction' },
+
+  { key: 'budgets_sent', label: 'Orcamentos enviados', type: 'number', group: 'budgets' },
+  { key: 'budgets_approved', label: 'Orcamentos aprovados', type: 'number', group: 'budgets' },
+  { key: 'budgets_pending', label: 'Orcamentos em analise pelo cliente', type: 'number', group: 'budgets' },
+  { key: 'budgets_total_value', label: 'Valor total orcado no mes (R$)', type: 'number', step: '0.01', group: 'budgets' },
+
+  { key: 'consulting_hours', label: 'Horas de consultoria realizadas', type: 'number', step: '0.5', group: 'consulting' },
+  { key: 'consulting_tickets_opened', label: 'Chamados de consultoria abertos', type: 'number', group: 'consulting' },
+  { key: 'consulting_tickets_closed', label: 'Chamados de consultoria concluidos', type: 'number', group: 'consulting' },
+  { key: 'consulting_projects_active', label: 'Projetos em andamento', type: 'number', group: 'consulting' },
+  { key: 'consulting_projects_completed', label: 'Projetos concluidos no mes', type: 'number', group: 'consulting' },
 ];
 
 const GROUPS = [
@@ -39,6 +50,8 @@ const GROUPS = [
   { key: 'sla', label: 'Cumprimento de SLA' },
   { key: 'uptime', label: 'Disponibilidade (Uptime)' },
   { key: 'security', label: 'Seguranca, Patches e Backups' },
+  { key: 'budgets', label: 'Orcamentos e Propostas' },
+  { key: 'consulting', label: 'Consultoria e Projetos' },
   { key: 'satisfaction', label: 'Satisfacao do Cliente' },
 ];
 
@@ -94,4 +107,16 @@ function suggestStatus(data) {
   return suggestions;
 }
 
-export { RAG_OPTIONS, FIELDS, GROUPS, TEXT_FIELDS, STATUS_AREAS, suggestStatus };
+function formatFieldValue(key, rawValue) {
+  if (rawValue === undefined || rawValue === null || rawValue === '') return '—';
+  if (key === 'budgets_total_value') {
+    const n = Number(rawValue);
+    if (Number.isNaN(n)) return String(rawValue);
+    return `R$ ${n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  if (key.includes('pct')) return `${rawValue}%`;
+  if (key.includes('hours')) return `${rawValue}h`;
+  return String(rawValue);
+}
+
+export { RAG_OPTIONS, FIELDS, GROUPS, TEXT_FIELDS, STATUS_AREAS, suggestStatus, formatFieldValue };

@@ -24,11 +24,6 @@ function nl2br(text) {
   return esc(text).replace(/\n/g, '<br>');
 }
 
-function fmtNumber(value, suffix = '') {
-  if (value === undefined || value === null || value === '') return '—';
-  return `${value}${suffix}`;
-}
-
 function ragChip(status) {
   const color = RAG_COLORS[status] || '#94a3b8';
   const label = status ? RAG_LABELS[status] : 'N/D';
@@ -57,8 +52,7 @@ function renderReportHtml({ client, report, companySiteUrl, companyPhone }) {
 
   const groupTables = schema.GROUPS.map((group) => {
     const fields = schema.FIELDS.filter((f) => f.group === group.key);
-    const suffix = (key) => (key.includes('pct') ? '%' : key.includes('hours') ? 'h' : '');
-    const rows = fields.map((f) => metricRow(f.label, fmtNumber(data[f.key], suffix(f.key)))).join('');
+    const rows = fields.map((f) => metricRow(f.label, schema.formatFieldValue(f.key, data[f.key]))).join('');
     return `
       <div style="margin-bottom:28px;">
         <h3 style="font-size:16px;color:#0f172a;margin:0 0 10px;font-weight:700;">${esc(group.label)}</h3>

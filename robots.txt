@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://techwave.tec.br/sitemap.xml

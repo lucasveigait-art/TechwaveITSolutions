@@ -100,15 +100,22 @@
   .tier-grid input:focus { border-color: var(--brand); }
 
   .tier-grid .tg-sec { grid-column: 1 / -1; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--brand); padding: 10px 0 2px; border-top: 1px solid rgba(255,255,255,.06); margin-top: 4px; }
-  .stack-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .stack-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
   .stack-table th { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); text-align: left; padding: 0 3px 6px; }
   .stack-table td { padding: 3px; }
   .stack-table input[type=text], .stack-table input[type=number], .stack-table select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: #fff; padding: 6px; font-size: 12px; outline: none; }
-  .stack-table input[type=number] { text-align: right; font-family: 'JetBrains Mono', Consolas, monospace; width: 64px; }
+  .stack-table input[type=number] { text-align: right; font-family: 'JetBrains Mono', Consolas, monospace; width: 56px; padding: 6px 4px; }
+  .stack-table input[type=number]:placeholder-shown { border-style: dashed; }
   .stack-table select { width: 84px; }
   .stack-table select option { background: var(--bg-card); }
   .stack-table input[type=checkbox] { accent-color: var(--brand); width: 15px; height: 15px; }
   .stack-table td.c { text-align: center; }
+  .stack-table tr.st-name td { padding-top: 10px; }
+  .stack-table tr.st-name input { font-weight: 600; background: transparent; border-color: transparent; padding-left: 2px; }
+  .stack-table tr.st-name input:hover, .stack-table tr.st-name input:focus { border-color: var(--border); background: var(--bg-input); }
+  .stack-table tr.st-vals td { border-bottom: 1px solid rgba(255,255,255,.05); padding-bottom: 8px; }
+  .stack-table select { width: 100%; }
+  .stack-table input[type=number] { width: 100%; }
   .helper-out { margin-top: 12px; padding: 12px; border-radius: 10px; background: var(--bg-soft); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; }
   .helper-out strong { font-family: 'JetBrains Mono', Consolas, monospace; font-size: 18px; color: var(--brand-hover); }
 
@@ -282,9 +289,10 @@
         <div id="tp-stack" class="tab-content">
           <div class="card">
             <div class="card-title"><span class="dot" style="background:var(--seg-lic)"></span> Stack de ferramentas por plano</div>
-            <p class="card-note">Cadastre cada ferramenta com o custo mensal e marque em quais planos ela está inclusa. O custo é multiplicado automaticamente pela quantidade do cliente.</p>
+            <p class="card-note">Informe o custo mensal da ferramenta <b>em cada plano</b> (pode ser uma versão diferente por plano). Deixe <b>em branco</b> quando o plano não inclui a ferramenta. O custo é multiplicado pela quantidade do cliente.</p>
             <table class="stack-table">
-              <thead><tr><th>Ferramenta</th><th>Cobra por</th><th>R$/un.</th><th title="Essential">E</th><th title="Pro">P</th><th title="Elite">El</th><th></th></tr></thead>
+              <colgroup><col style="width:104px"><col><col><col><col style="width:38px"></colgroup>
+              <thead><tr><th>Cobrado por</th><th style="color:var(--tier-1)" title="Custo por unidade no Essential">Essential</th><th style="color:var(--tier-2)" title="Custo por unidade no Pro">Pro</th><th style="color:var(--tier-3)" title="Custo por unidade no Elite">Elite</th><th></th></tr></thead>
               <tbody id="stack_body"></tbody>
             </table>
             <div class="btn-row"><button class="btn btn-ghost" id="btn_add_tool">+ Adicionar ferramenta</button></div>
@@ -658,24 +666,25 @@
   const UNITS = { endpoint: 'Endpoint', usuario: 'Usuário', servidor: 'Servidor', fixo: 'Fixo/mês' };
 
   const DEFAULT_STACK = [
-    { name: 'ESET Endpoint (antivírus)', unit: 'endpoint', cost: 15, tiers: [true, true, true] },
-    { name: 'RMM / monitoramento', unit: 'endpoint', cost: 5, tiers: [true, true, true] },
-    { name: 'Monitoramento de servidor', unit: 'servidor', cost: 30, tiers: [true, true, true] },
-    { name: 'Backup em nuvem (servidor)', unit: 'servidor', cost: 50, tiers: [false, true, true] },
-    { name: 'Backup Microsoft 365', unit: 'usuario', cost: 8, tiers: [false, false, true] },
-    { name: 'Chamados / documentação', unit: 'fixo', cost: 25, tiers: [true, true, true] }
+    // costs = custo por unidade em [Essential, Pro, Elite]; null = não incluso no plano
+    { name: 'ESET (antivírus)', unit: 'endpoint', costs: [20, 25, 30] },
+    { name: 'RMM / monitoramento', unit: 'endpoint', costs: [5, 5, 5] },
+    { name: 'Monitoramento de servidor', unit: 'servidor', costs: [30, 30, 30] },
+    { name: 'Backup em nuvem (servidor)', unit: 'servidor', costs: [null, 50, 50] },
+    { name: 'Backup Microsoft 365', unit: 'usuario', costs: [null, null, 8] },
+    { name: 'Chamados / documentação', unit: 'fixo', costs: [25, 25, 25] }
   ];
 
   let stack = [];
 
   function renderStack() {
-    $('stack_body').innerHTML = stack.map((s, i) => `<tr>
-      <td><input type="text" data-s="${i}" data-k="name" value="${esc(s.name)}"></td>
+    $('stack_body').innerHTML = stack.map((s, i) => `<tr class="st-name">
+      <td colspan="5"><input type="text" data-s="${i}" data-k="name" value="${esc(s.name)}" title="Nome da ferramenta"></td>
+    </tr><tr class="st-vals">
       <td><select data-s="${i}" data-k="unit">${Object.entries(UNITS).map(([k, l]) => `<option value="${k}" ${k === s.unit ? 'selected' : ''}>${l}</option>`).join('')}</select></td>
-      <td><input type="number" data-s="${i}" data-k="cost" value="${esc(s.cost)}" step="0.01" min="0"></td>
-      ${[0, 1, 2].map(t => `<td class="c"><input type="checkbox" data-s="${i}" data-t="${t}" ${s.tiers[t] ? 'checked' : ''}></td>`).join('')}
+      ${[0, 1, 2].map(t => `<td class="c"><input type="number" data-s="${i}" data-t="${t}" value="${s.costs[t] == null ? '' : esc(s.costs[t])}" placeholder="—" step="0.01" min="0" title="Em branco = não incluso"></td>`).join('')}
       <td class="c"><button class="btn-x" data-sdel="${i}" title="Remover">×</button></td>
-    </tr>`).join('') || `<tr><td colspan="7" style="color:var(--text-muted);padding:10px 3px">Nenhuma ferramenta cadastrada.</td></tr>`;
+    </tr>`).join('') || `<tr><td colspan="5" style="color:var(--text-muted);padding:10px 3px">Nenhuma ferramenta cadastrada.</td></tr>`;
   }
 
   function hourCostHelper() {
@@ -709,8 +718,8 @@
       const g = k => num(t.id + '_' + k);
 
       // 1) Ferramentas inclusas neste plano
-      const tools = stack.filter(s => s.tiers && s.tiers[ti]);
-      const stackCost = tools.reduce((a, s) => a + qtyFor(s.unit) * (+s.cost || 0), 0);
+      const tools = stack.filter(s => s.costs[ti] != null);
+      const stackCost = tools.reduce((a, s) => a + qtyFor(s.unit) * (+s.costs[ti] || 0), 0);
 
       // 2) Esforço técnico — cresce com o tamanho do cliente
       const franquia = Math.ceil(Math.max(users * g('hu'), g('hmin')));   // horas prometidas ao cliente
@@ -1015,7 +1024,7 @@
       if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
     });
     if (Array.isArray(data.items)) items = data.items;
-    if (Array.isArray(data.stack)) stack = data.stack;
+    if (Array.isArray(data.stack) && data.stack.every(x => Array.isArray(x.costs))) stack = data.stack;
   }
 
   function save() {
@@ -1078,16 +1087,14 @@
   $('stack_body').addEventListener('input', e => {
     const el = e.target, s = stack[+el.dataset.s];
     if (!s) return;
-    if (el.dataset.t != null) s.tiers[+el.dataset.t] = el.checked;
-    else if (el.dataset.k === 'cost') s.cost = el.value === '' ? 0 : parseFloat(el.value);
+    if (el.dataset.t != null) s.costs[+el.dataset.t] = el.value === '' ? null : parseFloat(el.value);
     else if (el.dataset.k) s[el.dataset.k] = el.value;
     recalc();
   });
   $('stack_body').addEventListener('change', e => {
     const el = e.target, s = stack[+el.dataset.s];
     if (!s) return;
-    if (el.dataset.t != null) s.tiers[+el.dataset.t] = el.checked;
-    else if (el.dataset.k === 'unit') s.unit = el.value;
+    if (el.dataset.k === 'unit') s.unit = el.value;
     recalc();
   });
   $('stack_body').addEventListener('click', e => {
@@ -1098,7 +1105,7 @@
     recalc();
   });
   $('btn_add_tool').addEventListener('click', () => {
-    stack.push({ name: 'Nova ferramenta', unit: 'endpoint', cost: 0, tiers: [true, true, true] });
+    stack.push({ name: 'Nova ferramenta', unit: 'endpoint', costs: [0, 0, 0] });
     renderStack();
     recalc();
   });

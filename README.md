@@ -13,4 +13,10 @@ Tudo que é digitado fica salvo no navegador. Use *Exportar/Importar backup* par
 ## Fórmulas
 - Margem alvo: `Preço = Custo ÷ (1 − imposto − comissão − taxas − margem)`
 - Lucro sobre o custo: `Preço = Custo × (1 + lucro) ÷ (1 − imposto − comissão − taxas)`
-- Custo do plano = licenças + (horas × maturidade × custo da hora × fator SLA) + visitas × (km × custo km + tempo de trajeto × custo da hora) + rateio.
+
+### Planos MSP
+1. **Franquia prometida** = maior entre (usuários × h/usuário) e a franquia mínima do plano.
+2. **Horas de trabalho previstas** = franquia × maturidade (reativo) + (endpoints × h/endpoint + servidores × h/servidor) × maturidade (proativo) + horas de gestão/vCIO.
+3. **Custo** = ferramentas inclusas no plano + reativo × hora × fator SLA + (proativo + gestão) × hora + visitas × (km × custo km + trajeto × hora) + rateio.
+4. **Preço** = custo ÷ (1 − deduções − margem alvo), respeitando a mensalidade mínima; na cobrança por usuário, o valor por usuário é arredondado.
+5. Indicadores: desconto máximo até a margem mínima, margem se o cliente usar +50% de horas reativas, lucro anual e alerta se a diferença entre planos for pequena.

@@ -227,7 +227,8 @@
 
   <div class="client-bar">
     <label for="c_nome">Cliente / Prospect</label>
-    <input type="text" id="c_nome" value="Empresa Exemplo">
+    <input type="text" id="c_nome" value="" placeholder="Nome da empresa">
+    <button class="btn btn-ghost" id="btn_novo" style="padding:8px 14px">Novo cliente</button>
   </div>
 
   <nav class="main-tabs">
@@ -252,23 +253,23 @@
             <div class="card-title"><span class="dot"></span> Ambiente do Cliente</div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Usuários</span><span class="label-desc">Colaboradores que usam TI</span></div>
-              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_users" value="10" min="0"></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_users" value="" placeholder="0" min="0"></div>
             </div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Endpoints</span><span class="label-desc">Computadores / notebooks</span></div>
-              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_endpoints" value="10" min="0"></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_endpoints" value="" placeholder="0" min="0"></div>
             </div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Servidores</span><span class="label-desc">Físicos ou VMs</span></div>
-              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_servers" value="1" min="0"></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_servers" value="" placeholder="0" min="0"></div>
             </div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Links de internet</span></div>
-              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_links" value="2" min="0"></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_links" value="" placeholder="0" min="0"></div>
             </div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Roteador / firewall / switch</span><span class="label-desc">Equipamentos de rede gerenciados</span></div>
-              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_rede" value="1" min="0"></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_rede" value="" placeholder="0" min="0"></div>
             </div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Complexidade do ambiente</span><span class="label-desc">Ajusta as horas previstas e o preço da tabela (−10% / 0 / +20%)</span></div>
@@ -331,7 +332,7 @@
         <div id="tp-tiers" class="tab-content">
           <div class="card">
             <div class="card-title"><span class="dot"></span> Configuração dos 3 planos</div>
-            <p class="card-note"><b>Tabela de preços</b> é o que o cliente paga (modelo híbrido usado pelos MSPs: taxa base + usuário + servidor + rede). O <b>custo</b> abaixo serve de piso de segurança: se o preço ficar abaixo da margem mínima, o plano fica vermelho.</p>
+            <p class="card-note"><b>Tabela de preços</b> é o que o cliente paga, em 3 camadas: <b>cobertura</b> do ambiente (usuário, servidor, rede) + <b>valor agregado</b> (% de consultoria e projetos) respeitando a <b>mensalidade mínima</b>. O <b>custo</b> abaixo serve de piso de segurança: se o preço ficar abaixo da margem mínima, o plano fica vermelho.</p>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Como calcular o preço</span></div>
               <div class="input-field">
@@ -356,28 +357,36 @@
               <div class="th" style="color:var(--tier-2)">Professional</div>
               <div class="th" style="color:var(--tier-3)">Enterprise</div>
 
-              <div class="tg-sec">Tabela de preços (o que o cliente paga)</div>
-              <div class="rl">Taxa base do contrato<small>gestão, ferramentas, consultoria</small></div>
-              <input type="number" id="t1_pbase" value="150" step="10" min="0"><input type="number" id="t2_pbase" value="245" step="10" min="0"><input type="number" id="t3_pbase" value="500" step="10" min="0">
-
+              <div class="tg-sec">1 · Cobertura do ambiente (cresce com o cliente)</div>
               <div class="rl">Por usuário<small>inclui 1 computador</small></div>
-              <input type="number" id="t1_puser" value="60" step="5" min="0"><input type="number" id="t2_puser" value="110" step="5" min="0"><input type="number" id="t3_puser" value="230" step="5" min="0">
+              <input type="number" id="t1_puser" value="75" step="5" min="0"><input type="number" id="t2_puser" value="110" step="5" min="0"><input type="number" id="t3_puser" value="200" step="5" min="0">
 
               <div class="rl">Por computador extra<small>além de 1 por usuário</small></div>
               <input type="number" id="t1_pdev" value="30" step="5" min="0"><input type="number" id="t2_pdev" value="50" step="5" min="0"><input type="number" id="t3_pdev" value="80" step="5" min="0">
 
               <div class="rl">Por servidor</div>
-              <input type="number" id="t1_psrv" value="100" step="10" min="0"><input type="number" id="t2_psrv" value="200" step="10" min="0"><input type="number" id="t3_psrv" value="500" step="10" min="0">
+              <input type="number" id="t1_psrv" value="120" step="10" min="0"><input type="number" id="t2_psrv" value="160" step="10" min="0"><input type="number" id="t3_psrv" value="250" step="10" min="0">
 
               <div class="rl">Por ativo de rede<small>link, roteador, firewall</small></div>
-              <input type="number" id="t1_prede" value="15" step="5" min="0"><input type="number" id="t2_prede" value="35" step="5" min="0"><input type="number" id="t3_prede" value="100" step="5" min="0">
+              <input type="number" id="t1_prede" value="10" step="5" min="0"><input type="number" id="t2_prede" value="20" step="5" min="0"><input type="number" id="t3_prede" value="50" step="5" min="0">
+
+              <div class="tg-sec">2 · Valor agregado (% sobre a cobertura)</div>
+              <div class="rl">Consultoria e gestão de TI<small>planejamento, fornecedores, reuniões</small></div>
+              <input type="number" id="t1_pcons" value="0" step="5" min="0"><input type="number" id="t2_pcons" value="15" step="5" min="0"><input type="number" id="t3_pcons" value="30" step="5" min="0">
+
+              <div class="rl">Apoio a projetos<small>migrações, implantações; vira reserva de horas</small></div>
+              <input type="number" id="t1_pproj" value="0" step="5" min="0"><input type="number" id="t2_pproj" value="10" step="5" min="0"><input type="number" id="t3_pproj" value="20" step="5" min="0">
+
+              <div class="tg-sec">3 · Mensalidade mínima</div>
+              <div class="rl">Mínimo do plano (R$)<small>protege clientes muito pequenos</small></div>
+              <input type="number" id="t1_pmin" value="120" step="10" min="0"><input type="number" id="t2_pmin" value="550" step="10" min="0"><input type="number" id="t3_pmin" value="1300" step="10" min="0">
 
               <div class="tg-sec">Suporte reativo (chamados)</div>
               <div class="rl">Horas por usuário/mês<small>define a franquia prometida</small></div>
               <input type="number" id="t1_hu" value="0.3" step="0.05" min="0"><input type="number" id="t2_hu" value="0.4" step="0.05" min="0"><input type="number" id="t3_hu" value="0.5" step="0.05" min="0">
 
               <div class="rl">Franquia mínima (h)<small>para clientes pequenos</small></div>
-              <input type="number" id="t1_hmin" value="1" min="0"><input type="number" id="t2_hmin" value="2" min="0"><input type="number" id="t3_hmin" value="3" min="0">
+              <input type="number" id="t1_hmin" value="0" min="0" step="0.5"><input type="number" id="t2_hmin" value="1" min="0" step="0.5"><input type="number" id="t3_hmin" value="2" min="0" step="0.5">
 
               <div class="rl">Fator SLA<small>× custo da hora reativa</small></div>
               <input type="number" id="t1_sla" value="1.00" step="0.05"><input type="number" id="t2_sla" value="1.15" step="0.05"><input type="number" id="t3_sla" value="1.35" step="0.05">
@@ -833,7 +842,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     { name: 'Monitoramento de servidor', unit: 'servidor', costs: [30, 30, 30] },
     { name: 'Backup em nuvem (servidor)', unit: 'servidor', costs: [null, 50, 50] },
     { name: 'Backup Microsoft 365', unit: 'usuario', costs: [null, null, 8] },
-    { name: 'Chamados / documentação', unit: 'fixo', costs: [25, 25, 25] }
+    { name: 'Chamados / documentação', unit: 'endpoint', costs: [3, 3, 3] }
   ];
 
   let stack = [];
@@ -959,7 +968,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const stackCost = tools.reduce((a, s) => a + qtyFor(s.unit) * (+s.costs[ti] || 0), 0);
 
       // 2) Esforço técnico — cresce com o tamanho do cliente
-      const franquia = Math.ceil(Math.max(users * g('hu'), g('hmin')));   // horas prometidas ao cliente
+      const franquia = Math.ceil(Math.max(users * g('hu'), g('hmin')) * 2) / 2;   // horas prometidas ao cliente (meias horas)
       const sla = g('sla') || 1;
       const hReat = franquia * mat;                                       // horas reativas previstas (com retrabalho)
       const hPro = (endpoints * g('hep') + servers * g('hsv') + rede * g('hrd')) * mat;   // manutenção proativa
@@ -975,7 +984,12 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const boleto = num('g_boleto');
       // Reserva de risco: SLA curto exige alguém disponível e absorve picos de chamados
       const riskV = (labor + travel) * g('risk') / 100;
-      const cost = stackCost + labor + travel + boleto + riskV;
+
+      // Tabela em 3 camadas: cobertura + valor agregado (% consultoria e projetos) → mínimo do plano
+      const cobertura = users * g('puser') + Math.max(0, endpoints - users) * g('pdev') + servers * g('psrv') + rede * g('prede');
+      const consV = tableMode ? cobertura * g('pcons') / 100 : 0;
+      const projV = tableMode ? cobertura * g('pproj') / 100 : 0;   // reserva para horas de projeto: entra como custo
+      const cost = stackCost + labor + travel + boleto + riskV + projV;
 
       // 4) Preço: o maior entre custo + margem e o preço de mercado por usuário → arredondamento
       const mg = g('mg');
@@ -987,11 +1001,12 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const piso = g('ppumin') * users;
       const pisoApplied = !tableMode && piso > raw;
       const target = Math.max(raw, piso);
-      let price, ppu, tabela = 0;
+      let price, ppu, tabela = 0, minApplied = false;
       if (tableMode) {
-        // Modelo híbrido: taxa base + usuários + computadores extras + servidores + rede
-        tabela = g('pbase') + users * g('puser') + Math.max(0, endpoints - users) * g('pdev') + servers * g('psrv') + rede * g('prede');
-        price = roundUp(tabela * (1 + adjComplex) * (1 + adjClient), step);
+        tabela = cobertura + consV + projV;
+        const ajustado = tabela * (1 + adjComplex) * (1 + adjClient);
+        minApplied = g('pmin') > ajustado;
+        price = roundUp(Math.max(ajustado, g('pmin')), step);
         ppu = users > 0 ? price / users : 0;
       } else if (perUserBilling) {
         ppu = roundUp(target / users, step >= 10 ? 5 : step);
@@ -1024,7 +1039,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const h1 = v => v.toFixed(1).replace('.', ',');
 
       state.plans.push({ ...t, price, ppu, perUserBilling, cost, stack: stackCost, tools, labor, laborReat, laborPro, laborGest,
-        travel, boleto, tabela, suggested: roundUp(raw, step), franquia, hReat, hPro, hGest, hWork, vis, extraHour, setup, setupCost, setupHrs, maxDisc, stressMargin, pisoApplied, riskV, slaTxt: $(t.id + '_slatxt').value, netAfterFixed, netPct, ...b });
+        travel, boleto, tabela, consV, projV, minApplied, suggested: roundUp(raw, step), franquia, hReat, hPro, hGest, hWork, vis, extraHour, setup, setupCost, setupHrs, maxDisc, stressMargin, pisoApplied, riskV, slaTxt: $(t.id + '_slatxt').value, netAfterFixed, netPct, ...b });
 
       const stressCls = stressMargin < 0 ? 'var(--danger)' : stressMargin < minMargin ? 'var(--warning)' : 'var(--success)';
 
@@ -1035,20 +1050,21 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             <div>
               <div class="plan-name" style="color:${t.color}">Wave ${t.name} ${t.rec ? '★' : ''}</div>
               <div class="plan-desc">${t.sub}</div>
-              <div class="plan-desc" style="margin-top:6px">${franquia}h de suporte/mês · ${visitLabel(vis)} · ${tools.length} ferramenta(s)</div>
+              <div class="plan-desc" style="margin-top:6px">${String(franquia).replace('.', ',')}h de suporte/mês · ${visitLabel(vis)} · ${tools.length} ferramenta(s)</div>
             </div>
             <div class="plan-price-box">
               <div class="plan-price">${fmt(price)}<small> /mês</small></div>
               ${tableMode
-                ? `<div class="plan-desc">Tabela ${fmt(tabela)}${adjComplex ? ` · complexidade ${adjComplex > 0 ? '+' : ''}${pct(adjComplex * 100, 0)}` : ''}${adjClient ? ` · ajuste ${adjClient > 0 ? '+' : ''}${pct(adjClient * 100, 0)}` : ''}</div>`
+                ? `<div class="plan-desc">Cobertura ${fmt(cobertura)}${consV ? ` + consultoria ${fmt(consV)}` : ''}${projV ? ` + projetos ${fmt(projV)}` : ''}${adjComplex ? ` · complexidade ${adjComplex > 0 ? '+' : ''}${pct(adjComplex * 100, 0)}` : ''}${adjClient ? ` · ajuste ${adjClient > 0 ? '+' : ''}${pct(adjClient * 100, 0)}` : ''}</div>`
                 : perUserBilling ? `<div class="plan-desc">${fmt(ppu)} por usuário × ${users}</div>` : ''}
               <div class="badge ${cls}">${label} · lucro ${fmt(b.profit)} (${pct(b.margin, 0)})</div>
+              ${minApplied ? `<div><span class="badge badge-warn" title="A tabela deu menos que a mensalidade mínima do plano">Mensalidade mínima aplicada</span></div>` : ''}
               ${pisoApplied ? `<div><span class="badge badge-warn" title="O cálculo pelo custo deu abaixo do seu preço de mercado; foi usado o preço mínimo por usuário">Preço de mercado aplicado</span></div>` : ''}
             </div>
           </div>
           <div class="comp"><div class="comp-bar">${compBar([
             { l: 'Ferramentas', v: stackCost, c: 'var(--seg-lic)' },
-            { l: `Mão de obra (reativo ${fmt(laborReat)} · proativo ${fmt(laborPro)} · gestão ${fmt(laborGest)} · reserva SLA ${fmt(riskV)})`, v: labor + riskV, c: 'var(--seg-mo)' },
+            { l: `Mão de obra (reativo ${fmt(laborReat)} · proativo ${fmt(laborPro)} · gestão ${fmt(laborGest)} · reserva SLA ${fmt(riskV)} · reserva projetos ${fmt(projV)})`, v: labor + riskV + projV, c: 'var(--seg-mo)' },
             { l: 'Deslocamento', v: travel, c: 'var(--seg-desl)' },
             { l: 'Impostos, comissão e taxas (inclui boleto)', v: b.tax + b.fees + boleto, c: 'var(--seg-imp)' },
             { l: 'Lucro líquido', v: Math.max(b.profit, 0), c: 'var(--seg-lucro)' }
@@ -1077,6 +1093,12 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       else if (c.price / a.price < 1.25) problems.push(`${c.name} custa só ${pct((c.price / a.price - 1) * 100, 0)} a mais que o ${a.name} — diferença pequena demais para o cliente enxergar valor no upgrade.`);
     }
 
+    // Sem ambiente preenchido, não há o que precificar
+    if (users + endpoints + servers + rede === 0) {
+      html = '<div class="card" style="text-align:center;color:var(--text-muted)">Preencha o <b>ambiente do cliente</b> (usuários, computadores, servidores e rede) para ver os preços.</div>';
+      state.plans = [];
+      problems.length = 0;
+    }
     $('render_plans').innerHTML = html;
     const al = $('plan_alert');
     al.innerHTML = problems.map(esc).join('<br>');
@@ -1213,10 +1235,12 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         L.push('');
         L.push(`>> Wave ${p.name.toUpperCase()}${p.rec && chosen.length > 1 ? ' (recomendado)' : ''} — ${p.sub}`);
         L.push(`   Investimento: ${fmt(p.price)} / mês`);
-        L.push(`   Inclui: ${p.franquia}h de suporte técnico por mês (remoto ou presencial)`);
+        L.push(`   Inclui: ${String(p.franquia).replace('.', ',')}h de suporte técnico por mês (remoto ou presencial)`);
         if (p.slaTxt) L.push(`   Tempo de resposta: ${p.slaTxt}`);
         L.push(`   Visitas: ${p.vis ? visitLabel(p.vis) + '; visitas extras com taxa de deslocamento de ' + fmt(state.visitFee) : 'sob demanda, com taxa de deslocamento de ' + fmt(state.visitFee)}`);
         if (p.hPro > 0) L.push('   Manutenção preventiva: atualizações, monitoramento e revisões sem consumir a franquia');
+        if (p.consV > 0) L.push('   Consultoria e gestão de TI: planejamento, fornecedores e alinhamento da TI ao negócio');
+        if (p.projV > 0) L.push('   Apoio a projetos: migrações e implantações dentro do escopo do plano');
         if (p.hGest > 0) L.push(`   Gestão de TI: ${String(p.hGest).replace('.', ',')}h/mês de reuniões, relatórios e planejamento`);
         if (p.tools.length) L.push(`   Ferramentas: ${p.tools.map(t => t.name).join(', ')}`);
         if ($('pr_extra').checked) L.push(`   Hora excedente: ${fmt(p.extraHour)}`);
@@ -1274,7 +1298,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     .filter(el => !['pr_texto', 'file_restore'].includes(el.id));
 
   function snapshot() {
-    const data = { fields: {}, items, stack, stackUpdated };
+    const data = { fields: {}, items, stack, stackUpdated, envCleared: true };
     persistIds().forEach(el => { data.fields[el.id] = el.type === 'checkbox' ? el.checked : el.value; });
     return data;
   }
@@ -1284,12 +1308,18 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     k_comb: ['6.40', '4.99'], g_km: ['1.00', '0.85'], h_horas_socio: ['80', '143'], g_hora_avulsa: ['90', '75'],
     t1_hxd: ['10', '5'], t2_hxd: ['15', '10'], t3_hxd: ['20', '15'],
     t2_vis: ['0.5', '1'], t3_vis: [['1', '2'], '5'],
-    t2_pbase: ['250', '245'],
+    t1_puser: ['60', '75'], t3_puser: ['230', '200'],
+    t1_psrv: ['100', '120'], t2_psrv: ['200', '160'], t3_psrv: ['500', '250'],
+    t1_prede: ['15', '10'], t2_prede: ['35', '20'], t3_prede: ['100', '50'],
+    t1_hmin: ['1', '0'], t2_hmin: ['2', '1'], t3_hmin: ['3', '2'],
     t1_slatxt: ['8h úteis', 'até 2 horas'], t2_slatxt: ['4h úteis', 'até 1 hora'], t3_slatxt: ['30 min', '30 min, 24/7']
   };
 
+  const ENV_FIELDS = ['c_nome', 'c_users', 'c_endpoints', 'c_servers', 'c_links', 'c_rede', 'c_ajuste'];
+
   function apply(data) {
     if (!data) return;
+    if (!data.envCleared && data.fields) ENV_FIELDS.forEach(id => { delete data.fields[id]; });
     Object.entries(DEFAULT_UPGRADES).forEach(([id, [oldV, newV]]) => {
       const olds = Array.isArray(oldV) ? oldV : [oldV];
       if (data.fields && olds.includes(data.fields[id])) data.fields[id] = newV;
@@ -1300,7 +1330,13 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
     });
     if (Array.isArray(data.items)) items = data.items;
-    if (Array.isArray(data.stack) && data.stack.every(x => Array.isArray(x.costs))) stack = data.stack;
+    if (Array.isArray(data.stack) && data.stack.every(x => Array.isArray(x.costs))) {
+      stack = data.stack;
+      // Chamados/documentação era custo fixo por contrato (pesava demais em cliente pequeno): vira custo por computador
+      stack.forEach(t => {
+        if (t.name === 'Chamados / documentação' && t.unit === 'fixo' && t.costs.every(c => c === 25)) { t.unit = 'endpoint'; t.costs = [3, 3, 3]; }
+      });
+    }
     stackUpdated = data.stackUpdated || null;
   }
 
@@ -1381,6 +1417,15 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     recalc();
   });
   ['l_km', 'l_min', 'l_pedagio'].forEach(id => $(id).addEventListener('input', () => { $('l_regiao').value = 'custom'; }));
+
+  $('btn_novo').addEventListener('click', () => {
+    if (!confirm('Limpar o ambiente e o nome do cliente para começar uma nova proposta?')) return;
+    ENV_FIELDS.forEach(id => { $(id).value = id === 'c_ajuste' ? '0' : ''; });
+    $('c_maturidade').value = '1.25';
+    $('l_regiao').value = 'local'; $('l_km').value = 0; $('l_min').value = 20; $('l_pedagio').value = 0;
+    recalc();
+    $('c_nome').focus();
+  });
 
   // Stack de ferramentas
   $('stack_body').addEventListener('input', e => {

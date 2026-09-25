@@ -37,7 +37,14 @@ Tudo que é digitado fica salvo no navegador. Use *Exportar/Importar backup* par
 - Na proposta, a opção de **ancoragem** apresenta Enterprise → Pro → Essential, para o Pro parecer o melhor custo-benefício.
 
 ### Tabela de preços (modo padrão)
-Modelo híbrido usado por MSPs: **taxa base + usuários (com 1 computador) + computadores extras + servidores + ativos de rede**, por plano. Depois entram a complexidade do ambiente (−10% / 0 / +20%) e o **ajuste comercial do cliente** (%). O custo calculado vira o piso: cada plano mostra o **preço mínimo seguro** (margem mínima), o preço pela margem alvo e o desconto máximo. O modo "custo + margem" continua disponível.
+O preço de cada plano tem 3 camadas:
+1. **Cobertura do ambiente**: por usuário (com 1 computador), computador extra, servidor e item de rede (links, roteador, firewall).
+2. **Valor agregado**: % sobre a cobertura para **consultoria e gestão de TI** e **apoio a projetos** (Professional e Enterprise). A parte de projetos entra no custo como reserva de horas.
+3. **Mensalidade mínima** do plano, para clientes muito pequenos.
+
+Depois entram a complexidade do ambiente (−10% / 0 / +20%) e o **ajuste comercial do cliente** (%). O custo calculado vira o piso: cada plano mostra o **preço mínimo seguro**, o preço pela margem alvo e o desconto máximo. O modo "custo + margem" continua disponível.
+
+O ambiente do cliente começa em branco; o botão **Novo cliente** limpa tudo para a próxima proposta.
 
 ### Proposta em PowerPoint
 Na aba **Proposta**, carregue o modelo oficial com marcadores (`Modelo_Proposta_Techwave.pptx`) uma vez; ele fica salvo no navegador. O botão **Gerar PowerPoint** substitui `{{CLIENTE}}`, `{{DATA}}`, `{{USUARIOS}}`, `{{COMPUTADORES}}`, `{{LINKS}}`, `{{SERVIDORES}}`, `{{ROTEADORES}}`, `{{P1}}`/`{{P2}}`/`{{P3}}` (preços), `{{VIS3}}` (visitas do Enterprise) e `{{ECO_MES}}`/`{{ECO_ANO}}` (economia vs. analista interno). Os marcadores podem ser movidos no PowerPoint, desde que cada um fique inteiro, sem formatação diferente no meio.

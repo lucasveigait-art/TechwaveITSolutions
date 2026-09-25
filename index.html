@@ -365,7 +365,7 @@
               <input type="number" id="t1_piso" value="0" step="50" min="0"><input type="number" id="t2_piso" value="0" step="50" min="0"><input type="number" id="t3_piso" value="0" step="50" min="0">
 
               <div class="rl">Desconto na hora excedente<small>% sobre a hora avulsa</small></div>
-              <input type="number" id="t1_hxd" value="10" step="5" min="0" max="100"><input type="number" id="t2_hxd" value="15" step="5" min="0" max="100"><input type="number" id="t3_hxd" value="20" step="5" min="0" max="100">
+              <input type="number" id="t1_hxd" value="5" step="5" min="0" max="100"><input type="number" id="t2_hxd" value="10" step="5" min="0" max="100"><input type="number" id="t3_hxd" value="15" step="5" min="0" max="100">
 
               <div class="tg-sec">Implantação (taxa única)</div>
               <div class="rl">Horas base<small>levantamento, documentação</small></div>
@@ -591,8 +591,8 @@
           <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_prolabore" value="1630" step="10"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Você: horas técnicas/mês</span><span class="label-desc">Sem contar vendas e administrativo</span></div>
-          <div class="input-field"><div class="input-prefix">h</div><input type="number" id="h_horas_socio" value="80" step="5"></div>
+          <div class="input-label"><span class="label-title">Você: horas técnicas/mês</span><span class="label-desc">~6,5h/dia × 22 dias úteis</span></div>
+          <div class="input-field"><div class="input-prefix">h</div><input type="number" id="h_horas_socio" value="143" step="5"></div>
         </div>
         <div class="input-group">
           <div class="input-label"><span class="label-title">Outros custos da equipe</span><span class="label-desc">Celular, notebook, VT, VR</span></div>
@@ -609,7 +609,7 @@
         </div>
         <div class="input-group">
           <div class="input-label"><span class="label-title">Custo do km rodado</span><span class="label-desc">Use a calculadora abaixo</span></div>
-          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_km" value="1.00" step="0.05"></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_km" value="0.85" step="0.05"></div>
         </div>
         <div class="tg-sec" style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--brand);margin:14px 0 8px">Calculadora do km</div>
         <div class="input-group">
@@ -617,8 +617,8 @@
           <div class="input-field"><div class="input-prefix">km/l</div><input type="number" id="k_consumo" value="10" step="0.5"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Preço do combustível</span></div>
-          <div class="input-field"><div class="input-prefix">R$/l</div><input type="number" id="k_comb" value="6.40" step="0.05"></div>
+          <div class="input-label"><span class="label-title">Preço do combustível</span><span class="label-desc">Álcool</span></div>
+          <div class="input-field"><div class="input-prefix">R$/l</div><input type="number" id="k_comb" value="4.99" step="0.05"></div>
         </div>
         <div class="input-group">
           <div class="input-label"><span class="label-title">Desgaste por km</span><span class="label-desc">Pneu, óleo, revisão, depreciação (≈ R$ 0,30–0,50)</span></div>
@@ -635,7 +635,7 @@
         </div>
         <div class="input-group">
           <div class="input-label"><span class="label-title">Hora avulsa básica</span><span class="label-desc">Suporte a usuário, formatação, impressora</span></div>
-          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora_avulsa" value="90" step="5"></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora_avulsa" value="75" step="5"></div>
         </div>
         <div class="input-group">
           <div class="input-label"><span class="label-title">Hora avulsa especializada</span><span class="label-desc">Servidor, rede, firewall, nuvem, projeto</span></div>
@@ -1183,8 +1183,17 @@
     return data;
   }
 
+  // Padrões que mudaram: [valor antigo, valor novo]. Só troca se o salvo ainda for o antigo.
+  const DEFAULT_UPGRADES = {
+    k_comb: ['6.40', '4.99'], g_km: ['1.00', '0.85'], h_horas_socio: ['80', '143'], g_hora_avulsa: ['90', '75'],
+    t1_hxd: ['10', '5'], t2_hxd: ['15', '10'], t3_hxd: ['20', '15']
+  };
+
   function apply(data) {
     if (!data) return;
+    Object.entries(DEFAULT_UPGRADES).forEach(([id, [oldV, newV]]) => {
+      if (data.fields && data.fields[id] === oldV) data.fields[id] = newV;
+    });
     Object.entries(data.fields || {}).forEach(([id, v]) => {
       const el = $(id);
       if (!el) return;

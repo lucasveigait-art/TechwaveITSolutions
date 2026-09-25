@@ -262,12 +262,12 @@
               <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_servers" value="0" min="0"></div>
             </div>
             <div class="input-group">
-              <div class="input-label"><span class="label-title">Maturidade do ambiente</span><span class="label-desc">Multiplica as horas que você espera gastar</span></div>
+              <div class="input-label"><span class="label-title">Complexidade do ambiente</span><span class="label-desc">Multiplica as horas que você espera gastar</span></div>
               <div class="input-field">
                 <select id="c_maturidade">
-                  <option value="1.0">Organizado (1,0×)</option>
+                  <option value="1.0">Simples / organizado (1,0×)</option>
                   <option value="1.25" selected>Padrão (1,25×)</option>
-                  <option value="1.6">Caótico (1,6×)</option>
+                  <option value="1.6">Complexo / desorganizado (1,6×)</option>
                 </select>
               </div>
             </div>
@@ -276,12 +276,27 @@
           <div class="card">
             <div class="card-title"><span class="dot" style="background:var(--seg-desl)"></span> Logística até o cliente</div>
             <div class="input-group">
+              <div class="input-label"><span class="label-title">Região do cliente</span><span class="label-desc">Preenche km, tempo e pedágio (ajuste se precisar)</span></div>
+              <div class="input-field">
+                <select id="l_regiao">
+                  <option value="local" selected>Saquarema (local)</option>
+                  <option value="lagos">Região dos Lagos</option>
+                  <option value="rio">Rio / Grande Rio</option>
+                  <option value="custom">Personalizado</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
               <div class="input-label"><span class="label-title">Distância ida + volta</span></div>
-              <div class="input-field"><div class="input-prefix">KM</div><input type="number" id="l_km" value="30" min="0"></div>
+              <div class="input-field"><div class="input-prefix">KM</div><input type="number" id="l_km" value="0" min="0"></div>
             </div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Tempo de trajeto ida + volta</span><span class="label-desc">Hora do técnico no trânsito também é custo</span></div>
-              <div class="input-field"><div class="input-prefix">min</div><input type="number" id="l_min" value="40" min="0"></div>
+              <div class="input-field"><div class="input-prefix">min</div><input type="number" id="l_min" value="20" min="0"></div>
+            </div>
+            <div class="input-group">
+              <div class="input-label"><span class="label-title">Pedágio + estacionamento</span><span class="label-desc">Por visita, ida e volta</span></div>
+              <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="l_pedagio" value="0" min="0" step="1"></div>
             </div>
           </div>
         </div>
@@ -292,7 +307,7 @@
             <p class="card-note">Informe o custo mensal da ferramenta <b>em cada plano</b> (pode ser uma versão diferente por plano). Deixe <b>em branco</b> quando o plano não inclui a ferramenta. O custo é multiplicado pela quantidade do cliente.</p>
             <table class="stack-table">
               <colgroup><col style="width:104px"><col><col><col><col style="width:38px"></colgroup>
-              <thead><tr><th>Cobrado por</th><th style="color:var(--tier-1)" title="Custo por unidade no Essential">Essential</th><th style="color:var(--tier-2)" title="Custo por unidade no Pro">Pro</th><th style="color:var(--tier-3)" title="Custo por unidade no Elite">Elite</th><th></th></tr></thead>
+              <thead><tr><th>Cobrado por</th><th style="color:var(--tier-1)" title="Custo por unidade no Essential">Essential</th><th style="color:var(--tier-2)" title="Custo por unidade no Pro">Pro</th><th style="color:var(--tier-3)" title="Custo por unidade no Enterprise">Enterprise</th><th></th></tr></thead>
               <tbody id="stack_body"></tbody>
             </table>
             <div class="btn-row"><button class="btn btn-ghost" id="btn_add_tool">+ Adicionar ferramenta</button></div>
@@ -317,20 +332,20 @@
               <div></div>
               <div class="th" style="color:var(--tier-1)">Essential</div>
               <div class="th" style="color:var(--tier-2)">Pro ★</div>
-              <div class="th" style="color:var(--tier-3)">Elite</div>
+              <div class="th" style="color:var(--tier-3)">Enterprise</div>
 
               <div class="tg-sec">Suporte reativo (chamados)</div>
               <div class="rl">Horas por usuário/mês<small>define a franquia prometida</small></div>
               <input type="number" id="t1_hu" value="0.3" step="0.05" min="0"><input type="number" id="t2_hu" value="0.4" step="0.05" min="0"><input type="number" id="t3_hu" value="0.5" step="0.05" min="0">
 
               <div class="rl">Franquia mínima (h)<small>para clientes pequenos</small></div>
-              <input type="number" id="t1_hmin" value="2" min="0"><input type="number" id="t2_hmin" value="4" min="0"><input type="number" id="t3_hmin" value="8" min="0">
+              <input type="number" id="t1_hmin" value="1" min="0"><input type="number" id="t2_hmin" value="2" min="0"><input type="number" id="t3_hmin" value="3" min="0">
 
               <div class="rl">Fator SLA<small>× custo da hora reativa</small></div>
               <input type="number" id="t1_sla" value="1.00" step="0.05"><input type="number" id="t2_sla" value="1.15" step="0.05"><input type="number" id="t3_sla" value="1.35" step="0.05">
 
-              <div class="rl">Visitas inclusas/mês</div>
-              <input type="number" id="t1_vis" value="0" min="0"><input type="number" id="t2_vis" value="1" min="0"><input type="number" id="t3_vis" value="2" min="0">
+              <div class="rl">Visitas preventivas/mês<small>0,5 = bimestral · 0,33 = trimestral</small></div>
+              <input type="number" id="t1_vis" value="0" min="0" step="0.25"><input type="number" id="t2_vis" value="0.5" min="0" step="0.25"><input type="number" id="t3_vis" value="1" min="0" step="0.25">
 
               <div class="tg-sec">Trabalho proativo (não sai da franquia)</div>
               <div class="rl">Horas por endpoint/mês<small>patches, monitoramento, revisão</small></div>
@@ -344,10 +359,13 @@
 
               <div class="tg-sec">Preço</div>
               <div class="rl">Margem líquida alvo<small>% sobre o preço</small></div>
-              <input type="number" id="t1_mg" value="30" step="1"><input type="number" id="t2_mg" value="35" step="1"><input type="number" id="t3_mg" value="40" step="1">
+              <input type="number" id="t1_mg" value="35" step="1"><input type="number" id="t2_mg" value="38" step="1"><input type="number" id="t3_mg" value="40" step="1">
 
-              <div class="rl">Mensalidade mínima (R$)<small>piso do plano</small></div>
-              <input type="number" id="t1_piso" value="400" step="50" min="0"><input type="number" id="t2_piso" value="800" step="50" min="0"><input type="number" id="t3_piso" value="1500" step="50" min="0">
+              <div class="rl">Mensalidade mínima (R$)<small>0 = sem piso</small></div>
+              <input type="number" id="t1_piso" value="0" step="50" min="0"><input type="number" id="t2_piso" value="0" step="50" min="0"><input type="number" id="t3_piso" value="0" step="50" min="0">
+
+              <div class="rl">Desconto na hora excedente<small>% sobre a hora avulsa</small></div>
+              <input type="number" id="t1_hxd" value="10" step="5" min="0" max="100"><input type="number" id="t2_hxd" value="15" step="5" min="0" max="100"><input type="number" id="t3_hxd" value="20" step="5" min="0" max="100">
 
               <div class="tg-sec">Implantação (taxa única)</div>
               <div class="rl">Horas base<small>levantamento, documentação</small></div>
@@ -364,7 +382,7 @@
         <div class="alert alert-bad" id="plan_alert"></div>
         <div class="summary-bar">
           <div><span class="stat-label">Custo da hora técnica</span><span class="stat-value" id="out_hora">R$ 0,00</span></div>
-          <div><span class="stat-label">Custo por visita</span><span class="stat-value" id="out_visita">R$ 0,00</span></div>
+          <div><span class="stat-label">Custo por visita / taxa extra</span><span class="stat-value" id="out_visita">R$ 0,00</span></div>
           <div><span class="stat-label">Descontos sobre a venda</span><span class="stat-value" id="out_deducoes">0%</span></div>
         </div>
         <div class="plans-wrapper" id="render_plans"></div>
@@ -470,7 +488,7 @@
           <div class="card-title"><span class="dot"></span> O que entra na proposta</div>
           <label class="check-row"><input type="checkbox" id="pr_t1" checked> Plano Essential</label>
           <label class="check-row"><input type="checkbox" id="pr_t2" checked> Plano Pro ★</label>
-          <label class="check-row"><input type="checkbox" id="pr_t3" checked> Plano Elite</label>
+          <label class="check-row"><input type="checkbox" id="pr_t3" checked> Plano Enterprise</label>
           <label class="check-row"><input type="checkbox" id="pr_setup" checked> Mostrar taxa de implantação</label>
           <label class="check-row"><input type="checkbox" id="pr_extra" checked> Mostrar valor da hora excedente</label>
           <label class="check-row"><input type="checkbox" id="pr_proj"> Incluir projeto / serviço pontual</label>
@@ -521,7 +539,7 @@
       <div class="card">
         <div class="card-title"><span class="dot" style="background:var(--seg-mo)"></span> Custos internos</div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Custo da sua hora técnica</span><span class="label-desc">Quanto custa 1 hora de técnico para a Techwave</span></div>
+          <div class="input-label"><span class="label-title">Custo da hora técnica usado nos preços</span><span class="label-desc">Use o custo de um técnico em tempo integral, para não reajustar contratos quando contratar</span></div>
           <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora" value="45" step="1"></div>
         </div>
         <div class="input-group">
@@ -535,23 +553,31 @@
       </div>
 
       <div class="card">
-        <div class="card-title"><span class="dot" style="background:var(--seg-mo)"></span> Descubra o custo real da sua hora</div>
-        <p class="card-note">O custo da hora não é só o salário: inclui encargos, benefícios e o fato de que o técnico não passa 100% do tempo atendendo cliente.</p>
+        <div class="card-title"><span class="dot" style="background:var(--seg-mo)"></span> Custo real da hora da sua equipe</div>
+        <p class="card-note">Some o custo de todo mundo que atende e divida pelas horas que realmente viram atendimento (ninguém fica 100% do tempo no cliente).</p>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Salário ou pró-labore</span></div>
-          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_salario" value="3000" step="100"></div>
+          <div class="input-label"><span class="label-title">Funcionário: salário</span><span class="label-desc">Meio período</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_salario" value="820" step="10"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Encargos + provisões</span><span class="label-desc">INSS, FGTS, férias, 13º (CLT ≈ 60–80%)</span></div>
-          <div class="input-field"><div class="input-prefix">%</div><input type="number" id="h_encargos" value="70" step="5"></div>
+          <div class="input-label"><span class="label-title">Funcionário: encargos + provisões</span><span class="label-desc">FGTS 8% + reserva de 13º e férias ≈ 30% no Simples</span></div>
+          <div class="input-field"><div class="input-prefix">%</div><input type="number" id="h_encargos" value="30" step="1"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Benefícios e ferramentas do técnico</span><span class="label-desc">VR, VT, plano de saúde, celular, notebook</span></div>
-          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_beneficios" value="600" step="50"></div>
+          <div class="input-label"><span class="label-title">Funcionário: horas produtivas/mês</span><span class="label-desc">~88h de meio período × 70% em atendimento</span></div>
+          <div class="input-field"><div class="input-prefix">h</div><input type="number" id="h_horas" value="60" step="5"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Horas produtivas por mês</span><span class="label-desc">~220h de jornada × 60–70% de tempo útil com cliente</span></div>
-          <div class="input-field"><div class="input-prefix">h</div><input type="number" id="h_horas" value="140" step="5"></div>
+          <div class="input-label"><span class="label-title">Você: pró-labore (parte técnica)</span><span class="label-desc">Quanto do seu ganho mensal vem do trabalho técnico</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_prolabore" value="3000" step="100"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Você: horas técnicas/mês</span><span class="label-desc">Tirando vendas, gestão e administrativo</span></div>
+          <div class="input-field"><div class="input-prefix">h</div><input type="number" id="h_horas_socio" value="80" step="5"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Outros custos da equipe</span><span class="label-desc">Celular, notebook, VT, VR</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_beneficios" value="0" step="50"></div>
         </div>
         <div class="helper-out"><span>Custo real da hora: <strong id="h_result">R$ 0,00</strong></span><button class="btn" id="btn_usar_hora" style="padding:8px 14px">Usar este valor</button></div>
       </div>
@@ -560,7 +586,15 @@
         <div class="card-title"><span class="dot" style="background:var(--seg-lucro)"></span> Regras comerciais</div>
         <div class="input-group">
           <div class="input-label"><span class="label-title">Margem mínima aceitável</span><span class="label-desc">Abaixo disso o resultado fica vermelho</span></div>
-          <div class="input-field"><div class="input-prefix">%</div><input type="number" id="g_margem_min" value="20" step="1"></div>
+          <div class="input-field"><div class="input-prefix">%</div><input type="number" id="g_margem_min" value="30" step="1"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Hora técnica avulsa</span><span class="label-desc">Cliente sem contrato. Referência de mercado MSP/RJ: R$ 120–180</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora_avulsa" value="150" step="5"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Visita extra: taxa mínima</span><span class="label-desc">Piso da taxa de deslocamento em visitas fora do plano</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_visita_min" value="80" step="10"></div>
         </div>
         <div class="input-group">
           <div class="input-label"><span class="label-title">Arredondar preços para cima</span></div>
@@ -600,7 +634,7 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'techwave_pricing_v1';
+  const STORAGE_KEY = 'techwave_pricing_v2';
   const $ = id => document.getElementById(id);
   const num = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
   const fmt = v => (isFinite(v) ? v : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -611,7 +645,7 @@
   const TIERS = [
     { id: 't1', name: 'Essential', sub: 'Monitoramento & suporte remoto', color: 'var(--tier-1)' },
     { id: 't2', name: 'Pro', sub: 'Prevenção & atendimento híbrido', color: 'var(--tier-2)', rec: true },
-    { id: 't3', name: 'Elite', sub: 'TI terceirizada completa (vCIO)', color: 'var(--tier-3)' }
+    { id: 't3', name: 'Enterprise', sub: 'TI terceirizada completa (vCIO)', color: 'var(--tier-3)' }
   ];
 
   const ITEM_TYPES = {
@@ -667,7 +701,7 @@
   const UNITS = { endpoint: 'Endpoint', usuario: 'Usuário', servidor: 'Servidor', fixo: 'Fixo/mês' };
 
   const DEFAULT_STACK = [
-    // costs = custo por unidade em [Essential, Pro, Elite]; null = não incluso no plano
+    // costs = custo por unidade em [Essential, Pro, Enterprise]; null = não incluso no plano
     { name: 'ESET (antivírus)', unit: 'endpoint', costs: [20, 25, 30] },
     { name: 'RMM / monitoramento', unit: 'endpoint', costs: [5, 5, 5] },
     { name: 'Monitoramento de servidor', unit: 'servidor', costs: [30, 30, 30] },
@@ -701,10 +735,17 @@
   }
 
   function hourCostHelper() {
-    const h = num('h_horas');
-    const v = h > 0 ? (num('h_salario') * (1 + num('h_encargos') / 100) + num('h_beneficios')) / h : 0;
+    const h = num('h_horas') + num('h_horas_socio');
+    const v = h > 0 ? (num('h_salario') * (1 + num('h_encargos') / 100) + num('h_prolabore') + num('h_beneficios')) / h : 0;
     $('h_result').textContent = fmt(v);
     return v;
+  }
+
+  function visitLabel(v) {
+    if (!v) return 'remoto (visita sob demanda)';
+    if (v === 1) return '1 visita preventiva/mês';
+    if (v > 1) return `${String(Math.round(v * 100) / 100).replace('.', ',')} visitas preventivas/mês`;
+    return `1 visita preventiva a cada ${Math.round(1 / v)} meses`;
   }
 
   function calcPlans() {
@@ -717,10 +758,14 @@
     const perUserBilling = $('pl_cobranca').value === 'usuario' && users > 0;
     const qtyFor = u => ({ usuario: users, endpoint: endpoints, servidor: servers, fixo: 1 })[u] || 0;
 
-    const visitCost = num('l_km') * num('g_km') + (num('l_min') / 60) * hora;
+    const visitCost = num('l_km') * num('g_km') + num('l_pedagio') + (num('l_min') / 60) * hora;
+    // Visita fora do plano: cobra o deslocamento à parte (as horas no local saem da franquia ou viram hora avulsa)
+    // Taxa cobre custo + impostos + 20% (deslocamento não é onde você ganha dinheiro, mas não pode dar prejuízo)
+    const visitFee = Math.max(roundUp(priceForMargin(visitCost, 20), 10) || 0, num('g_visita_min'));
+    state.visitFee = visitFee;
 
     $('out_hora').textContent = fmt(hora);
-    $('out_visita').textContent = fmt(visitCost);
+    $('out_visita').textContent = `${fmt(visitCost)} / ${fmt(visitFee)}`;
     $('out_deducoes').textContent = pct(deductions() * 100);
 
     let html = '';
@@ -731,7 +776,7 @@
       const g = k => num(t.id + '_' + k);
 
       // 1) Ferramentas inclusas neste plano
-      const tools = stack.filter(s => s.costs[ti] != null);
+      const tools = stack.filter(s => s.costs[ti] != null && qtyFor(s.unit) > 0);
       const stackCost = tools.reduce((a, s) => a + qtyFor(s.unit) * (+s.costs[ti] || 0), 0);
 
       // 2) Esforço técnico — cresce com o tamanho do cliente
@@ -777,7 +822,10 @@
       const stressMargin = breakdown(price, cost + laborReat * 0.5 * (1 + overhead)).margin;   // cliente usa +50% de horas reativas
 
       // 6) Hora excedente e implantação
-      const extraHour = roundUp(priceForMargin(hora * sla * (1 + overhead), mg), 5);
+      // Hora excedente = hora avulsa de mercado com desconto de cliente de contrato,
+      // nunca abaixo do mínimo que mantém a margem do plano
+      const extraFloor = roundUp(priceForMargin(hora * sla * (1 + overhead), mg), 5);
+      const extraHour = Math.max(roundUp(num('g_hora_avulsa') * (1 - g('hxd') / 100), 5), extraFloor);
       const setupHrs = (g('onbb') + (endpoints + servers) * g('onb')) * mat;
       const setupCost = setupHrs * hora * (1 + overhead);
       const setup = setupHrs > 0 ? roundUp(priceForMargin(setupCost, mg), step) : 0;
@@ -799,7 +847,7 @@
             <div>
               <div class="plan-name" style="color:${t.color}">${t.name} ${t.rec ? '★' : ''}</div>
               <div class="plan-desc">${t.sub}</div>
-              <div class="plan-desc" style="margin-top:6px">${franquia}h de suporte/mês · ${vis ? vis + ' visita(s)' : '100% remoto'} · ${tools.length} ferramenta(s)</div>
+              <div class="plan-desc" style="margin-top:6px">${franquia}h de suporte/mês · ${visitLabel(vis)} · ${tools.length} ferramenta(s)</div>
             </div>
             <div class="plan-price-box">
               <div class="plan-price">${fmt(price)}<small> /mês</small></div>
@@ -968,16 +1016,16 @@
       chosen.forEach(p => {
         L.push('');
         L.push(`>> Plano ${p.name.toUpperCase()}${p.rec && chosen.length > 1 ? ' (recomendado)' : ''} — ${p.sub}`);
-        L.push(p.perUserBilling
-          ? `   Investimento: ${fmt(p.ppu)} por usuário/mês × ${num('c_users')} usuários = ${fmt(p.price)} / mês`
-          : `   Investimento: ${fmt(p.price)} / mês`);
-        L.push(`   Inclui: ${p.franquia}h de suporte técnico${p.vis ? ` + ${p.vis} visita(s) presencial(is)` : ' (100% remoto)'} por mês`);
+        L.push(`   Investimento: ${fmt(p.price)} / mês`);
+        L.push(`   Inclui: ${p.franquia}h de suporte técnico por mês (remoto ou presencial)`);
+        L.push(`   Visitas: ${p.vis ? visitLabel(p.vis) + '; visitas extras com taxa de deslocamento de ' + fmt(state.visitFee) : 'sob demanda, com taxa de deslocamento de ' + fmt(state.visitFee)}`);
         if (p.hPro > 0) L.push('   Manutenção preventiva: atualizações, monitoramento e revisões sem consumir a franquia');
         if (p.hGest > 0) L.push(`   Gestão de TI: ${String(p.hGest).replace('.', ',')}h/mês de reuniões, relatórios e planejamento`);
         if (p.tools.length) L.push(`   Ferramentas: ${p.tools.map(t => t.name).join(', ')}`);
         if ($('pr_extra').checked) L.push(`   Hora excedente: ${fmt(p.extraHour)}`);
         if ($('pr_setup').checked && p.setup > 0) L.push(`   Implantação (pagamento único): ${fmt(p.setup)}`);
         if (interno) {
+          if (p.perUserBilling) L.push(`   · Base: ${fmt(p.ppu)} por usuário × ${num('c_users')}`);
           L.push(`   · Custo: ${fmt(p.cost)} (ferramentas ${fmt(p.stack)}, reativo ${fmt(p.laborReat)}, proativo ${fmt(p.laborPro)}, gestão ${fmt(p.laborGest)}, deslocamento ${fmt(p.travel)}, rateio ${fmt(p.ovh)})`);
           L.push(`   · Impostos ${fmt(p.tax)} · comissão/taxas ${fmt(p.fees)} · LUCRO ${fmt(p.profit)} (${pct(p.margin)}) · ${fmt(p.profit * 12)}/ano`);
           L.push(`   · Horas previstas: ${p.hWork.toFixed(1).replace(".", ",")}h/mês · desconto máx. ${pct(p.maxDisc, 0)} · margem c/ +50% horas ${pct(p.stressMargin, 0)}${p.pisoApplied ? ' · PISO APLICADO' : ''}`);
@@ -1047,7 +1095,15 @@
   }
 
   function load() {
-    try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+      // Versão anterior: mantém ferramentas e itens de projeto; os parâmetros voltam aos novos padrões
+      const v1 = localStorage.getItem('techwave_pricing_v1');
+      if (!v1) return null;
+      const d = JSON.parse(v1);
+      return { items: d.items, stack: d.stack, stackUpdated: d.stackUpdated, fields: { c_nome: (d.fields || {}).c_nome } };
+    } catch (e) { return null; }
   }
 
   function toast(msg) {
@@ -1097,6 +1153,20 @@
     if (e.target.closest('#items_body') || e.target.closest('#stack_body') || e.target.id === 'file_restore') return;
     recalc();
   });
+
+  // Região do cliente → km, tempo e pedágio (estimativas a partir de Saquarema)
+  const REGIOES = {
+    local: { km: 0, min: 20, ped: 0 },
+    lagos: { km: 80, min: 90, ped: 0 },
+    rio:   { km: 190, min: 240, ped: 40 }
+  };
+  $('l_regiao').addEventListener('change', e => {
+    const r = REGIOES[e.target.value];
+    if (!r) return;
+    $('l_km').value = r.km; $('l_min').value = r.min; $('l_pedagio').value = r.ped;
+    recalc();
+  });
+  ['l_km', 'l_min', 'l_pedagio'].forEach(id => $(id).addEventListener('input', () => { $('l_regiao').value = 'custom'; }));
 
   // Stack de ferramentas
   $('stack_body').addEventListener('input', e => {

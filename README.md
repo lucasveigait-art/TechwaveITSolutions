@@ -3,7 +3,7 @@
 Arquivo único (`index.html`), sem instalação: basta abrir no navegador (duplo clique). Funciona offline.
 
 ## Abas
-- **Planos MSP** — preço mensal dos planos Essential / Pro / Elite, hora excedente e taxa de implantação.
+- **Planos MSP** — preço mensal dos planos Essential / Pro / Enterprise, hora excedente e taxa de implantação.
 - **Projetos & Terceiros** — orçamento item a item (terceiros, horas Techwave, material, deslocamento) com lucro sobre o custo ou margem sobre a venda.
 - **Proposta** — gera o texto para o cliente (copiar, .txt ou PDF) ou a versão interna com custos e margens.
 - **Parâmetros Techwave** — imposto, comissão, taxas, custo da hora, km, rateio de fixos, margem mínima e arredondamento. Valem para todas as abas.
@@ -20,3 +20,8 @@ Tudo que é digitado fica salvo no navegador. Use *Exportar/Importar backup* par
 3. **Custo** = ferramentas inclusas no plano + reativo × hora × fator SLA + (proativo + gestão) × hora + visitas × (km × custo km + trajeto × hora) + rateio.
 4. **Preço** = custo ÷ (1 − deduções − margem alvo), respeitando a mensalidade mínima; na cobrança por usuário, o valor por usuário é arredondado.
 5. Indicadores: desconto máximo até a margem mínima, margem se o cliente usar +50% de horas reativas, lucro anual e alerta se a diferença entre planos for pequena.
+
+### Visitas e hora avulsa
+- Visitas preventivas por plano (0,5 = bimestral). O custo de cada visita vem da região do cliente: km × custo do km + pedágio + tempo de trajeto × hora.
+- Visita fora do plano: o cliente paga a **taxa de deslocamento** (custo + impostos + 20%, com valor mínimo). As horas no local saem da franquia.
+- Hora excedente = hora avulsa × (1 − desconto do plano). Nunca fica abaixo do valor que mantém a margem do plano.

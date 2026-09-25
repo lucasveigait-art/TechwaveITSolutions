@@ -25,3 +25,8 @@ Tudo que é digitado fica salvo no navegador. Use *Exportar/Importar backup* par
 - Visitas preventivas por plano (0,5 = bimestral). O custo de cada visita vem da região do cliente: km × custo do km + pedágio + tempo de trajeto × hora.
 - Visita fora do plano: o cliente paga a **taxa de deslocamento** (custo + impostos + 20%, com valor mínimo). As horas no local saem da franquia.
 - Hora excedente = hora avulsa × (1 − desconto do plano). Nunca fica abaixo do valor que mantém a margem do plano.
+
+### Parâmetros Techwave
+- **Margem de contribuição** = o que sobra do preço depois de custos diretos, impostos e taxas. Ela paga os custos fixos e vira lucro. Cada plano mostra também o **lucro após custos fixos**.
+- Calculadoras de apoio (só mudam os preços ao clicar em "Usar"): simulador do Simples (Fator R, Anexo III × V), custos fixos (% do faturamento e ponto de equilíbrio), custo real da hora da equipe e custo do km.
+- Tarifa de boleto somada ao custo de cada cobrança. Hora avulsa básica e especializada.

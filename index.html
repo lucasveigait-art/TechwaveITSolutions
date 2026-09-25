@@ -358,7 +358,7 @@
               <input type="number" id="t1_vcio" value="0" step="0.5" min="0"><input type="number" id="t2_vcio" value="1" step="0.5" min="0"><input type="number" id="t3_vcio" value="3" step="0.5" min="0">
 
               <div class="tg-sec">Preço</div>
-              <div class="rl">Margem líquida alvo<small>% sobre o preço</small></div>
+              <div class="rl">Margem de contribuição alvo<small>paga os custos fixos + lucro</small></div>
               <input type="number" id="t1_mg" value="35" step="1"><input type="number" id="t2_mg" value="38" step="1"><input type="number" id="t3_mg" value="40" step="1">
 
               <div class="rl">Mensalidade mínima (R$)<small>0 = sem piso</small></div>
@@ -388,7 +388,7 @@
         <div class="plans-wrapper" id="render_plans"></div>
         <div class="legend" style="margin-top:12px; justify-content:center">
           <span><i style="background:var(--seg-lic)"></i>Ferramentas</span>
-          <span><i style="background:var(--seg-mo)"></i>Mão de obra + rateio</span>
+          <span><i style="background:var(--seg-mo)"></i>Mão de obra</span>
           <span><i style="background:var(--seg-desl)"></i>Deslocamento</span>
           <span><i style="background:var(--seg-imp)"></i>Impostos, comissão e taxas</span>
           <span><i style="background:var(--seg-lucro)"></i>Lucro líquido</span>
@@ -518,12 +518,18 @@
 
   <!-- ============================ PARÂMETROS ============================ -->
   <section id="v-param" class="view">
+    <div class="card" style="border-left:3px solid var(--brand)">
+      <div class="card-title"><span class="dot"></span> Como estes números entram no preço</div>
+      <p class="card-note" style="margin:0">Preço = <b>custo direto do cliente</b> (ferramentas + horas × custo da hora + deslocamento) ÷ (1 − imposto − comissão − taxas − margem de contribuição).
+      A <b>margem de contribuição</b> é o que sobra para pagar os <b>custos fixos</b> da Techwave e virar lucro. Os cards com botão “Usar” são calculadoras de apoio: só mudam os preços quando você clica.</p>
+    </div>
+
     <div class="two-col">
       <div class="card">
-        <div class="card-title"><span class="dot"></span> Impostos e descontos sobre a venda</div>
-        <p class="card-note">Tudo aqui é descontado do valor que o cliente paga. Vale para planos e projetos.</p>
+        <div class="card-title"><span class="dot"></span> 1 · Impostos e descontos sobre a venda</div>
+        <p class="card-note">Saem do valor que o cliente paga. Valem para planos e projetos.</p>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Imposto efetivo da NF</span><span class="label-desc">Alíquota real do Simples / Presumido</span></div>
+          <div class="input-label"><span class="label-title">Imposto efetivo da NF</span><span class="label-desc">Use o simulador ao lado</span></div>
           <div class="input-field"><div class="input-prefix">%</div><input type="number" id="g_imposto" value="6" step="0.01"></div>
         </div>
         <div class="input-group">
@@ -531,48 +537,61 @@
           <div class="input-field"><div class="input-prefix">%</div><input type="number" id="g_comissao" value="0" step="0.5"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Taxas de recebimento</span><span class="label-desc">Boleto, cartão, gateway</span></div>
+          <div class="input-label"><span class="label-title">Taxas de recebimento (%)</span><span class="label-desc">Cartão / gateway. Pix = 0</span></div>
           <div class="input-field"><div class="input-prefix">%</div><input type="number" id="g_taxas" value="0" step="0.1"></div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot" style="background:var(--seg-mo)"></span> Custos internos</div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Custo da hora técnica usado nos preços</span><span class="label-desc">Use o custo de um técnico em tempo integral, para não reajustar contratos quando contratar</span></div>
-          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora" value="45" step="1"></div>
-        </div>
-        <div class="input-group">
-          <div class="input-label"><span class="label-title">Custo do km rodado</span><span class="label-desc">Combustível + desgaste</span></div>
-          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_km" value="1.00" step="0.1"></div>
-        </div>
-        <div class="input-group">
-          <div class="input-label"><span class="label-title">Rateio de custos fixos</span><span class="label-desc">% extra sobre o custo p/ cobrir estrutura. Use 0 se os fixos já estão pagos.</span></div>
-          <div class="input-field"><div class="input-prefix">%</div><input type="number" id="g_overhead" value="0" step="1"></div>
+          <div class="input-label"><span class="label-title">Tarifa por boleto</span><span class="label-desc">Somada ao custo de cada cobrança</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_boleto" value="3" step="0.5" min="0"></div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-title"><span class="dot" style="background:var(--seg-mo)"></span> Custo real da hora da sua equipe</div>
-        <p class="card-note">Some o custo de todo mundo que atende e divida pelas horas que realmente viram atendimento (ninguém fica 100% do tempo no cliente).</p>
+        <div class="card-title"><span class="dot" style="background:var(--seg-imp)"></span> 2 · Simulador do Simples Nacional</div>
+        <p class="card-note">Serviço de TI cai no <b>Anexo V</b> (a partir de 15,5%), a não ser que a folha (salários + pró-labore + FGTS) seja <b>≥ 28% do faturamento</b> (Fator R). Aí vai para o <b>Anexo III</b> (a partir de 6%). Confirme com seu contador.</p>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Funcionário: salário</span><span class="label-desc">Meio período</span></div>
+          <div class="input-label"><span class="label-title">Faturamento médio mensal</span><span class="label-desc">Usado também nos custos fixos</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="t_fat" value="14500" step="500"></div>
+        </div>
+        <div id="tax_out" class="card-note" style="margin:12px 0 0; line-height:1.7"></div>
+        <div class="helper-out"><span>Alíquota efetiva hoje: <strong id="tax_result">0%</strong></span><button class="btn" id="btn_usar_imposto" style="padding:8px 14px">Usar este valor</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--text-muted)"></span> 3 · Custos fixos mensais da empresa</div>
+        <p class="card-note">O que você paga todo mês, tendo cliente ou não. Não entra no preço de cada cliente: é pago pela margem de contribuição.</p>
+        <div class="input-group"><div class="input-label"><span class="label-title">Contador</span></div><div class="input-field"><div class="input-prefix">R$</div><input type="number" id="f_contador" value="800" step="10"></div></div>
+        <div class="input-group"><div class="input-label"><span class="label-title">Aluguel</span></div><div class="input-field"><div class="input-prefix">R$</div><input type="number" id="f_aluguel" value="1000" step="10"></div></div>
+        <div class="input-group"><div class="input-label"><span class="label-title">IPTU</span><span class="label-desc">Valor mensal</span></div><div class="input-field"><div class="input-prefix">R$</div><input type="number" id="f_iptu" value="140" step="10"></div></div>
+        <div class="input-group"><div class="input-label"><span class="label-title">Internet + telefone</span></div><div class="input-field"><div class="input-prefix">R$</div><input type="number" id="f_internet" value="120" step="10"></div></div>
+        <div class="input-group"><div class="input-label"><span class="label-title">Softwares internos</span></div><div class="input-field"><div class="input-prefix">R$</div><input type="number" id="f_softwares" value="250" step="10"></div></div>
+        <div class="input-group"><div class="input-label"><span class="label-title">Seguro do carro</span><span class="label-desc">Valor mensal</span></div><div class="input-field"><div class="input-prefix">R$</div><input type="number" id="f_seguro" value="650" step="10"></div></div>
+        <div class="input-group"><div class="input-label"><span class="label-title">Domínio / site</span><span class="label-desc">R$ 70 a cada 3 anos ≈ R$ 2/mês</span></div><div class="input-field"><div class="input-prefix">R$</div><input type="number" id="f_dominio" value="2" step="1"></div></div>
+        <div class="input-group"><div class="input-label"><span class="label-title">Outros</span><span class="label-desc">Marketing, contabilidade extra, etc.</span></div><div class="input-field"><div class="input-prefix">R$</div><input type="number" id="f_outros" value="0" step="10"></div></div>
+        <div id="fix_out" class="card-note" style="margin:12px 0 0; line-height:1.7"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--seg-mo)"></span> 4 · Custo real da hora da equipe</div>
+        <p class="card-note">Salários + pró-labore ÷ horas que realmente viram atendimento.</p>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Funcionário: salário</span><span class="label-desc">Meio período, CLT</span></div>
           <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_salario" value="820" step="10"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Funcionário: encargos + provisões</span><span class="label-desc">FGTS 8% + reserva de 13º e férias ≈ 30% no Simples</span></div>
+          <div class="input-label"><span class="label-title">Funcionário: encargos + provisões</span><span class="label-desc">FGTS 8% + reserva de 13º e férias ≈ 30%</span></div>
           <div class="input-field"><div class="input-prefix">%</div><input type="number" id="h_encargos" value="30" step="1"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Funcionário: horas produtivas/mês</span><span class="label-desc">~88h de meio período × 70% em atendimento</span></div>
+          <div class="input-label"><span class="label-title">Funcionário: horas produtivas/mês</span><span class="label-desc">~88h de meio período × 70%</span></div>
           <div class="input-field"><div class="input-prefix">h</div><input type="number" id="h_horas" value="60" step="5"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Você: pró-labore (parte técnica)</span><span class="label-desc">Quanto do seu ganho mensal vem do trabalho técnico</span></div>
-          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_prolabore" value="3000" step="100"></div>
+          <div class="input-label"><span class="label-title">Você: pró-labore</span><span class="label-desc">Hoje: 1 salário mínimo (confira o valor do ano)</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="h_prolabore" value="1630" step="10"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Você: horas técnicas/mês</span><span class="label-desc">Tirando vendas, gestão e administrativo</span></div>
+          <div class="input-label"><span class="label-title">Você: horas técnicas/mês</span><span class="label-desc">Sem contar vendas e administrativo</span></div>
           <div class="input-field"><div class="input-prefix">h</div><input type="number" id="h_horas_socio" value="80" step="5"></div>
         </div>
         <div class="input-group">
@@ -583,17 +602,47 @@
       </div>
 
       <div class="card">
-        <div class="card-title"><span class="dot" style="background:var(--seg-lucro)"></span> Regras comerciais</div>
+        <div class="card-title"><span class="dot" style="background:var(--seg-desl)"></span> 5 · Custos usados nos preços</div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Margem mínima aceitável</span><span class="label-desc">Abaixo disso o resultado fica vermelho</span></div>
-          <div class="input-field"><div class="input-prefix">%</div><input type="number" id="g_margem_min" value="30" step="1"></div>
+          <div class="input-label"><span class="label-title">Custo da hora técnica</span><span class="label-desc">Valor de mercado de um técnico sênior, não o seu salário atual</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora" value="45" step="1"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Hora técnica avulsa</span><span class="label-desc">Cliente sem contrato. Referência de mercado MSP/RJ: R$ 120–180</span></div>
-          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora_avulsa" value="150" step="5"></div>
+          <div class="input-label"><span class="label-title">Custo do km rodado</span><span class="label-desc">Use a calculadora abaixo</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_km" value="1.00" step="0.05"></div>
+        </div>
+        <div class="tg-sec" style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--brand);margin:14px 0 8px">Calculadora do km</div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Consumo do carro</span></div>
+          <div class="input-field"><div class="input-prefix">km/l</div><input type="number" id="k_consumo" value="10" step="0.5"></div>
         </div>
         <div class="input-group">
-          <div class="input-label"><span class="label-title">Visita extra: taxa mínima</span><span class="label-desc">Piso da taxa de deslocamento em visitas fora do plano</span></div>
+          <div class="input-label"><span class="label-title">Preço do combustível</span></div>
+          <div class="input-field"><div class="input-prefix">R$/l</div><input type="number" id="k_comb" value="6.40" step="0.05"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Desgaste por km</span><span class="label-desc">Pneu, óleo, revisão, depreciação (≈ R$ 0,30–0,50)</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="k_desgaste" value="0.35" step="0.05"></div>
+        </div>
+        <div class="helper-out"><span>Custo real do km: <strong id="k_result">R$ 0,00</strong></span><button class="btn" id="btn_usar_km" style="padding:8px 14px">Usar este valor</button></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--seg-lucro)"></span> 6 · Regras comerciais</div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Margem de contribuição mínima</span><span class="label-desc">Abaixo disso o plano fica vermelho</span></div>
+          <div class="input-field"><div class="input-prefix">%</div><input type="number" id="g_margem_min" value="25" step="1"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Hora avulsa básica</span><span class="label-desc">Suporte a usuário, formatação, impressora</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora_avulsa" value="90" step="5"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Hora avulsa especializada</span><span class="label-desc">Servidor, rede, firewall, nuvem, projeto</span></div>
+          <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_hora_sr" value="150" step="5"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label"><span class="label-title">Visita extra: taxa mínima</span><span class="label-desc">Piso da taxa de deslocamento fora do plano</span></div>
           <div class="input-field"><div class="input-prefix">R$</div><input type="number" id="g_visita_min" value="80" step="10"></div>
         </div>
         <div class="input-group">
@@ -634,7 +683,7 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'techwave_pricing_v2';
+  const STORAGE_KEY = 'techwave_pricing_v3';
   const $ = id => document.getElementById(id);
   const num = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
   const fmt = v => (isFinite(v) ? v : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -741,6 +790,56 @@
     return v;
   }
 
+  // Simples Nacional — tabelas da LC 123/2006 (redação LC 155/2016): [limite RBT12, alíquota nominal, parcela a deduzir]
+  const SIMPLES = {
+    III: [[180000, 6, 0], [360000, 11.2, 9360], [720000, 13.5, 17640], [1800000, 16, 35640], [3600000, 21, 125640], [4800000, 33, 648000]],
+    V:   [[180000, 15.5, 0], [360000, 18, 4500], [720000, 19.5, 9900], [1800000, 20.5, 17100], [3600000, 23, 62100], [4800000, 30.5, 540000]]
+  };
+  function simplesRate(anexo, rbt12) {
+    if (rbt12 <= 0) return SIMPLES[anexo][0][1];
+    const f = SIMPLES[anexo].find(r => rbt12 <= r[0]) || SIMPLES[anexo][5];
+    return (rbt12 * f[1] / 100 - f[2]) / rbt12 * 100;
+  }
+
+  function taxHelper() {
+    const fat = num('t_fat');
+    const salario = num('h_salario');
+    const folha = salario * 1.08 + num('h_prolabore');           // salários + FGTS + pró-labore
+    const fatorR = fat > 0 ? folha / fat * 100 : 0;
+    const anexo = fatorR >= 28 ? 'III' : 'V';
+    const rate = simplesRate(anexo, fat * 12);
+    const rateIII = simplesRate('III', fat * 12);
+    const prolaboreMin = Math.max(0, fat * 0.28 - salario * 1.08);
+    const economia = (simplesRate('V', fat * 12) - rateIII) / 100 * fat;
+    $('tax_result').textContent = pct(rate, 2);
+    $('tax_out').innerHTML =
+      `Folha mensal: <b>${fmt(folha)}</b> · Fator R: <b style="color:${anexo === 'III' ? 'var(--success)' : 'var(--warning)'}">${pct(fatorR)}</b> → <b>Anexo ${anexo}</b>` +
+      (anexo === 'V'
+        ? `<br><span style="color:var(--warning)">Com pró-labore de <b>${fmt(prolaboreMin)}</b> ou mais você vai para o Anexo III (${pct(rateIII, 2)}) e economiza cerca de <b>${fmt(economia)}/mês</b> em imposto.</span>`
+        : '<br>Mantenha a folha acima de 28% do faturamento para continuar no Anexo III.');
+    return rate;
+  }
+
+  function fixedHelper() {
+    const ids = ['f_contador', 'f_aluguel', 'f_iptu', 'f_internet', 'f_softwares', 'f_seguro', 'f_dominio', 'f_outros'];
+    const total = ids.reduce((a, id) => a + num(id), 0);
+    const fat = num('t_fat');
+    const share = fat > 0 ? total / fat * 100 : 0;
+    const avgMargin = (num('t1_mg') + num('t2_mg') + num('t3_mg')) / 3;
+    const breakEven = avgMargin > 0 ? total / (avgMargin / 100) : 0;
+    $('fix_out').innerHTML = `Total: <b>${fmt(total)}/mês</b> = <b>${pct(share)}</b> do faturamento atual.<br>` +
+      `Ponto de equilíbrio: com margem de contribuição média de ${pct(avgMargin, 0)}, você precisa faturar <b>${fmt(breakEven)}/mês</b> só para pagar a estrutura.`;
+    state.fixedShare = share;
+    return share;
+  }
+
+  function kmHelper() {
+    const c = num('k_consumo');
+    const v = (c > 0 ? num('k_comb') / c : 0) + num('k_desgaste');
+    $('k_result').textContent = fmt(v);
+    return v;
+  }
+
   function visitLabel(v) {
     if (!v) return 'remoto (visita sob demanda)';
     if (v === 1) return '1 visita preventiva/mês';
@@ -752,7 +851,6 @@
     const users = num('c_users'), endpoints = num('c_endpoints'), servers = num('c_servers');
     const mat = num('c_maturidade') || 1;
     const hora = num('g_hora');
-    const overhead = num('g_overhead') / 100;
     const step = num('g_round');
     const minMargin = num('g_margem_min');
     const perUserBilling = $('pl_cobranca').value === 'usuario' && users > 0;
@@ -790,11 +888,11 @@
       const laborGest = hGest * hora;
       const labor = laborReat + laborPro + laborGest;
 
-      // 3) Deslocamento e rateio
+      // 3) Deslocamento e tarifa de cobrança
       const vis = g('vis');
       const travel = vis * visitCost;
-      const ovh = (stackCost + labor + travel) * overhead;
-      const cost = stackCost + labor + travel + ovh;
+      const boleto = num('g_boleto');
+      const cost = stackCost + labor + travel + boleto;
 
       // 4) Preço: margem alvo → piso → arredondamento (por usuário ou total)
       const mg = g('mg');
@@ -819,24 +917,27 @@
       // 5) Indicadores de negociação e risco
       const floor = priceForMargin(cost, minMargin);
       const maxDisc = isFinite(floor) && price > 0 ? Math.max(0, 1 - floor / price) * 100 : 0;
-      const stressMargin = breakdown(price, cost + laborReat * 0.5 * (1 + overhead)).margin;   // cliente usa +50% de horas reativas
+      const stressMargin = breakdown(price, cost + laborReat * 0.5).margin;   // cliente usa +50% de horas reativas
 
       // 6) Hora excedente e implantação
-      // Hora excedente = hora avulsa de mercado com desconto de cliente de contrato,
-      // nunca abaixo do mínimo que mantém a margem do plano
-      const extraFloor = roundUp(priceForMargin(hora * sla * (1 + overhead), mg), 5);
+      // Hora excedente = hora avulsa básica com desconto de cliente de contrato,
+      // nunca abaixo do valor que mantém a margem mínima
+      const extraFloor = roundUp(priceForMargin(hora, minMargin), 5);
       const extraHour = Math.max(roundUp(num('g_hora_avulsa') * (1 - g('hxd') / 100), 5), extraFloor);
       const setupHrs = (g('onbb') + (endpoints + servers) * g('onb')) * mat;
-      const setupCost = setupHrs * hora * (1 + overhead);
+      const setupCost = setupHrs * hora;
       const setup = setupHrs > 0 ? roundUp(priceForMargin(setupCost, mg), step) : 0;
 
       const hWork = hReat + hPro + hGest;
+      const fixedShare = state.fixedShare || 0;
+      const netAfterFixed = b.profit - price * fixedShare / 100;
+      const netPct = price ? netAfterFixed / price * 100 : 0;
       const [cls, label] = statusBadge(b.margin);
       const perDevice = endpoints > 0 ? fmt(price / endpoints) : '—';
       const h1 = v => v.toFixed(1).replace('.', ',');
 
       state.plans.push({ ...t, price, ppu, perUserBilling, cost, stack: stackCost, tools, labor, laborReat, laborPro, laborGest,
-        travel, ovh, franquia, hReat, hPro, hGest, hWork, vis, extraHour, setup, setupCost, setupHrs, maxDisc, stressMargin, pisoApplied, ...b });
+        travel, boleto, franquia, hReat, hPro, hGest, hWork, vis, extraHour, setup, setupCost, setupHrs, maxDisc, stressMargin, pisoApplied, netAfterFixed, netPct, ...b });
 
       const stressCls = stressMargin < 0 ? 'var(--danger)' : stressMargin < minMargin ? 'var(--warning)' : 'var(--success)';
 
@@ -858,14 +959,14 @@
           </div>
           <div class="comp"><div class="comp-bar">${compBar([
             { l: 'Ferramentas', v: stackCost, c: 'var(--seg-lic)' },
-            { l: `Mão de obra (reativo ${fmt(laborReat)} · proativo ${fmt(laborPro)} · gestão ${fmt(laborGest)}) + rateio`, v: labor + ovh, c: 'var(--seg-mo)' },
+            { l: `Mão de obra (reativo ${fmt(laborReat)} · proativo ${fmt(laborPro)} · gestão ${fmt(laborGest)})`, v: labor, c: 'var(--seg-mo)' },
             { l: 'Deslocamento', v: travel, c: 'var(--seg-desl)' },
-            { l: 'Impostos, comissão e taxas', v: b.tax + b.fees, c: 'var(--seg-imp)' },
+            { l: 'Impostos, comissão e taxas (inclui boleto)', v: b.tax + b.fees + boleto, c: 'var(--seg-imp)' },
             { l: 'Lucro líquido', v: Math.max(b.profit, 0), c: 'var(--seg-lucro)' }
           ], Math.max(price, cost + b.tax + b.fees))}</div></div>
           <div class="plan-details">
             <div class="detail-item">Custo mensal total <strong>${fmt(cost)}</strong></div>
-            <div class="detail-item">Markup equivalente <strong>${(price / (cost || 1)).toFixed(2).replace('.', ',')}×</strong></div>
+            <div class="detail-item" title="Lucro depois de pagar a parte deste cliente nos custos fixos da Techwave (${pct(fixedShare)} do faturamento)">Lucro após custos fixos <strong style="color:${netAfterFixed < 0 ? 'var(--danger)' : 'inherit'}">${fmt(netAfterFixed)} (${pct(netPct, 0)})</strong></div>
             <div class="detail-item" title="Reativo ${h1(hReat)}h + proativo ${h1(hPro)}h + gestão ${h1(hGest)}h">Horas de trabalho previstas <strong>${h1(hWork)}h</strong></div>
             <div class="detail-item">Custo das ferramentas <strong>${fmt(stackCost)}</strong></div>
             <div class="detail-item">Preço por endpoint <strong>${perDevice}</strong></div>
@@ -919,7 +1020,6 @@
     const modo = $('p_modo').value;
     const lucro = num('p_lucro');
     const conting = num('p_conting') / 100;
-    const overhead = num('g_overhead') / 100;
     const ded = deductions();
     const step = num('g_round');
 
@@ -938,8 +1038,9 @@
     });
 
     const contingV = base * conting;
-    const ovhV = (base + contingV) * overhead;
-    const cost = base + contingV + ovhV;
+    const parcelasN = Math.max(1, Math.round(num('p_parcelas')));
+    const boletoV = num('g_boleto') * parcelasN;
+    const cost = base + contingV + boletoV;
 
     let raw;
     if (modo === 'custo') raw = ded < 1 ? cost * (1 + lucro / 100) / (1 - ded) : NaN;
@@ -970,10 +1071,10 @@
     $('r_markup').textContent = pct(b.markup);
 
     const sum = t => lines.filter(l => l.type === t).reduce((a, l) => a + l.total, 0);
-    const laborish = sum('terceiro') + sum('interno') + contingV + ovhV;
+    const laborish = sum('terceiro') + sum('interno') + contingV;
     $('proj_bar').innerHTML = compBar([
       { l: 'Material / hardware', v: sum('material'), c: 'var(--seg-lic)' },
-      { l: 'Mão de obra (terceiros + Techwave) + contingência/rateio', v: laborish, c: 'var(--seg-mo)' },
+      { l: 'Mão de obra (terceiros + Techwave) + contingência', v: laborish, c: 'var(--seg-mo)' },
       { l: 'Deslocamento', v: sum('desloc'), c: 'var(--seg-desl)' },
       { l: 'Impostos, comissão e taxas', v: b.tax + b.fees, c: 'var(--seg-imp)' },
       { l: 'Lucro líquido', v: Math.max(b.profit, 0), c: 'var(--seg-lucro)' }
@@ -985,7 +1086,7 @@
 
     // Preço de cada item para a proposta (proporcional ao custo)
     const factor = base > 0 ? price / base : 0;
-    state.project = { name: $('p_nome').value, price, cost, parcelas, lines: lines.map(l => ({ ...l, sale: l.total * factor })), contingV, ovhV, ...b };
+    state.project = { name: $('p_nome').value, price, cost, parcelas, lines: lines.map(l => ({ ...l, sale: l.total * factor })), contingV, boletoV, ...b };
   }
 
   /* ============================= PROPOSTA ============================= */
@@ -1026,12 +1127,13 @@
         if ($('pr_setup').checked && p.setup > 0) L.push(`   Implantação (pagamento único): ${fmt(p.setup)}`);
         if (interno) {
           if (p.perUserBilling) L.push(`   · Base: ${fmt(p.ppu)} por usuário × ${num('c_users')}`);
-          L.push(`   · Custo: ${fmt(p.cost)} (ferramentas ${fmt(p.stack)}, reativo ${fmt(p.laborReat)}, proativo ${fmt(p.laborPro)}, gestão ${fmt(p.laborGest)}, deslocamento ${fmt(p.travel)}, rateio ${fmt(p.ovh)})`);
-          L.push(`   · Impostos ${fmt(p.tax)} · comissão/taxas ${fmt(p.fees)} · LUCRO ${fmt(p.profit)} (${pct(p.margin)}) · ${fmt(p.profit * 12)}/ano`);
+          L.push(`   · Custo: ${fmt(p.cost)} (ferramentas ${fmt(p.stack)}, reativo ${fmt(p.laborReat)}, proativo ${fmt(p.laborPro)}, gestão ${fmt(p.laborGest)}, deslocamento ${fmt(p.travel)}, boleto ${fmt(p.boleto)})`);
+          L.push(`   · Impostos ${fmt(p.tax)} · comissão/taxas ${fmt(p.fees)} · CONTRIBUIÇÃO ${fmt(p.profit)} (${pct(p.margin)}) · lucro após fixos ${fmt(p.netAfterFixed)} (${pct(p.netPct)}) · ${fmt(p.netAfterFixed * 12)}/ano`);
           L.push(`   · Horas previstas: ${p.hWork.toFixed(1).replace(".", ",")}h/mês · desconto máx. ${pct(p.maxDisc, 0)} · margem c/ +50% horas ${pct(p.stressMargin, 0)}${p.pisoApplied ? ' · PISO APLICADO' : ''}`);
           L.push(`   · Implantação: ${p.setupHrs.toFixed(1).replace(".", ",")}h, custo ${fmt(p.setupCost)}`);
         }
       });
+      if ($('pr_extra').checked) L.push(`\nServiços fora do escopo do plano: hora técnica ${fmt(num('g_hora_avulsa'))} (suporte) / ${fmt(num('g_hora_sr'))} (especializada: servidores, redes, nuvem).`);
       L.push('');
     }
 
@@ -1041,11 +1143,11 @@
       L.push(`>> ${pj.name}`);
       if ($('pr_itens').checked) {
         pj.lines.forEach(l => L.push(`   - ${l.desc}: ${fmt(l.sale)}`));
-        if (pj.contingV + pj.ovhV > 0) L.push('   (valores dos itens já incluem gestão, contingência e impostos)');
+        if (pj.contingV > 0) L.push('   (valores dos itens já incluem gestão, contingência e impostos)');
       }
       L.push(`   Investimento total: ${fmt(pj.price)}${pj.parcelas > 1 ? ` — ${pj.parcelas}× de ${fmt(pj.price / pj.parcelas)}` : ''}`);
       if (interno) {
-        L.push(`   · Custo: ${fmt(pj.cost)} (contingência ${fmt(pj.contingV)}, rateio ${fmt(pj.ovhV)})`);
+        L.push(`   · Custo: ${fmt(pj.cost)} (contingência ${fmt(pj.contingV)}, boletos ${fmt(pj.boletoV)})`);
         pj.lines.forEach(l => L.push(`     ${ITEM_TYPES[l.type]} — ${l.desc}: ${l.qty} × ${fmt(l.unit)} = ${fmt(l.total)}`));
         L.push(`   · Impostos ${fmt(pj.tax)} · comissão/taxas ${fmt(pj.fees)} · LUCRO ${fmt(pj.profit)} (${pct(pj.margin)} da venda / ${pct(pj.markup)} sobre o custo)`);
       }
@@ -1062,6 +1164,9 @@
   /* ============================= GERAL ============================= */
   function recalc() {
     hourCostHelper();
+    kmHelper();
+    taxHelper();
+    fixedHelper();
     calcPlans();
     calcProject();
     buildProposal();
@@ -1099,9 +1204,9 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) return JSON.parse(raw);
       // Versão anterior: mantém ferramentas e itens de projeto; os parâmetros voltam aos novos padrões
-      const v1 = localStorage.getItem('techwave_pricing_v1');
-      if (!v1) return null;
-      const d = JSON.parse(v1);
+      const old = localStorage.getItem('techwave_pricing_v2') || localStorage.getItem('techwave_pricing_v1');
+      if (!old) return null;
+      const d = JSON.parse(old);
       return { items: d.items, stack: d.stack, stackUpdated: d.stackUpdated, fields: { c_nome: (d.fields || {}).c_nome } };
     } catch (e) { return null; }
   }
@@ -1158,7 +1263,7 @@
   const REGIOES = {
     local: { km: 0, min: 20, ped: 0 },
     lagos: { km: 80, min: 90, ped: 0 },
-    rio:   { km: 190, min: 240, ped: 40 }
+    rio:   { km: 190, min: 240, ped: 55 }
   };
   $('l_regiao').addEventListener('change', e => {
     const r = REGIOES[e.target.value];
@@ -1195,6 +1300,17 @@
     touchStack();
     renderStack();
     recalc();
+  });
+  $('btn_usar_imposto').addEventListener('click', () => {
+    $('g_imposto').value = taxHelper().toFixed(2);
+    recalc();
+    toast('Alíquota atualizada');
+  });
+  $('btn_usar_km').addEventListener('click', () => {
+    $('g_km').value = kmHelper().toFixed(2);
+    renderItems();
+    recalc();
+    toast('Custo do km atualizado');
   });
   $('btn_usar_hora').addEventListener('click', () => {
     $('g_hora').value = hourCostHelper().toFixed(2);

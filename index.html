@@ -296,6 +296,7 @@
               <tbody id="stack_body"></tbody>
             </table>
             <div class="btn-row"><button class="btn btn-ghost" id="btn_add_tool">+ Adicionar ferramenta</button></div>
+            <p class="card-note" id="stack_updated" style="margin:12px 0 0"></p>
           </div>
         </div>
 
@@ -676,8 +677,20 @@
   ];
 
   let stack = [];
+  let stackUpdated = null;   // data da última alteração de custos (AAAA-MM-DD)
+
+  function touchStack() { stackUpdated = new Date().toISOString().slice(0, 10); showStackUpdated(); }
+  function showStackUpdated() {
+    const el = $('stack_updated');
+    if (!stackUpdated) { el.textContent = 'Revise os custos das ferramentas todo mês: eles mudam com câmbio e reajuste dos fornecedores.'; return; }
+    const d = new Date(stackUpdated + 'T12:00:00');
+    const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+    el.innerHTML = `Custos atualizados em <b>${d.toLocaleDateString('pt-BR')}</b>` +
+      (days > 30 ? ` <span style="color:var(--warning)">· há ${days} dias, confira se mudaram</span>` : '');
+  }
 
   function renderStack() {
+    showStackUpdated();
     $('stack_body').innerHTML = stack.map((s, i) => `<tr class="st-name">
       <td colspan="5"><input type="text" data-s="${i}" data-k="name" value="${esc(s.name)}" title="Nome da ferramenta"></td>
     </tr><tr class="st-vals">
@@ -940,6 +953,7 @@
     L.push('Techwave IT Solutions');
     L.push('');
     L.push(`Cliente: ${cliente}`);
+    if (interno && stackUpdated) L.push(`Custos de ferramentas atualizados em: ${new Date(stackUpdated + 'T12:00:00').toLocaleDateString('pt-BR')}`);
     L.push(`Data: ${d(hoje)}    Válida até: ${d(validade)}`);
     L.push('');
 
@@ -1011,7 +1025,7 @@
     .filter(el => !['pr_texto', 'file_restore'].includes(el.id));
 
   function snapshot() {
-    const data = { fields: {}, items, stack };
+    const data = { fields: {}, items, stack, stackUpdated };
     persistIds().forEach(el => { data.fields[el.id] = el.type === 'checkbox' ? el.checked : el.value; });
     return data;
   }
@@ -1025,6 +1039,7 @@
     });
     if (Array.isArray(data.items)) items = data.items;
     if (Array.isArray(data.stack) && data.stack.every(x => Array.isArray(x.costs))) stack = data.stack;
+    stackUpdated = data.stackUpdated || null;
   }
 
   function save() {
@@ -1087,7 +1102,7 @@
   $('stack_body').addEventListener('input', e => {
     const el = e.target, s = stack[+el.dataset.s];
     if (!s) return;
-    if (el.dataset.t != null) s.costs[+el.dataset.t] = el.value === '' ? null : parseFloat(el.value);
+    if (el.dataset.t != null) { s.costs[+el.dataset.t] = el.value === '' ? null : parseFloat(el.value); touchStack(); }
     else if (el.dataset.k) s[el.dataset.k] = el.value;
     recalc();
   });
@@ -1101,11 +1116,13 @@
     const b = e.target.closest('[data-sdel]');
     if (!b) return;
     stack.splice(+b.dataset.sdel, 1);
+    touchStack();
     renderStack();
     recalc();
   });
   $('btn_add_tool').addEventListener('click', () => {
     stack.push({ name: 'Nova ferramenta', unit: 'endpoint', costs: [0, 0, 0] });
+    touchStack();
     renderStack();
     recalc();
   });

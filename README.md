@@ -38,3 +38,6 @@ Tudo que é digitado fica salvo no navegador. Use *Exportar/Importar backup* par
 
 ### Tabela de preços (modo padrão)
 Modelo híbrido usado por MSPs: **taxa base + usuários (com 1 computador) + computadores extras + servidores + ativos de rede**, por plano. Depois entram a complexidade do ambiente (−10% / 0 / +20%) e o **ajuste comercial do cliente** (%). O custo calculado vira o piso: cada plano mostra o **preço mínimo seguro** (margem mínima), o preço pela margem alvo e o desconto máximo. O modo "custo + margem" continua disponível.
+
+### Proposta em PowerPoint
+Na aba **Proposta**, carregue o modelo oficial com marcadores (`Modelo_Proposta_Techwave.pptx`) uma vez; ele fica salvo no navegador. O botão **Gerar PowerPoint** substitui `{{CLIENTE}}`, `{{DATA}}`, `{{USUARIOS}}`, `{{COMPUTADORES}}`, `{{LINKS}}`, `{{SERVIDORES}}`, `{{ROTEADORES}}`, `{{P1}}`/`{{P2}}`/`{{P3}}` (preços), `{{VIS3}}` (visitas do Enterprise) e `{{ECO_MES}}`/`{{ECO_ANO}}` (economia vs. analista interno). Os marcadores podem ser movidos no PowerPoint, desde que cada um fique inteiro, sem formatação diferente no meio.

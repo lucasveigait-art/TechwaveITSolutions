@@ -30,3 +30,8 @@ Tudo que é digitado fica salvo no navegador. Use *Exportar/Importar backup* par
 - **Margem de contribuição** = o que sobra do preço depois de custos diretos, impostos e taxas. Ela paga os custos fixos e vira lucro. Cada plano mostra também o **lucro após custos fixos**.
 - Calculadoras de apoio (só mudam os preços ao clicar em "Usar"): simulador do Simples (Fator R, Anexo III × V), custos fixos (% do faturamento e ponto de equilíbrio), custo real da hora da equipe e custo do km.
 - Tarifa de boleto somada ao custo de cada cobrança. Hora avulsa básica e especializada.
+
+### Preço de mercado, risco do SLA e ancoragem
+- Cada plano tem um **preço mínimo por usuário** (valor de mercado). O preço final é o maior entre custo + margem e esse piso.
+- **Adicional de risco do SLA**: reserva sobre mão de obra e visitas para planos com resposta rápida (Enterprise, 30 min).
+- Na proposta, a opção de **ancoragem** apresenta Enterprise → Pro → Essential, para o Pro parecer o melhor custo-benefício.

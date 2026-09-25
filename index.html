@@ -98,6 +98,7 @@
   .tier-grid .rl small { display: block; color: var(--text-muted); font-size: 10px; }
   .tier-grid input { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: #fff; padding: 6px 8px; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 12px; text-align: right; outline: none; }
   .tier-grid input:focus { border-color: var(--brand); }
+  .tier-grid input[type=text] { font-family: Arial, sans-serif; text-align: center; }
 
   .tier-grid .tg-sec { grid-column: 1 / -1; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--brand); padding: 10px 0 2px; border-top: 1px solid rgba(255,255,255,.06); margin-top: 4px; }
   .stack-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
@@ -344,6 +345,12 @@
               <div class="rl">Fator SLA<small>× custo da hora reativa</small></div>
               <input type="number" id="t1_sla" value="1.00" step="0.05"><input type="number" id="t2_sla" value="1.15" step="0.05"><input type="number" id="t3_sla" value="1.35" step="0.05">
 
+              <div class="rl">Tempo de resposta<small>aparece na proposta</small></div>
+              <input type="text" id="t1_slatxt" value="8h úteis"><input type="text" id="t2_slatxt" value="4h úteis"><input type="text" id="t3_slatxt" value="30 min">
+
+              <div class="rl">Adicional de risco do SLA<small>% sobre mão de obra e visitas</small></div>
+              <input type="number" id="t1_risk" value="0" step="5" min="0"><input type="number" id="t2_risk" value="10" step="5" min="0"><input type="number" id="t3_risk" value="35" step="5" min="0">
+
               <div class="rl">Visitas preventivas/mês<small>0,5 = bimestral · 0,33 = trimestral</small></div>
               <input type="number" id="t1_vis" value="0" min="0" step="0.25"><input type="number" id="t2_vis" value="0.5" min="0" step="0.25"><input type="number" id="t3_vis" value="1" min="0" step="0.25">
 
@@ -361,8 +368,8 @@
               <div class="rl">Margem de contribuição alvo<small>paga os custos fixos + lucro</small></div>
               <input type="number" id="t1_mg" value="35" step="1"><input type="number" id="t2_mg" value="38" step="1"><input type="number" id="t3_mg" value="40" step="1">
 
-              <div class="rl">Mensalidade mínima (R$)<small>0 = sem piso</small></div>
-              <input type="number" id="t1_piso" value="0" step="50" min="0"><input type="number" id="t2_piso" value="0" step="50" min="0"><input type="number" id="t3_piso" value="0" step="50" min="0">
+              <div class="rl">Preço mínimo por usuário (R$)<small>valor de mercado; 0 = sem piso</small></div>
+              <input type="number" id="t1_ppumin" value="120" step="5" min="0"><input type="number" id="t2_ppumin" value="150" step="5" min="0"><input type="number" id="t3_ppumin" value="250" step="5" min="0">
 
               <div class="rl">Desconto na hora excedente<small>% sobre a hora avulsa</small></div>
               <input type="number" id="t1_hxd" value="5" step="5" min="0" max="100"><input type="number" id="t2_hxd" value="10" step="5" min="0" max="100"><input type="number" id="t3_hxd" value="15" step="5" min="0" max="100">
@@ -489,6 +496,7 @@
           <label class="check-row"><input type="checkbox" id="pr_t1" checked> Plano Essential</label>
           <label class="check-row"><input type="checkbox" id="pr_t2" checked> Plano Pro ★</label>
           <label class="check-row"><input type="checkbox" id="pr_t3" checked> Plano Enterprise</label>
+          <label class="check-row"><input type="checkbox" id="pr_ancora" checked> Apresentar do maior para o menor plano (ancoragem)</label>
           <label class="check-row"><input type="checkbox" id="pr_setup" checked> Mostrar taxa de implantação</label>
           <label class="check-row"><input type="checkbox" id="pr_extra" checked> Mostrar valor da hora excedente</label>
           <label class="check-row"><input type="checkbox" id="pr_proj"> Incluir projeto / serviço pontual</label>
@@ -892,16 +900,18 @@
       const vis = g('vis');
       const travel = vis * visitCost;
       const boleto = num('g_boleto');
-      const cost = stackCost + labor + travel + boleto;
+      // Reserva de risco: SLA curto exige alguém disponível e absorve picos de chamados
+      const riskV = (labor + travel) * g('risk') / 100;
+      const cost = stackCost + labor + travel + boleto + riskV;
 
-      // 4) Preço: margem alvo → piso → arredondamento (por usuário ou total)
+      // 4) Preço: o maior entre custo + margem e o preço de mercado por usuário → arredondamento
       const mg = g('mg');
       const raw = priceForMargin(cost, mg);
       if (!isFinite(raw)) {
         problems.push(`${t.name}: impostos + comissão + taxas + margem somam 100% ou mais — reduza a margem alvo.`);
         return;
       }
-      const piso = g('piso');
+      const piso = g('ppumin') * users;
       const pisoApplied = piso > raw;
       const target = Math.max(raw, piso);
       let price, ppu;
@@ -937,7 +947,7 @@
       const h1 = v => v.toFixed(1).replace('.', ',');
 
       state.plans.push({ ...t, price, ppu, perUserBilling, cost, stack: stackCost, tools, labor, laborReat, laborPro, laborGest,
-        travel, boleto, franquia, hReat, hPro, hGest, hWork, vis, extraHour, setup, setupCost, setupHrs, maxDisc, stressMargin, pisoApplied, netAfterFixed, netPct, ...b });
+        travel, boleto, franquia, hReat, hPro, hGest, hWork, vis, extraHour, setup, setupCost, setupHrs, maxDisc, stressMargin, pisoApplied, riskV, slaTxt: $(t.id + '_slatxt').value, netAfterFixed, netPct, ...b });
 
       const stressCls = stressMargin < 0 ? 'var(--danger)' : stressMargin < minMargin ? 'var(--warning)' : 'var(--success)';
 
@@ -954,12 +964,12 @@
               <div class="plan-price">${fmt(price)}<small> /mês</small></div>
               ${perUserBilling ? `<div class="plan-desc">${fmt(ppu)} por usuário × ${users}</div>` : ''}
               <div class="badge ${cls}">${label} · lucro ${fmt(b.profit)} (${pct(b.margin, 0)})</div>
-              ${pisoApplied ? `<div><span class="badge badge-warn" title="O custo deste cliente é baixo; o preço subiu até a mensalidade mínima do plano">Mensalidade mínima aplicada</span></div>` : ''}
+              ${pisoApplied ? `<div><span class="badge badge-warn" title="O cálculo pelo custo deu abaixo do seu preço de mercado; foi usado o preço mínimo por usuário">Preço de mercado aplicado</span></div>` : ''}
             </div>
           </div>
           <div class="comp"><div class="comp-bar">${compBar([
             { l: 'Ferramentas', v: stackCost, c: 'var(--seg-lic)' },
-            { l: `Mão de obra (reativo ${fmt(laborReat)} · proativo ${fmt(laborPro)} · gestão ${fmt(laborGest)})`, v: labor, c: 'var(--seg-mo)' },
+            { l: `Mão de obra (reativo ${fmt(laborReat)} · proativo ${fmt(laborPro)} · gestão ${fmt(laborGest)} · reserva SLA ${fmt(riskV)})`, v: labor + riskV, c: 'var(--seg-mo)' },
             { l: 'Deslocamento', v: travel, c: 'var(--seg-desl)' },
             { l: 'Impostos, comissão e taxas (inclui boleto)', v: b.tax + b.fees + boleto, c: 'var(--seg-imp)' },
             { l: 'Lucro líquido', v: Math.max(b.profit, 0), c: 'var(--seg-lucro)' }
@@ -1107,6 +1117,8 @@
     L.push('');
 
     const chosen = state.plans.filter(p => $('pr_' + p.id).checked);
+    // Ancoragem: o cliente vê primeiro o plano mais completo, e o Pro parece o melhor custo-benefício
+    if ($('pr_ancora').checked) chosen.reverse();
     if (chosen.length) {
       L.push('[AMBIENTE CONSIDERADO]');
       L.push(`- Usuários: ${num('c_users')}`);
@@ -1119,6 +1131,7 @@
         L.push(`>> Plano ${p.name.toUpperCase()}${p.rec && chosen.length > 1 ? ' (recomendado)' : ''} — ${p.sub}`);
         L.push(`   Investimento: ${fmt(p.price)} / mês`);
         L.push(`   Inclui: ${p.franquia}h de suporte técnico por mês (remoto ou presencial)`);
+        if (p.slaTxt) L.push(`   Tempo de resposta: ${p.slaTxt}`);
         L.push(`   Visitas: ${p.vis ? visitLabel(p.vis) + '; visitas extras com taxa de deslocamento de ' + fmt(state.visitFee) : 'sob demanda, com taxa de deslocamento de ' + fmt(state.visitFee)}`);
         if (p.hPro > 0) L.push('   Manutenção preventiva: atualizações, monitoramento e revisões sem consumir a franquia');
         if (p.hGest > 0) L.push(`   Gestão de TI: ${String(p.hGest).replace('.', ',')}h/mês de reuniões, relatórios e planejamento`);
@@ -1129,7 +1142,7 @@
           if (p.perUserBilling) L.push(`   · Base: ${fmt(p.ppu)} por usuário × ${num('c_users')}`);
           L.push(`   · Custo: ${fmt(p.cost)} (ferramentas ${fmt(p.stack)}, reativo ${fmt(p.laborReat)}, proativo ${fmt(p.laborPro)}, gestão ${fmt(p.laborGest)}, deslocamento ${fmt(p.travel)}, boleto ${fmt(p.boleto)})`);
           L.push(`   · Impostos ${fmt(p.tax)} · comissão/taxas ${fmt(p.fees)} · CONTRIBUIÇÃO ${fmt(p.profit)} (${pct(p.margin)}) · lucro após fixos ${fmt(p.netAfterFixed)} (${pct(p.netPct)}) · ${fmt(p.netAfterFixed * 12)}/ano`);
-          L.push(`   · Horas previstas: ${p.hWork.toFixed(1).replace(".", ",")}h/mês · desconto máx. ${pct(p.maxDisc, 0)} · margem c/ +50% horas ${pct(p.stressMargin, 0)}${p.pisoApplied ? ' · PISO APLICADO' : ''}`);
+          L.push(`   · Horas previstas: ${p.hWork.toFixed(1).replace(".", ",")}h/mês · desconto máx. ${pct(p.maxDisc, 0)} · margem c/ +50% horas ${pct(p.stressMargin, 0)}${p.pisoApplied ? ' · PREÇO DE MERCADO APLICADO' : ''} · reserva SLA ${fmt(p.riskV)}`);
           L.push(`   · Implantação: ${p.setupHrs.toFixed(1).replace(".", ",")}h, custo ${fmt(p.setupCost)}`);
         }
       });

@@ -35,3 +35,6 @@ Tudo que é digitado fica salvo no navegador. Use *Exportar/Importar backup* par
 - Cada plano tem um **preço mínimo por usuário** (valor de mercado). O preço final é o maior entre custo + margem e esse piso.
 - **Adicional de risco do SLA**: reserva sobre mão de obra e visitas para planos com resposta rápida (Enterprise, 30 min).
 - Na proposta, a opção de **ancoragem** apresenta Enterprise → Pro → Essential, para o Pro parecer o melhor custo-benefício.
+
+### Tabela de preços (modo padrão)
+Modelo híbrido usado por MSPs: **taxa base + usuários (com 1 computador) + computadores extras + servidores + ativos de rede**, por plano. Depois entram a complexidade do ambiente (−10% / 0 / +20%) e o **ajuste comercial do cliente** (%). O custo calculado vira o piso: cada plano mostra o **preço mínimo seguro** (margem mínima), o preço pela margem alvo e o desconto máximo. O modo "custo + margem" continua disponível.

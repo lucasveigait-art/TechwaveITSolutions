@@ -252,18 +252,22 @@
             <div class="card-title"><span class="dot"></span> Ambiente do Cliente</div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Usuários</span><span class="label-desc">Colaboradores que usam TI</span></div>
-              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_users" value="5" min="0"></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_users" value="10" min="0"></div>
             </div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Endpoints</span><span class="label-desc">Computadores / notebooks</span></div>
-              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_endpoints" value="5" min="0"></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_endpoints" value="10" min="0"></div>
             </div>
             <div class="input-group">
               <div class="input-label"><span class="label-title">Servidores</span><span class="label-desc">Físicos ou VMs</span></div>
-              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_servers" value="0" min="0"></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_servers" value="1" min="0"></div>
             </div>
             <div class="input-group">
-              <div class="input-label"><span class="label-title">Complexidade do ambiente</span><span class="label-desc">Multiplica as horas que você espera gastar</span></div>
+              <div class="input-label"><span class="label-title">Ativos de rede</span><span class="label-desc">Links de internet, roteador, firewall, switch gerenciável</span></div>
+              <div class="input-field"><div class="input-prefix">#</div><input type="number" id="c_rede" value="3" min="0"></div>
+            </div>
+            <div class="input-group">
+              <div class="input-label"><span class="label-title">Complexidade do ambiente</span><span class="label-desc">Ajusta as horas previstas e o preço da tabela (−10% / 0 / +20%)</span></div>
               <div class="input-field">
                 <select id="c_maturidade">
                   <option value="1.0">Simples / organizado (1,0×)</option>
@@ -271,6 +275,10 @@
                   <option value="1.6">Complexo / desorganizado (1,6×)</option>
                 </select>
               </div>
+            </div>
+            <div class="input-group">
+              <div class="input-label"><span class="label-title">Ajuste comercial deste cliente</span><span class="label-desc">Negativo = desconto estratégico (cliente âncora, entrada). Positivo = cliente exigente ou crítico</span></div>
+              <div class="input-field"><div class="input-prefix">%</div><input type="number" id="c_ajuste" value="0" step="5"></div>
             </div>
           </div>
 
@@ -319,9 +327,18 @@
         <div id="tp-tiers" class="tab-content">
           <div class="card">
             <div class="card-title"><span class="dot"></span> Configuração dos 3 planos</div>
-            <p class="card-note">As horas agora <b>crescem com o tamanho do cliente</b>. Você define o esforço por usuário/equipamento e a <b>margem líquida desejada</b>; a calculadora encontra o preço.</p>
+            <p class="card-note"><b>Tabela de preços</b> é o que o cliente paga (modelo híbrido usado pelos MSPs: taxa base + usuário + servidor + rede). O <b>custo</b> abaixo serve de piso de segurança: se o preço ficar abaixo da margem mínima, o plano fica vermelho.</p>
             <div class="input-group">
-              <div class="input-label"><span class="label-title">Modelo de cobrança</span><span class="label-desc">Por usuário facilita a venda e o reajuste</span></div>
+              <div class="input-label"><span class="label-title">Como calcular o preço</span></div>
+              <div class="input-field">
+                <select id="pl_modo">
+                  <option value="tabela" selected>Tabela de preços</option>
+                  <option value="custo">Custo + margem</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <div class="input-label"><span class="label-title">No modo custo + margem</span><span class="label-desc">Arredondar por usuário ou no total</span></div>
               <div class="input-field">
                 <select id="pl_cobranca">
                   <option value="usuario" selected>Por usuário/mês</option>
@@ -332,8 +349,24 @@
             <div class="tier-grid" style="margin-top:14px">
               <div></div>
               <div class="th" style="color:var(--tier-1)">Essential</div>
-              <div class="th" style="color:var(--tier-2)">Pro ★</div>
+              <div class="th" style="color:var(--tier-2)">Professional</div>
               <div class="th" style="color:var(--tier-3)">Enterprise</div>
+
+              <div class="tg-sec">Tabela de preços (o que o cliente paga)</div>
+              <div class="rl">Taxa base do contrato<small>gestão, ferramentas, consultoria</small></div>
+              <input type="number" id="t1_pbase" value="150" step="10" min="0"><input type="number" id="t2_pbase" value="250" step="10" min="0"><input type="number" id="t3_pbase" value="500" step="10" min="0">
+
+              <div class="rl">Por usuário<small>inclui 1 computador</small></div>
+              <input type="number" id="t1_puser" value="60" step="5" min="0"><input type="number" id="t2_puser" value="110" step="5" min="0"><input type="number" id="t3_puser" value="230" step="5" min="0">
+
+              <div class="rl">Por computador extra<small>além de 1 por usuário</small></div>
+              <input type="number" id="t1_pdev" value="30" step="5" min="0"><input type="number" id="t2_pdev" value="50" step="5" min="0"><input type="number" id="t3_pdev" value="80" step="5" min="0">
+
+              <div class="rl">Por servidor</div>
+              <input type="number" id="t1_psrv" value="100" step="10" min="0"><input type="number" id="t2_psrv" value="200" step="10" min="0"><input type="number" id="t3_psrv" value="500" step="10" min="0">
+
+              <div class="rl">Por ativo de rede<small>link, roteador, firewall</small></div>
+              <input type="number" id="t1_prede" value="15" step="5" min="0"><input type="number" id="t2_prede" value="35" step="5" min="0"><input type="number" id="t3_prede" value="100" step="5" min="0">
 
               <div class="tg-sec">Suporte reativo (chamados)</div>
               <div class="rl">Horas por usuário/mês<small>define a franquia prometida</small></div>
@@ -346,13 +379,13 @@
               <input type="number" id="t1_sla" value="1.00" step="0.05"><input type="number" id="t2_sla" value="1.15" step="0.05"><input type="number" id="t3_sla" value="1.35" step="0.05">
 
               <div class="rl">Tempo de resposta<small>aparece na proposta</small></div>
-              <input type="text" id="t1_slatxt" value="8h úteis"><input type="text" id="t2_slatxt" value="4h úteis"><input type="text" id="t3_slatxt" value="30 min">
+              <input type="text" id="t1_slatxt" value="até 2 horas"><input type="text" id="t2_slatxt" value="até 1 hora"><input type="text" id="t3_slatxt" value="30 min, 24/7">
 
               <div class="rl">Adicional de risco do SLA<small>% sobre mão de obra e visitas</small></div>
               <input type="number" id="t1_risk" value="0" step="5" min="0"><input type="number" id="t2_risk" value="10" step="5" min="0"><input type="number" id="t3_risk" value="35" step="5" min="0">
 
               <div class="rl">Visitas preventivas/mês<small>0,5 = bimestral · 0,33 = trimestral</small></div>
-              <input type="number" id="t1_vis" value="0" min="0" step="0.25"><input type="number" id="t2_vis" value="0.5" min="0" step="0.25"><input type="number" id="t3_vis" value="1" min="0" step="0.25">
+              <input type="number" id="t1_vis" value="0" min="0" step="0.25"><input type="number" id="t2_vis" value="1" min="0" step="0.25"><input type="number" id="t3_vis" value="2" min="0" step="0.25">
 
               <div class="tg-sec">Trabalho proativo (não sai da franquia)</div>
               <div class="rl">Horas por endpoint/mês<small>patches, monitoramento, revisão</small></div>
@@ -361,6 +394,9 @@
               <div class="rl">Horas por servidor/mês<small>backup, updates, capacidade</small></div>
               <input type="number" id="t1_hsv" value="1" step="0.5" min="0"><input type="number" id="t2_hsv" value="2" step="0.5" min="0"><input type="number" id="t3_hsv" value="3" step="0.5" min="0">
 
+              <div class="rl">Horas por ativo de rede/mês<small>firmware, links, regras</small></div>
+              <input type="number" id="t1_hrd" value="0.1" step="0.05" min="0"><input type="number" id="t2_hrd" value="0.25" step="0.05" min="0"><input type="number" id="t3_hrd" value="0.5" step="0.05" min="0">
+
               <div class="rl">Gestão / vCIO (h/mês)<small>reuniões, relatórios, planejamento</small></div>
               <input type="number" id="t1_vcio" value="0" step="0.5" min="0"><input type="number" id="t2_vcio" value="1" step="0.5" min="0"><input type="number" id="t3_vcio" value="3" step="0.5" min="0">
 
@@ -368,7 +404,7 @@
               <div class="rl">Margem de contribuição alvo<small>paga os custos fixos + lucro</small></div>
               <input type="number" id="t1_mg" value="35" step="1"><input type="number" id="t2_mg" value="38" step="1"><input type="number" id="t3_mg" value="40" step="1">
 
-              <div class="rl">Preço mínimo por usuário (R$)<small>valor de mercado; 0 = sem piso</small></div>
+              <div class="rl">Preço mínimo por usuário (R$)<small>só no modo custo + margem</small></div>
               <input type="number" id="t1_ppumin" value="120" step="5" min="0"><input type="number" id="t2_ppumin" value="150" step="5" min="0"><input type="number" id="t3_ppumin" value="250" step="5" min="0">
 
               <div class="rl">Desconto na hora excedente<small>% sobre a hora avulsa</small></div>
@@ -493,9 +529,9 @@
       <div>
         <div class="card">
           <div class="card-title"><span class="dot"></span> O que entra na proposta</div>
-          <label class="check-row"><input type="checkbox" id="pr_t1" checked> Plano Essential</label>
-          <label class="check-row"><input type="checkbox" id="pr_t2" checked> Plano Pro ★</label>
-          <label class="check-row"><input type="checkbox" id="pr_t3" checked> Plano Enterprise</label>
+          <label class="check-row"><input type="checkbox" id="pr_t1" checked> Wave Essential</label>
+          <label class="check-row"><input type="checkbox" id="pr_t2" checked> Wave Professional ★</label>
+          <label class="check-row"><input type="checkbox" id="pr_t3" checked> Wave Enterprise</label>
           <label class="check-row"><input type="checkbox" id="pr_ancora" checked> Apresentar do maior para o menor plano (ancoragem)</label>
           <label class="check-row"><input type="checkbox" id="pr_setup" checked> Mostrar taxa de implantação</label>
           <label class="check-row"><input type="checkbox" id="pr_extra" checked> Mostrar valor da hora excedente</label>
@@ -700,9 +736,9 @@
   const roundUp = (v, step) => step > 0 ? Math.ceil(v / step - 1e-9) * step : Math.round(v * 100) / 100;
 
   const TIERS = [
-    { id: 't1', name: 'Essential', sub: 'Monitoramento & suporte remoto', color: 'var(--tier-1)' },
-    { id: 't2', name: 'Pro', sub: 'Prevenção & atendimento híbrido', color: 'var(--tier-2)', rec: true },
-    { id: 't3', name: 'Enterprise', sub: 'TI terceirizada completa (vCIO)', color: 'var(--tier-3)' }
+    { id: 't1', name: 'Essential', sub: 'Operação assistida com previsibilidade', color: 'var(--tier-1)' },
+    { id: 't2', name: 'Professional', sub: 'Acompanhamento próximo, uso diário da TI', color: 'var(--tier-2)', rec: true },
+    { id: 't3', name: 'Enterprise', sub: 'Operações críticas, máxima disponibilidade', color: 'var(--tier-3)' }
   ];
 
   const ITEM_TYPES = {
@@ -755,7 +791,7 @@
   }
 
   /* ============================== PLANOS ============================== */
-  const UNITS = { endpoint: 'Endpoint', usuario: 'Usuário', servidor: 'Servidor', fixo: 'Fixo/mês' };
+  const UNITS = { endpoint: 'Endpoint', usuario: 'Usuário', servidor: 'Servidor', rede: 'Ativo de rede', fixo: 'Fixo/mês' };
 
   const DEFAULT_STACK = [
     // costs = custo por unidade em [Essential, Pro, Enterprise]; null = não incluso no plano
@@ -856,13 +892,17 @@
   }
 
   function calcPlans() {
-    const users = num('c_users'), endpoints = num('c_endpoints'), servers = num('c_servers');
+    const users = num('c_users'), endpoints = num('c_endpoints'), servers = num('c_servers'), rede = num('c_rede');
     const mat = num('c_maturidade') || 1;
+    const tableMode = $('pl_modo').value === 'tabela';
+    // Complexidade também mexe no preço da tabela (as horas já são multiplicadas por ela)
+    const adjComplex = mat <= 1 ? -0.10 : mat >= 1.6 ? 0.20 : 0;
+    const adjClient = num('c_ajuste') / 100;
     const hora = num('g_hora');
     const step = num('g_round');
     const minMargin = num('g_margem_min');
     const perUserBilling = $('pl_cobranca').value === 'usuario' && users > 0;
-    const qtyFor = u => ({ usuario: users, endpoint: endpoints, servidor: servers, fixo: 1 })[u] || 0;
+    const qtyFor = u => ({ usuario: users, endpoint: endpoints, servidor: servers, rede, fixo: 1 })[u] || 0;
 
     const visitCost = num('l_km') * num('g_km') + num('l_pedagio') + (num('l_min') / 60) * hora;
     // Visita fora do plano: cobra o deslocamento à parte (as horas no local saem da franquia ou viram hora avulsa)
@@ -889,7 +929,7 @@
       const franquia = Math.ceil(Math.max(users * g('hu'), g('hmin')));   // horas prometidas ao cliente
       const sla = g('sla') || 1;
       const hReat = franquia * mat;                                       // horas reativas previstas (com retrabalho)
-      const hPro = (endpoints * g('hep') + servers * g('hsv')) * mat;     // manutenção proativa
+      const hPro = (endpoints * g('hep') + servers * g('hsv') + rede * g('hrd')) * mat;   // manutenção proativa
       const hGest = g('vcio');                                            // gestão / vCIO
       const laborReat = hReat * hora * sla;
       const laborPro = hPro * hora;
@@ -912,10 +952,15 @@
         return;
       }
       const piso = g('ppumin') * users;
-      const pisoApplied = piso > raw;
+      const pisoApplied = !tableMode && piso > raw;
       const target = Math.max(raw, piso);
-      let price, ppu;
-      if (perUserBilling) {
+      let price, ppu, tabela = 0;
+      if (tableMode) {
+        // Modelo híbrido: taxa base + usuários + computadores extras + servidores + rede
+        tabela = g('pbase') + users * g('puser') + Math.max(0, endpoints - users) * g('pdev') + servers * g('psrv') + rede * g('prede');
+        price = roundUp(tabela * (1 + adjComplex) * (1 + adjClient), step);
+        ppu = users > 0 ? price / users : 0;
+      } else if (perUserBilling) {
         ppu = roundUp(target / users, step >= 10 ? 5 : step);
         price = ppu * users;
       } else {
@@ -943,11 +988,10 @@
       const netAfterFixed = b.profit - price * fixedShare / 100;
       const netPct = price ? netAfterFixed / price * 100 : 0;
       const [cls, label] = statusBadge(b.margin);
-      const perDevice = endpoints > 0 ? fmt(price / endpoints) : '—';
       const h1 = v => v.toFixed(1).replace('.', ',');
 
       state.plans.push({ ...t, price, ppu, perUserBilling, cost, stack: stackCost, tools, labor, laborReat, laborPro, laborGest,
-        travel, boleto, franquia, hReat, hPro, hGest, hWork, vis, extraHour, setup, setupCost, setupHrs, maxDisc, stressMargin, pisoApplied, riskV, slaTxt: $(t.id + '_slatxt').value, netAfterFixed, netPct, ...b });
+        travel, boleto, tabela, suggested: roundUp(raw, step), franquia, hReat, hPro, hGest, hWork, vis, extraHour, setup, setupCost, setupHrs, maxDisc, stressMargin, pisoApplied, riskV, slaTxt: $(t.id + '_slatxt').value, netAfterFixed, netPct, ...b });
 
       const stressCls = stressMargin < 0 ? 'var(--danger)' : stressMargin < minMargin ? 'var(--warning)' : 'var(--success)';
 
@@ -956,13 +1000,15 @@
           <div class="plan-ribbon" style="background:${t.color}"></div>
           <div class="plan-header">
             <div>
-              <div class="plan-name" style="color:${t.color}">${t.name} ${t.rec ? '★' : ''}</div>
+              <div class="plan-name" style="color:${t.color}">Wave ${t.name} ${t.rec ? '★' : ''}</div>
               <div class="plan-desc">${t.sub}</div>
               <div class="plan-desc" style="margin-top:6px">${franquia}h de suporte/mês · ${visitLabel(vis)} · ${tools.length} ferramenta(s)</div>
             </div>
             <div class="plan-price-box">
               <div class="plan-price">${fmt(price)}<small> /mês</small></div>
-              ${perUserBilling ? `<div class="plan-desc">${fmt(ppu)} por usuário × ${users}</div>` : ''}
+              ${tableMode
+                ? `<div class="plan-desc">Tabela ${fmt(tabela)}${adjComplex ? ` · complexidade ${adjComplex > 0 ? '+' : ''}${pct(adjComplex * 100, 0)}` : ''}${adjClient ? ` · ajuste ${adjClient > 0 ? '+' : ''}${pct(adjClient * 100, 0)}` : ''}</div>`
+                : perUserBilling ? `<div class="plan-desc">${fmt(ppu)} por usuário × ${users}</div>` : ''}
               <div class="badge ${cls}">${label} · lucro ${fmt(b.profit)} (${pct(b.margin, 0)})</div>
               ${pisoApplied ? `<div><span class="badge badge-warn" title="O cálculo pelo custo deu abaixo do seu preço de mercado; foi usado o preço mínimo por usuário">Preço de mercado aplicado</span></div>` : ''}
             </div>
@@ -979,12 +1025,14 @@
             <div class="detail-item" title="Lucro depois de pagar a parte deste cliente nos custos fixos da Techwave (${pct(fixedShare)} do faturamento)">Lucro após custos fixos <strong style="color:${netAfterFixed < 0 ? 'var(--danger)' : 'inherit'}">${fmt(netAfterFixed)} (${pct(netPct, 0)})</strong></div>
             <div class="detail-item" title="Reativo ${h1(hReat)}h + proativo ${h1(hPro)}h + gestão ${h1(hGest)}h">Horas de trabalho previstas <strong>${h1(hWork)}h</strong></div>
             <div class="detail-item">Custo das ferramentas <strong>${fmt(stackCost)}</strong></div>
-            <div class="detail-item">Preço por endpoint <strong>${perDevice}</strong></div>
+            <div class="detail-item">Média por usuário <strong>${users > 0 ? fmt(price / users) : '—'}</strong></div>
+            <div class="detail-item" title="Abaixo deste valor o contrato fica abaixo da margem mínima">Preço mínimo seguro <strong>${fmt(roundUp(floor, step))}</strong></div>
+            <div class="detail-item" title="Preço que a margem alvo do plano daria pelo custo">Preço pela margem alvo <strong>${fmt(roundUp(raw, step))}</strong></div>
             <div class="detail-item">Hora excedente <strong>${fmt(extraHour)}</strong></div>
             <div class="detail-item">Implantação (única) <strong>${fmt(setup)}</strong></div>
             <div class="detail-item" title="Quanto você pode dar de desconto sem cair abaixo da margem mínima">Desconto máx. negociável <strong>${pct(maxDisc, 0)}</strong></div>
             <div class="detail-item" title="Margem se o cliente consumir 50% a mais de horas reativas do que o previsto">Margem se usar +50% horas <strong style="color:${stressCls}">${pct(stressMargin, 0)}</strong></div>
-            <div class="detail-item">Lucro anual do contrato <strong>${fmt(b.profit * 12)}</strong></div>
+
           </div>
         </div>`;
     });
@@ -1124,11 +1172,12 @@
       L.push(`- Usuários: ${num('c_users')}`);
       L.push(`- Computadores gerenciados: ${num('c_endpoints')}`);
       L.push(`- Servidores gerenciados: ${num('c_servers')}`);
+      L.push(`- Ativos de rede (links, roteador, firewall): ${num('c_rede')}`);
       L.push('');
       L.push(chosen.length > 1 ? '[OPÇÕES DE PLANO MENSAL]' : '[PLANO MENSAL]');
       chosen.forEach(p => {
         L.push('');
-        L.push(`>> Plano ${p.name.toUpperCase()}${p.rec && chosen.length > 1 ? ' (recomendado)' : ''} — ${p.sub}`);
+        L.push(`>> Wave ${p.name.toUpperCase()}${p.rec && chosen.length > 1 ? ' (recomendado)' : ''} — ${p.sub}`);
         L.push(`   Investimento: ${fmt(p.price)} / mês`);
         L.push(`   Inclui: ${p.franquia}h de suporte técnico por mês (remoto ou presencial)`);
         if (p.slaTxt) L.push(`   Tempo de resposta: ${p.slaTxt}`);
@@ -1199,7 +1248,9 @@
   // Padrões que mudaram: [valor antigo, valor novo]. Só troca se o salvo ainda for o antigo.
   const DEFAULT_UPGRADES = {
     k_comb: ['6.40', '4.99'], g_km: ['1.00', '0.85'], h_horas_socio: ['80', '143'], g_hora_avulsa: ['90', '75'],
-    t1_hxd: ['10', '5'], t2_hxd: ['15', '10'], t3_hxd: ['20', '15']
+    t1_hxd: ['10', '5'], t2_hxd: ['15', '10'], t3_hxd: ['20', '15'],
+    t2_vis: ['0.5', '1'], t3_vis: ['1', '2'],
+    t1_slatxt: ['8h úteis', 'até 2 horas'], t2_slatxt: ['4h úteis', 'até 1 hora'], t3_slatxt: ['30 min', '30 min, 24/7']
   };
 
   function apply(data) {

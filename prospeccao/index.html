@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Techwave · Central de Prospecção</title>
+<style>
+:root{
+  --primary:#0066cc;--primary-dark:#004499;--accent:#ff6b35;
+  --text:#1a1a1a;--muted:#667085;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--ok:#16a34a;
+}
+@media (prefers-color-scheme:dark){
+  :root{--text:#e8edf5;--muted:#94a3b8;--bg:#0f172a;--card:#172036;--border:#2a3652}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:20px 16px}
+header div{max-width:1100px;margin:0 auto}
+header h1{font-size:20px;font-weight:800}
+header p{opacity:.85;font-size:14px}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px;display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+label:first-child{margin-top:0}
+input[type=text]{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font:inherit;background:var(--bg);color:var(--text)}
+input:focus{outline:2px solid var(--primary);border-color:transparent}
+.stages{display:grid;gap:6px}
+.stage{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;background:var(--bg)}
+.stage:hover{border-color:var(--primary)}
+.stage input{display:none}
+.stage.on{border-color:var(--primary);background:rgba(0,102,204,.10);font-weight:600}
+.stage small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+details{margin-top:14px;font-size:13px}
+summary{cursor:pointer;color:var(--primary);font-weight:600}
+.btn{border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:600;cursor:pointer;font-size:14px}
+.btn.main{background:var(--primary);color:#fff;width:100%;margin-top:16px;padding:13px;font-size:15px}
+.btn.main:hover{background:var(--primary-dark)}
+.btn.sec{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+.btn.wa{background:#25d366;color:#fff}
+.btn.ok{background:var(--ok);color:#fff}
+.tag{display:inline-block;font-size:12px;background:rgba(255,107,53,.14);color:var(--accent);padding:3px 9px;border-radius:99px;font-weight:600;margin-bottom:10px}
+.out{display:grid;gap:16px}
+.out h2{font-size:15px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.subject{font-weight:700;margin-bottom:8px;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:14px}
+pre{white-space:pre-wrap;font-family:inherit;font-size:14px;background:var(--bg);border-radius:8px;padding:12px;border:1px solid var(--border)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.empty{text-align:center;color:var(--muted);padding:50px 10px}
+.hist{margin-top:16px;font-size:13px}
+.hist button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--border);padding:7px 0;color:var(--text);cursor:pointer;font:inherit}
+.hist button:hover{color:var(--primary)}
+.note{font-size:12px;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<header><div>
+  <h1>Techwave · Central de Prospecção</h1>
+  <p>Informe empresa, nicho e momento. O texto sai pronto para e-mail e WhatsApp.</p>
+</div></header>
+
+<main>
+  <section class="card">
+    <label for="empresa">Empresa</label>
+    <input type="text" id="empresa" placeholder="Ex.: Empresa XYZ" autocomplete="off">
+
+    <label for="nicho">Nicho</label>
+    <input type="text" id="nicho" placeholder="Ex.: Contabilidade" list="nichos" autocomplete="off">
+    <datalist id="nichos"></datalist>
+
+    <label>Momento da prospecção</label>
+    <div class="stages" id="stages"></div>
+
+    <details>
+      <summary>Personalizar (opcional)</summary>
+      <label for="contato">Nome do contato</label>
+      <input type="text" id="contato" placeholder="Ex.: Marina">
+      <label for="remetente">Seu nome</label>
+      <input type="text" id="remetente" placeholder="Ex.: Lucas Veiga">
+    </details>
+
+    <button class="btn main" id="gerar">Gerar mensagens</button>
+    <p class="note">Tudo roda no seu navegador. Nada é enviado para servidores.</p>
+    <div class="hist" id="hist"></div>
+  </section>
+
+  <section id="resultado">
+    <div class="card empty">Preencha empresa e nicho, escolha o momento e clique em <b>Gerar mensagens</b>.</div>
+  </section>
+</main>
+
+<script>
+/* ---------- Momentos ---------- */
+const STAGES=[
+  {id:"primeiro",ico:"🟢",nome:"Primeiro contato",sub:"Abordagem inicial a frio"},
+  {id:"fu1",ico:"🟡",nome:"Follow-up 1",sub:"2 a 3 dias sem resposta"},
+  {id:"fu2",ico:"🟡",nome:"Follow-up 2",sub:"Último lembrete leve"},
+  {id:"aguardando",ico:"🔵",nome:"Aguardando retorno",sub:"Conversa parada, sem pressão"},
+  {id:"resposta",ico:"🟣",nome:"Após resposta",sub:"Lead respondeu, agendar conversa"},
+  {id:"proposta",ico:"🟠",nome:"Após envio de proposta",sub:"Proposta enviada, destravar decisão"},
+  {id:"reativacao",ico:"🔴",nome:"Reativação",sub:"Contato antigo ou lead frio"},
+  {id:"relacionamento",ico:"⚪",nome:"Relacionamento",sub:"Manter proximidade com cliente"}
+];
+
+/* ---------- Conhecimento por nicho ----------
+   dor: situações do dia a dia (3 variações) · risco: o que está em jogo · oferta: o que a Techwave resolve */
+const NICHOS=[
+ {k:["contab","contador","escritorio contabil","fiscal"],nome:"Contabilidade",
+  dor:["troca constante de arquivos sensíveis dos clientes por e-mail e WhatsApp","lentidão e instabilidade nos sistemas em época de fechamento e obrigações acessórias","backup que ninguém tem certeza se funciona"],
+  risco:"vazamento de dados fiscais de clientes e paradas em datas de entrega",
+  oferta:"infraestrutura segura, backup monitorado e suporte rápido para o escritório não parar nos prazos"},
+ {k:["advoc","juridic","escritorio de adv"],nome:"Advocacia",
+  dor:["sigilo de documentos e processos circulando sem controle de acesso","acesso remoto improvisado para advogados em audiência ou home office","perda de arquivos de casos por falta de backup confiável"],
+  risco:"quebra de sigilo profissional e multas pela LGPD",
+  oferta:"segurança da informação, controle de acesso e backup para proteger o sigilo dos seus clientes"},
+ {k:["clinica","medic","saude","hospital","consultorio","laborat"],nome:"Saúde / Clínicas",
+  dor:["prontuários e dados de pacientes em máquinas sem proteção adequada","sistema de agendamento fora do ar em horário de pico","adequação à LGPD para dados sensíveis de saúde"],
+  risco:"exposição de dados sensíveis de pacientes e atendimento interrompido",
+  oferta:"infraestrutura estável, proteção de dados sensíveis e suporte técnico ágil para a operação não parar"},
+ {k:["odonto","dentist"],nome:"Odontologia",
+  dor:["imagens e prontuários de pacientes sem backup","sistema de agenda e radiologia lento ou instável","computadores da recepção sem proteção contra vírus e ransomware"],
+  risco:"perda de histórico de pacientes e consultório parado",
+  oferta:"backup automático, proteção contra ransomware e suporte técnico sem dor de cabeça"},
+ {k:["varejo","loja","comercio","supermercado","mercado"],nome:"Varejo",
+  dor:["PDV e rede caindo em horário de maior movimento","câmeras, Wi-Fi e sistema de gestão sem integração ou monitoramento","falta de alguém de TI para resolver problemas rápido"],
+  risco:"vendas perdidas a cada minuto de loja parada",
+  oferta:"rede estável, monitoramento proativo e suporte para o PDV nunca ser o gargalo"},
+ {k:["ecommerce","e-commerce","loja virtual","marketplace"],nome:"E-commerce",
+  dor:["instabilidade da plataforma em campanhas e datas sazonais","dados de clientes e pagamentos expostos a ataques","servidores e integrações sem monitoramento"],
+  risco:"queda de vendas e danos à reputação em picos de demanda",
+  oferta:"cloud bem dimensionada, segurança e monitoramento 24x7 para sustentar o crescimento"},
+ {k:["industr","fabrica","manufat","metalurg"],nome:"Indústria",
+  dor:["ERP e rede do chão de fábrica sem redundância","sistemas legados difíceis de manter e proteger","ataques de ransomware que param a produção"],
+  risco:"linha de produção parada e prejuízo por hora",
+  oferta:"infraestrutura resiliente, segurança industrial e plano de continuidade de negócio"},
+ {k:["constru","engenharia","incorpor","arquitet"],nome:"Construção / Engenharia",
+  dor:["projetos pesados e plantas compartilhados de forma desorganizada","acesso remoto entre escritório e obras instável","máquinas de projeto lentas e sem manutenção preventiva"],
+  risco:"retrabalho, atrasos de projeto e perda de arquivos críticos",
+  oferta:"servidor de arquivos, acesso remoto seguro e suporte que acompanha o ritmo das obras"},
+ {k:["escola","educa","faculdade","curso","ensino","universidade"],nome:"Educação",
+  dor:["Wi-Fi que não aguenta alunos e professores conectados ao mesmo tempo","dados de alunos e responsáveis sem a proteção da LGPD","laboratórios e salas com equipamentos sem gestão"],
+  risco:"aulas comprometidas e exposição de dados de menores",
+  oferta:"rede robusta, gestão de equipamentos e adequação à LGPD para instituições de ensino"},
+ {k:["logist","transport","frete","armazem"],nome:"Logística / Transporte",
+  dor:["sistemas de roteirização e rastreio fora do ar","conectividade instável em galpões e pátios","falta de monitoramento da infraestrutura"],
+  risco:"entregas atrasadas e clientes insatisfeitos",
+  oferta:"conectividade estável, monitoramento contínuo e suporte para a operação rodar sem pausa"},
+ {k:["restaurante","bar","lanchonete","food","alimenta","padaria","hotel","pousada"],nome:"Alimentação / Hotelaria",
+  dor:["sistema de comandas e caixa travando no horário de pico","Wi-Fi de clientes misturado com a rede da operação","falta de suporte técnico em fins de semana"],
+  risco:"atendimento lento e faturamento perdido nos horários de maior fluxo",
+  oferta:"rede segmentada, sistemas estáveis e suporte técnico quando a operação mais precisa"},
+ {k:["imobili","corretor","corretora"],nome:"Imobiliário",
+  dor:["contratos e documentos de clientes espalhados em vários dispositivos","corretores acessando sistemas de fora sem segurança","CRM e portais lentos ou instáveis"],
+  risco:"vazamento de dados de clientes e negócios perdidos por falha de sistema",
+  oferta:"acesso remoto seguro, organização de documentos e suporte para o time de vendas"},
+ {k:["agencia","marketing","publicidade","design","tecnologia","software","ti ","startup"],nome:"Agência / Tecnologia",
+  dor:["máquinas potentes sem gestão e licenças de software desorganizadas","contas e senhas compartilhadas de clientes sem controle","falta de padrão de segurança entre o time"],
+  risco:"perda de acessos de clientes e retrabalho por falhas técnicas",
+  oferta:"gestão de ativos, políticas de segurança e suporte para o time focar em entregar"},
+ {k:["financ","banco","cooperativa","seguro","corretora de seguros","consorcio"],nome:"Financeiro / Seguros",
+  dor:["exigências regulatórias de segurança e auditoria de acessos","dados financeiros de clientes sob risco de vazamento","sistemas críticos sem plano de contingência"],
+  risco:"sanções regulatórias e perda de confiança dos clientes",
+  oferta:"segurança da informação, controle de acessos e continuidade de negócio com visão de conformidade"}
+];
+const GENERICO={nome:"",
+  dor:["falta de um parceiro de TI que resolva problemas rápido","dados importantes sem backup e proteção adequados","rede e sistemas lentos que atrapalham a rotina"],
+  risco:"paradas inesperadas e exposição de dados do negócio",
+  oferta:"infraestrutura, segurança e suporte técnico para a TI deixar de ser dor de cabeça"};
+
+/* ---------- Utilidades ---------- */
+const norm=s=>(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").trim();
+function acharNicho(txt){
+  const t=" "+norm(txt)+" ";
+  const n=NICHOS.find(n=>n.k.some(k=>t.includes(norm(k))));
+  return n||{...GENERICO,nome:txt.trim()};
+}
+const saud=()=>{const h=new Date().getHours();return h<12?"Bom dia":h<18?"Boa tarde":"Boa noite"};
+const lower1=s=>s.charAt(0).toLowerCase()+s.slice(1);
+
+/* ---------- Geração ---------- */
+function gerar(ctx,stageId,v){
+  const {empresa,contato,remetente,n}=ctx;
+  const oi=contato?`${saud()}, ${contato}!`:`${saud()}!`;
+  const olaEmail=contato?`Olá, ${contato},`:`Olá, equipe da ${empresa},`;
+  const dor=n.dor[v%n.dor.length];
+  const nichoTxt=n.nome?`empresas de ${lower1(n.nome)}`:"empresas como a sua";
+  const ass=`${remetente||"[Seu nome]"}\nTechwave IT Solutions`;
+  const T={
+  primeiro:{
+    assunto:`${empresa}: uma ideia sobre TI e segurança`,
+    email:`${olaEmail}\n\nMeu nome é ${remetente||"[Seu nome]"}, da Techwave IT Solutions. Há 15 anos ajudamos ${nichoTxt} a ter uma TI estável e segura.\n\nConversando com empresas do segmento, um ponto aparece com frequência: ${dor}. O risco costuma ser ${n.risco}.\n\nA Techwave atua com ${n.oferta}.\n\nFaz sentido uma conversa rápida de 15 minutos para ver se isso se aplica à ${empresa}? Posso me adaptar ao melhor horário para você.\n\nAbraço,\n${ass}`,
+    wa:`${oi} Aqui é ${remetente||"[Seu nome]"}, da Techwave IT Solutions. Trabalhamos com TI e segurança para ${nichoTxt}.\n\nMuitos negócios do segmento enfrentam ${dor}. Queria entender como isso está na ${empresa}. Posso te explicar em 2 minutos como ajudamos nisso?`},
+  fu1:{
+    assunto:`Re: ${empresa}: uma ideia sobre TI e segurança`,
+    email:`${olaEmail}\n\nVoltando ao meu e-mail anterior, caso tenha passado batido na correria.\n\nO ponto que mencionei foi ${dor}, com risco de ${n.risco}. Se isso é uma preocupação por aí, consigo mostrar em 15 minutos como outras empresas resolveram.\n\nQual seria o melhor dia da semana para você?\n\nAbraço,\n${ass}`,
+    wa:`${oi} Passando para retomar minha mensagem anterior sobre TI e segurança na ${empresa}. Sei que a rotina é corrida! Se fizer sentido, posso te mostrar rapidinho como ajudamos no ponto de ${dor}. Tem 10 minutos essa semana?`},
+  fu2:{
+    assunto:`Encerrando por aqui, ${empresa}?`,
+    email:`${olaEmail}\n\nComo não tive retorno, imagino que o momento não seja ideal, e está tudo bem.\n\nDeixo uma última nota: se ${dor} virar prioridade na ${empresa}, a Techwave pode ajudar com ${n.oferta}.\n\nSe preferir que eu não volte a escrever, é só me avisar. Caso contrário, fico à disposição.\n\nAbraço,\n${ass}`,
+    wa:`${oi} Última mensagem da minha parte para não ser inconveniente. Se TI e segurança forem pauta na ${empresa} em algum momento, é só me chamar por aqui. Sucesso para vocês! 🙂`},
+  aguardando:{
+    assunto:`${empresa}: sem pressa, fico à disposição`,
+    email:`${olaEmail}\n\nQuero apenas reforçar que não há pressa. Imagino que vocês estejam avaliando as prioridades.\n\nSe ajudar na decisão, posso preparar um resumo curto de como a Techwave endereçaria ${dor} na ${empresa}, sem compromisso.\n\nMe avise se quiser que eu envie.\n\nAbraço,\n${ass}`,
+    wa:`${oi} Tudo bem? Só passando para dizer que sigo à disposição quando for um bom momento para vocês. Se quiser, preparo um resumo curtinho sobre ${dor}, sem compromisso. 😉`},
+  resposta:{
+    assunto:`Obrigado pelo retorno, ${empresa}`,
+    email:`${olaEmail}\n\nObrigado pelo retorno! Fico feliz que tenha feito sentido.\n\nPara que a nossa conversa seja objetiva, gostaria de entender: como está hoje a estrutura de TI da ${empresa} (quantos usuários, quem dá suporte, como é o backup) e qual a maior dor no momento.\n\nTenho disponibilidade nos próximos dias. Qual horário fica melhor para uma call de 20 minutos?\n\nAbraço,\n${ass}`,
+    wa:`${oi} Obrigado pelo retorno! 🙌 Para eu chegar na conversa já com algo útil, pode me contar rapidinho: quantos usuários vocês têm e quem cuida da TI hoje na ${empresa}? E já te passo opções de horário para uma call de 20 min.`},
+  proposta:{
+    assunto:`Proposta Techwave para ${empresa}: dúvidas?`,
+    email:`${olaEmail}\n\nEnviei a proposta da Techwave para a ${empresa} e queria saber se conseguiu analisar.\n\nEla foi pensada para endereçar ${dor}, reduzindo o risco de ${n.risco}.\n\nSe houver qualquer dúvida sobre escopo, prazos ou valores, posso agendar 15 minutos para esclarecer e ajustar o que for preciso.\n\nAguardo seu retorno.\n\nAbraço,\n${ass}`,
+    wa:`${oi} Conseguiu dar uma olhada na proposta que enviei para a ${empresa}? Se ficou alguma dúvida (escopo, prazo ou valores), me diga que ajusto ou explico por aqui mesmo. 😊`},
+  reativacao:{
+    assunto:`${empresa}: faz tempo que não conversamos`,
+    email:`${olaEmail}\n\nFaz um tempo desde a nossa última conversa e queria saber como andam as coisas na ${empresa}.\n\nDesde então, ampliamos nossa atuação com ${n.oferta}. Muitas ${nichoTxt} vêm nos procurando por causa de ${dor}.\n\nSe o cenário mudou, vale retomarmos? Posso te atualizar em 15 minutos.\n\nAbraço,\n${ass}`,
+    wa:`${oi} Faz um tempo que conversamos, tudo bem por aí? Lembrei da ${empresa} porque temos ajudado ${nichoTxt} com ${dor}. Se o cenário mudou, topa retomarmos o papo?`},
+  relacionamento:{
+    assunto:`${empresa}: um alerta útil de TI`,
+    email:`${olaEmail}\n\nPassando para manter contato e compartilhar um ponto de atenção para ${nichoTxt}: ${dor}. É um tema que tem gerado ${n.risco}.\n\nNão é uma oferta, só uma dica. Se quiser, posso fazer uma revisão rápida do seu cenário e indicar pontos de melhoria, sem custo.\n\nConte conosco!\n\nAbraço,\n${ass}`,
+    wa:`${oi} Passando só para dar um alô e compartilhar uma dica: ${dor} está bem em alta entre ${nichoTxt}. Se quiser trocar uma ideia sobre como está na ${empresa}, estou por aqui. Sem compromisso! 🙂`}
+  };
+  return T[stageId];
+}
+
+/* ---------- UI ---------- */
+const $=id=>document.getElementById(id);
+let stageAtual="primeiro",variacao=0,ultimo=null;
+
+$("nichos").innerHTML=NICHOS.map(n=>`<option value="${n.nome}">`).join("");
+$("stages").innerHTML=STAGES.map(s=>`<label class="stage${s.id===stageAtual?" on":""}" data-id="${s.id}"><input type="radio" name="st" value="${s.id}" ${s.id===stageAtual?"checked":""}><span>${s.ico}</span><span>${s.nome}<small>${s.sub}</small></span></label>`).join("");
+$("stages").addEventListener("click",e=>{
+  const el=e.target.closest(".stage");if(!el)return;
+  stageAtual=el.dataset.id;variacao=0;
+  document.querySelectorAll(".stage").forEach(x=>x.classList.toggle("on",x===el));
+});
+
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(){
+  const empresa=$("empresa").value.trim(),nicho=$("nicho").value.trim();
+  if(!empresa||!nicho){
+    $("resultado").innerHTML=`<div class="card empty">Informe a <b>empresa</b> e o <b>nicho</b> para gerar as mensagens.</div>`;return;
+  }
+  const ctx={empresa,contato:$("contato").value.trim(),remetente:$("remetente").value.trim(),n:acharNicho(nicho)};
+  const st=STAGES.find(s=>s.id===stageAtual);
+  const m=gerar(ctx,stageAtual,variacao);
+  ultimo={m,empresa};
+  $("resultado").innerHTML=`
+  <div class="out">
+    <div class="card">
+      <span class="tag">${st.ico} ${st.nome}</span> <span class="tag" style="background:rgba(0,102,204,.12);color:var(--primary)">${esc(ctx.n.nome||nicho)}</span>
+      <div class="row" style="margin:0 0 4px"><button class="btn sec" id="outra">🔄 Gerar outra variação</button></div>
+    </div>
+    <div class="card">
+      <h2>✉️ E-mail <button class="btn sec" data-copy="email">Copiar e-mail</button></h2>
+      <div class="subject">Assunto: ${esc(m.assunto)}</div>
+      <pre id="t-email">${esc(m.email)}</pre>
+      <div class="row"><button class="btn sec" data-copy="assunto">Copiar assunto</button>
+      <a class="btn sec" style="text-decoration:none" href="mailto:?subject=${encodeURIComponent(m.assunto)}&body=${encodeURIComponent(m.email)}">Abrir no e-mail</a></div>
+    </div>
+    <div class="card">
+      <h2>💬 WhatsApp <button class="btn sec" data-copy="wa">Copiar mensagem</button></h2>
+      <pre id="t-wa">${esc(m.wa)}</pre>
+      <div class="row"><a class="btn wa" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(m.wa)}">Abrir no WhatsApp</a></div>
+    </div>
+  </div>`;
+}
+
+async function copiar(btn,txt){
+  try{await navigator.clipboard.writeText(txt)}catch{
+    const t=document.createElement("textarea");t.value=txt;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();
+  }
+  const old=btn.textContent;btn.textContent="✓ Copiado";btn.classList.add("ok");
+  setTimeout(()=>{btn.textContent=old;btn.classList.remove("ok")},1400);
+}
+
+$("resultado").addEventListener("click",e=>{
+  if(e.target.id==="outra"){variacao++;render();return}
+  const c=e.target.dataset.copy;if(c&&ultimo)copiar(e.target,ultimo.m[c]);
+});
+
+/* Histórico (localStorage, opcional) */
+function histLer(){try{return JSON.parse(localStorage.getItem("tw_hist")||"[]")}catch{return[]}}
+function histSalvar(){
+  const h=histLer().filter(i=>!(i.e===$("empresa").value.trim()&&i.s===stageAtual));
+  h.unshift({e:$("empresa").value.trim(),n:$("nicho").value.trim(),s:stageAtual});
+  try{localStorage.setItem("tw_hist",JSON.stringify(h.slice(0,8)))}catch{}
+  histRender();
+}
+function histRender(){
+  const h=histLer();
+  $("hist").innerHTML=h.length?`<b>Recentes</b>`+h.map((i,x)=>{const s=STAGES.find(s=>s.id===i.s);return`<button data-i="${x}">${s.ico} ${esc(i.e)} · ${esc(i.n)}</button>`}).join(""):"";
+}
+$("hist").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  const i=histLer()[b.dataset.i];
+  $("empresa").value=i.e;$("nicho").value=i.n;stageAtual=i.s;variacao=0;
+  document.querySelectorAll(".stage").forEach(x=>x.classList.toggle("on",x.dataset.id===i.s));
+  render();
+});
+
+$("gerar").addEventListener("click",()=>{variacao=0;render();if($("empresa").value.trim()&&$("nicho").value.trim())histSalvar()});
+["empresa","nicho"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")$("gerar").click()}));
+histRender();
+</script>
+</body>
+</html>

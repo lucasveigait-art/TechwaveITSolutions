@@ -93,8 +93,9 @@ ol.passos{padding-left:22px;display:grid;gap:10px;font-size:14px}
       <p class="hint">Opcional, mas é o que tira a mensagem do "frio".</p>
 
       <label for="cidade">Cidade do cliente</label>
-      <input type="text" id="cidade" placeholder="Ex.: Saquarema" autocomplete="off">
-      <p class="hint">Se já temos cliente na mesma cidade ou no mesmo ramo, ele entra como referência.</p>
+      <input type="text" id="cidade" placeholder="Ex.: Saquarema" list="cidades" autocomplete="off">
+      <datalist id="cidades"></datalist>
+      <p class="hint">Cita clientes nossos da mesma cidade, região ou ramo. Na Região dos Lagos e no Rio, o convite vira café presencial.</p>
 
       <label for="contato">Nome do contato</label>
       <input type="text" id="contato" placeholder="Ex.: Marina" autocomplete="off">
@@ -127,6 +128,21 @@ ol.passos{padding-left:22px;display:grid;gap:10px;font-size:14px}
 </main>
 
 <script>
+/* ---------- Utilidades ---------- */
+const semAcento=s=>(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const norm=s=>semAcento(s).trim();
+function acharNicho(txt){
+  const t=" "+norm(txt)+" ";
+  /* a ordem importa: nichos mais específicos vêm antes; chave com espaço nas pontas casa só a palavra inteira */
+  const n=NICHOS.find(n=>n.k.some(k=>t.includes(semAcento(k))));
+  if(n)return n;
+  const nome=txt.trim();
+  return {...GENERICO,nome,txt:`empresas de ${nome.toLowerCase()}`};
+}
+const saud=()=>{const h=new Date().getHours();return h<12?"Bom dia":h<18?"Boa tarde":"Boa noite"};
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const pick=(arr,v)=>arr[v%arr.length];
+
 /* ---------- Momentos ----------
    seq: sequência para criar conexão com um contato novo, com o dia sugerido */
 const STAGES=[
@@ -144,7 +160,7 @@ const DICAS={
   aquecimento:"Antes de pedir atenção, apareça: siga, curta e comente algo real. Quando a mensagem chegar, seu nome já vai ser familiar.",
   primeiro:"Fale da empresa do cliente antes de falar da sua e termine com uma pergunta fácil de responder.",
   fu1:"Dê antes de pedir: uma dica útil, sem vender nada, gera confiança e costuma puxar resposta.",
-  fu2:"Convide para um café em vez de uma reunião. Se for perto, presencial é ainda melhor.",
+  fu2:"Convide para um café em vez de uma reunião. Na Região dos Lagos e no Rio, o convite já sai presencial.",
   aguardando:"Encerre deixando a porta aberta. Daqui a 60 ou 90 dias, use a Reativação.",
   resposta:"Responda rápido e mostre curiosidade pela empresa antes de falar de TI.",
   proposta:"Pergunte o que achou e ofereça ajustar junto. Proposta é conversa, não ultimato.",
@@ -212,38 +228,62 @@ function textosConexao(t,x,E){
   }[t]||null;
 }
 
+/* ---------- Onde a Techwave atende presencialmente ----------
+   [cidade, cidade com preposição, apelidos...]. Fora daqui o café vira virtual. */
+const REGIOES={
+  lagos:[["Saquarema","em Saquarema","bacaxa","sampaio correia"],["Araruama","em Araruama"],["Iguaba Grande","em Iguaba Grande"],["São Pedro da Aldeia","em São Pedro da Aldeia"],["Cabo Frio","em Cabo Frio"],["Arraial do Cabo","em Arraial do Cabo"],["Armação dos Búzios","em Búzios","buzios"],["Rio das Ostras","em Rio das Ostras"],["Casimiro de Abreu","em Casimiro de Abreu"],["Silva Jardim","em Silva Jardim"],["Região dos Lagos","na Região dos Lagos","lagos"]],
+  rio:[["Rio de Janeiro","no Rio de Janeiro","rio","rj"],["Niterói","em Niterói"],["São Gonçalo","em São Gonçalo"],["Maricá","em Maricá"],["Itaboraí","em Itaboraí"],["Duque de Caxias","em Duque de Caxias"],["Nova Iguaçu","em Nova Iguaçu"]]
+};
+const CIDADES=Object.entries(REGIOES).flatMap(([regiao,l])=>l.map(([nome,em,...apelidos])=>({nome,em,regiao,chaves:[nome,...apelidos].map(x=>norm(x))})));
+/* casa o nome exato, um apelido ou um texto que contenha o nome (ex.: "Cabo Frio - RJ") */
+function acharCidade(txt){
+  const t=norm(txt);
+  if(!t)return null;
+  const exata=CIDADES.find(c=>c.chaves.includes(t));
+  if(exata)return exata;
+  const pares=CIDADES.flatMap(c=>c.chaves.filter(k=>k.length>=5).map(k=>[k,c])).sort((a,b)=>b[0].length-a[0].length);
+  const par=pares.find(([k])=>t.includes(k));
+  return par?par[1]:null;
+}
+const infoCidade=nome=>CIDADES.find(c=>c.nome===nome)||{nome,em:emDe(nome),regiao:null};
+const emDe=c=>/^(em|no|na|nos|nas)\s/i.test(c)?c:"em "+c;
+
 /* ---------- Clientes da Techwave usados como referência ----------
-   ramo: igual ao nome do nicho na lista abaixo (vazio = só referência por cidade) · em: cidade com a preposição */
+   sing: como o cliente aparece na frase · ramo: igual ao nome do nicho · cidade: igual à lista acima */
 const CLIENTES=[
-  {nome:"Attual Contabilidade",ramo:"Contabilidade",cidade:"Saquarema",em:"em Saquarema"},
-  {nome:"Radio Mix",ramo:"Comunicação / Mídia",cidade:"Saquarema",em:"em Saquarema"},
-  {nome:"Talita Gloria",ramo:"",cidade:"Saquarema",em:"em Saquarema"},
-  {nome:"Sediver",ramo:"Indústria",cidade:"Rio de Janeiro",em:"no Rio de Janeiro"}
+  {nome:"Attual Contabilidade",sing:"a Attual Contabilidade",ramo:"Contabilidade",cidade:"Saquarema"},
+  {nome:"Radio Mix",sing:"a Radio Mix",ramo:"Comunicação / Mídia",cidade:"Saquarema"},
+  {nome:"Talita Gloria",sing:"o escritório Talita Gloria",ramo:"Advocacia",cidade:"Saquarema"},
+  {nome:"Sediver",sing:"a multinacional Sediver",ramo:"Indústria",cidade:"Rio de Janeiro"}
 ];
 const lista=a=>a.length>1?a.slice(0,-1).join(", ")+" e "+a[a.length-1]:a[0];
-const emDe=c=>/^(em|no|na|nos|nas)\s/i.test(c)?c:"em "+c;
-/* Prioridade: clientes da mesma cidade (os do mesmo ramo primeiro); senão, clientes do mesmo ramo */
-function referencia(n,cidade,E){
-  const cid=norm(cidade);
-  const outros=CLIENTES.filter(r=>norm(r.nome)!==norm(E));
-  const local=cid.length>=3?outros.filter(r=>cid.includes(norm(r.cidade))||norm(r.cidade).includes(cid)):[];
-  if(local.length){
-    const daCidade=local.filter(r=>r.cidade===local[0].cidade).sort((a,b)=>(b.ramo===n.nome)-(a.ramo===n.nome));
-    const nomes=daCidade.map(r=>r.nome),em=daCidade[0].em;
-    return {
-      texto:`${cap(em)}, ${nomes.length>1?`${lista(nomes)} já confiam`:`a ${nomes[0]} já confia`} na gente.`,
-      quem:`${lista(nomes)} (${nomes.length>1?"clientes":"cliente"} ${em})`,
-      em,perto:true};
+const de=s=>s.replace(/^a /,"da ").replace(/^o /,"do ");
+/* a) clientes da mesma cidade (ou, se não houver, da mesma região), com os do mesmo ramo primeiro;
+   b) clientes do mesmo ramo que ainda não foram citados */
+function referencia(n,local,E){
+  const outros=CLIENTES.filter(r=>norm(r.nome)!==norm(E)).map(r=>({...r,c:infoCidade(r.cidade)}));
+  const doRamo=r=>r.ramo===n.nome;
+  let perto=[];
+  if(local){
+    perto=outros.filter(r=>r.c.nome===local.nome);
+    if(!perto.length)perto=outros.filter(r=>r.c.regiao===local.regiao);
+    perto.sort((a,b)=>doRamo(b)-doRamo(a));
+    if(perto.length)perto=perto.filter(r=>r.c.nome===perto[0].c.nome);
   }
-  const ramo=outros.filter(r=>r.ramo&&r.ramo===n.nome);
+  const ramo=outros.filter(r=>doRamo(r)&&!perto.includes(r));
+  const frases=[],quem=[];
+  if(perto.length){
+    frases.push(`${cap(perto[0].c.em)}, ${lista(perto.map(r=>r.sing))} já ${perto.length>1?"confiam":"confia"} na gente.`);
+    quem.push(`${lista(perto.map(r=>r.nome))} (${perto[0].c.nome})`);
+  }
   if(ramo.length){
-    const nomes=ramo.map(r=>r.nome);
-    return {
-      texto:nomes.length>1?`${lista(nomes)} já confiam na gente.`:`A ${nomes[0]}, ${ramo[0].em}, já confia na gente.`,
-      quem:`${lista(nomes)} (mesmo ramo)`,
-      perto:false};
+    const um=ramo.length===1;
+    frases.push(perto.length
+      ?`Também cuidamos da TI ${um?`${de(ramo[0].sing)}, ${ramo[0].c.em}`:lista(ramo.map(r=>de(r.sing)))}.`
+      :um?`${cap(ramo[0].sing)}, ${ramo[0].c.em}, já confia na gente.`:`${cap(lista(ramo.map(r=>r.sing)))} já confiam na gente.`);
+    quem.push(`${lista(ramo.map(r=>r.nome))} (mesmo ramo)`);
   }
-  return null;
+  return frases.length?{texto:frases.join(" "),quem:quem.join(" · ")}:null;
 }
 
 /* ---------- Temas de TI ----------
@@ -252,9 +292,9 @@ const CAT={
   backup:{p:"como funciona o backup de vocês hoje?",d:"Um teste simples: peça para alguém restaurar um arquivo do backup de ontem. Se demorar ou ninguém souber como fazer, o backup provavelmente não está protegendo como deveria."},
   arquivos:{p:"como vocês organizam e compartilham os arquivos hoje?",d:"Centralizar os arquivos num lugar só, com acesso por pessoa (em vez de e-mail e WhatsApp), já reduz muito o risco de vazamento e de alguém usar a versão errada."},
   lentidao:{p:"os sistemas costumam dar trabalho nos dias mais corridos?",d:"Vale anotar por uma semana quantas vezes o sistema travou e quanto tempo durou. Multiplicando pelas pessoas paradas, o custo real costuma surpreender."},
-  acesso:{p:"como vocês controlam quem acessa cada pasta e sistema?",d:"Faça uma lista de quem tem acesso às pastas e sistemas mais sensíveis. Quase sempre aparece ex-funcionário ou alguém que não precisaria ver aquilo."},
+  acesso:{p:"como vocês controlam quem acessa cada pasta e sistema?",d:"Faça uma lista de quem tem acesso às pastas e sistemas mais sensíveis. É comum aparecer ex-funcionário ou alguém que não precisaria ver aquilo."},
   remoto:{p:"como o time acessa os sistemas quando está fora?",d:"Se o acesso de fora é feito por programa gratuito com senha compartilhada, vale trocar por VPN com login individual. É simples e fecha uma porta enorme."},
-  seguranca:{p:"como vocês se protegem hoje contra vírus e ataques?",d:"Três cuidados evitam a maior parte dos sequestros de dados: Windows e antivírus atualizados, verificação em duas etapas no e-mail e uma cópia do backup fora da rede."},
+  seguranca:{p:"como vocês se protegem hoje contra vírus e ataques?",d:"Três cuidados reduzem muito o risco de sequestro de dados (ransomware): Windows e antivírus atualizados, verificação em duas etapas no e-mail e uma cópia do backup fora da rede."},
   lgpd:{p:"como está a adequação de vocês à LGPD?",d:"O primeiro passo da LGPD é mapear onde estão os dados pessoais (planilhas, sistemas, e-mails e papel). Só esse mapa já mostra a maior parte dos riscos."},
   rede:{p:"a internet e a rede aí dão conta nos horários de pico?",d:"Separar a rede de visitantes da rede da operação e ter um segundo link de internet (mesmo um 4G de reserva) resolve boa parte das quedas."},
   monitoramento:{p:"vocês ficam sabendo quando algo sai do ar antes de alguém reclamar?",d:"Um monitoramento simples avisa quando um servidor, link ou equipamento começa a dar problema, antes de alguém reclamar. Custa pouco e evita muita parada."},
@@ -321,21 +361,6 @@ const GENERICO={
   dor:[["demora para resolver chamados de TI no dia a dia","suporte de TI","suporte"],["dados importantes sem backup e proteção adequados","backup","backup"],["rede e sistemas lentos atrapalhando a rotina","sistemas lentos","lentidao"]],
   risco:"parada inesperada e exposição de dados do negócio"};
 
-/* ---------- Utilidades ---------- */
-const semAcento=s=>(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-const norm=s=>semAcento(s).trim();
-function acharNicho(txt){
-  const t=" "+norm(txt)+" ";
-  /* a ordem importa: nichos mais específicos vêm antes; chave com espaço nas pontas casa só a palavra inteira */
-  const n=NICHOS.find(n=>n.k.some(k=>t.includes(semAcento(k))));
-  if(n)return n;
-  const nome=txt.trim();
-  return {...GENERICO,nome,txt:`empresas de ${nome.toLowerCase()}`};
-}
-const saud=()=>{const h=new Date().getHours();return h<12?"Bom dia":h<18?"Boa tarde":"Boa noite"};
-const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-const pick=(arr,v)=>arr[v%arr.length];
-
 /* ---------- Geração ---------- */
 function gerar(c,st,v){
   const {empresa:E,n,cargo}=c;
@@ -346,17 +371,18 @@ function gerar(c,st,v){
   const [,tema2,cat2]=pick(n.dor,v+1);
   const P=CAT[cat].p,P2=CAT[cat2].p;
   const cx=textosConexao(c.con.t,c.con.x,E);
-  const ref=referencia(n,c.cidade,E);
+  const local=acharCidade(c.cidade);
+  const ref=referencia(n,local,E);
   const prova=ref?" "+ref.texto:"";
-  const perto=!!ref&&ref.perto;
-  const cidadeEm=c.cidade?(ref&&ref.em)||emDe(c.cidade):"";
+  const perto=!!local;
+  const cidadeEm=local?local.em:(c.cidade?emDe(c.cidade):"");
 
   const olaE=nome1?`Olá, ${nome1}, tudo bem?`:"Olá, tudo bem?";
   const oi=nome1?`Oi, ${nome1}, tudo bem?`:"Oi, tudo bem?";
   const oiCurto=nome1?`Oi, ${nome1}!`:"Oi!";
   const ass=`Um abraço,\n${eu}\nTechwave IT Solutions`;
   const apres=`Sou ${eu}, da Techwave. Há 15 anos a gente cuida da TI de ${N}.${prova}`;
-  /* café presencial quando já temos cliente na cidade, virtual nos outros casos */
+  /* café presencial onde a Techwave atende presencialmente, virtual nos outros casos */
   const cafe=perto?`um café aí na ${E}`:"um café virtual de 15 minutos";
   const cafeConvite=perto?`tomar um café com você aí na ${E}`:"um café virtual de 15 minutos";
 
@@ -385,7 +411,7 @@ function gerar(c,st,v){
     ],
     convite},
   primeiro:{
-    assunto:cx?cx.assunto:perto?`TI ${ref.em}`:pick([`conhecendo a ${E}`,`uma ideia para a ${E}`,tema],v),
+    assunto:cx?cx.assunto:perto?`TI ${local.em}`:pick([`conhecendo a ${E}`,`uma ideia para a ${E}`,tema],v),
     email:`${olaE}\n\n${cx?cx.email:`Estava conhecendo o trabalho da ${E} e quis me apresentar.`}\n\n${apres}\n\nUma coisa que vejo muito no segmento: ${dor}.${angulo}\n\n${pick([`Queria entender: ${P} Se fizer sentido, adoraria trocar uma ideia, sem compromisso nenhum.`,`Me conta: ${P} Se quiser, a gente marca ${cafe} para se conhecer.`,`Adoraria conhecer melhor a ${E}. Me conta: ${P}`],v)}\n\n${ass}`,
     wa:`${oi} Aqui é ${eu}, da Techwave 🙂\n\n${cx?cx.wa:"Estava conhecendo o trabalho de vocês e quis me apresentar."} A gente cuida da TI de ${N} há 15 anos.${prova}\n\nQueria te perguntar uma coisa: ${P}`,
     audio:`${oi} Aqui é ${eu}, da Techwave. ${cx?cx.fala+" ":""}Resolvi te mandar um áudio porque acho mais pessoal do que mensagem escrita. A gente cuida da TI de ${N} há 15 anos.${prova} E queria te perguntar uma coisa: ${P} Se fizer sentido, adoraria marcar ${cafe} pra gente se conhecer. Um abraço!`,
@@ -476,6 +502,9 @@ SE NÃO PUDER FALAR
   /* respostas para quando o cliente responder com uma objeção */
   m.objecoes=[
     ["\"Do que se trata?\"",`Claro! Sou ${eu}, da Techwave. A gente cuida da TI de ${N}.${prova} Queria conhecer melhor a ${E}, sem compromisso. Você teria 5 minutinhos essa semana pra uma ligação rápida?`],
+    ["\"Vocês atendem aqui?\" / \"Vocês são de onde?\"",local
+      ?`A gente atende toda a Região dos Lagos e o Rio de Janeiro, então dá pra ir até vocês sempre que precisar.${prova}`
+      :`A gente atende a Região dos Lagos, o Rio de Janeiro e também empresas de outros estados. Muita coisa se resolve de forma remota, então a distância não costuma ser problema.${c.cidade?"":" Onde vocês ficam?"}`],
     ["\"Já temos TI\" / \"Já temos uma empresa\"","Que bom! Ter alguém cuidando faz toda a diferença. A ideia não é substituir ninguém: muita empresa usa a gente como segunda opinião ou reforço em projetos. Se um dia quiser comparar ou só tirar uma dúvida, pode contar comigo 🙂"],
     ["\"Agora não é o momento\"","Imagina, entendo totalmente! Posso te chamar de novo mais pra frente? Qual época costuma ser mais tranquila aí?"],
     ["\"Está caro\" / \"Não temos orçamento\"","Faz todo sentido, ninguém quer gasto a mais. A conversa não tem custo nenhum e, muitas vezes, a gente encontra jeitos de reduzir o que vocês já gastam com TI. Se não fizer sentido, sem problema."],
@@ -494,6 +523,7 @@ let stageAtual="primeiro",cargoAtual="",conAtual="",variacao=0,abaAtual=store.ge
 const conValores={};
 
 $("nichos").innerHTML=NICHOS.map(n=>`<option value="${n.nome}">`).join("");
+$("cidades").innerHTML=CIDADES.map(c=>`<option value="${c.nome}">`).join("");
 $("remetente").value=store.get("tw_remetente","");
 $("remetente").addEventListener("input",e=>store.set("tw_remetente",e.target.value.trim()));
 

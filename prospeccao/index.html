@@ -13,6 +13,7 @@
   :root{--text:#e8edf5;--muted:#94a3b8;--bg:#0f172a;--card:#172036;--border:#2a3652;--warn:#f59e0b}
 }
 *{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
 body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
 header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:20px 16px}
 header div{max-width:1100px;margin:0 auto}
@@ -32,14 +33,15 @@ input:focus{outline:2px solid var(--primary);border-color:transparent}
 .stage.on{border-color:var(--primary);background:rgba(0,102,204,.10);font-weight:600}
 .stage small{display:block;font-weight:400;color:var(--muted);font-size:12px}
 .sep{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:8px 0 2px}
+.secao{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.secao h2{font-size:15px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:99px;padding:6px 11px;font:inherit;font-size:13px;cursor:pointer}
 .chip.on{border-color:var(--primary);background:rgba(0,102,204,.10);color:var(--primary);font-weight:600}
+#conexaoCampo{margin-top:10px}
 .hint{font-size:12px;color:var(--muted);margin-top:4px}
-details{margin-top:14px;font-size:13px}
-summary{cursor:pointer;color:var(--primary);font-weight:600}
 .btn{border:0;border-radius:8px;padding:9px 13px;font:inherit;font-weight:600;cursor:pointer;font-size:14px;text-decoration:none;display:inline-block}
-.btn.main{background:var(--primary);color:#fff;width:100%;margin-top:16px;padding:13px;font-size:15px}
+.btn.main{background:var(--primary);color:#fff;width:100%;margin-top:18px;padding:13px;font-size:15px}
 .btn.main:hover{background:var(--primary-dark)}
 .btn.sec{background:var(--bg);color:var(--text);border:1px solid var(--border)}
 .btn.wa{background:#25d366;color:#fff}
@@ -48,6 +50,7 @@ summary{cursor:pointer;color:var(--primary);font-weight:600}
 .tag.blue{background:rgba(0,102,204,.12);color:var(--primary)}
 .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .tip{margin-top:12px;font-size:13px;color:var(--muted);border-left:3px solid var(--accent);padding-left:10px}
+.tip.warn{color:var(--text);border-color:var(--warn);background:rgba(245,158,11,.10);padding:8px 10px;border-radius:0 6px 6px 0}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin:16px 0 14px}
 .tab{background:none;border:0;padding:9px 12px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
 .tab.on{color:var(--primary);border-color:var(--primary)}
@@ -56,6 +59,7 @@ summary{cursor:pointer;color:var(--primary);font-weight:600}
 .block h3 small{font-weight:400;color:var(--muted)}
 .subject{font-weight:700;margin-bottom:8px;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:14px}
 pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:14px;background:var(--bg);border-radius:8px;padding:12px;border:1px solid var(--border)}
+ol.passos{padding-left:22px;display:grid;gap:10px;font-size:14px}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .count{font-size:12px;color:var(--muted)}
 .count.bad{color:var(--warn);font-weight:600}
@@ -69,7 +73,7 @@ pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:14px
 <body>
 <header><div>
   <h1>Techwave · Central de Prospecção</h1>
-  <p>Informe empresa, nicho e momento. Sai pronto para e-mail, WhatsApp, LinkedIn e ligação.</p>
+  <p>Mensagens que criam conexão: informe a empresa, o nicho e o momento.</p>
 </div></header>
 
 <main>
@@ -84,21 +88,33 @@ pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:14px
     <span class="lbl">Momento da prospecção</span>
     <div class="stages" id="stages"></div>
 
-    <details open>
-      <summary>Personalizar (opcional, aumenta a taxa de resposta)</summary>
+    <div class="secao">
+      <h2>Conexão com o cliente</h2>
+      <p class="hint">Opcional, mas é o que tira a mensagem do "frio".</p>
+
+      <label for="cidade">Cidade do cliente</label>
+      <input type="text" id="cidade" placeholder="Ex.: Saquarema" autocomplete="off">
+      <p class="hint">Se já temos cliente na mesma cidade ou no mesmo ramo, ele entra como referência.</p>
+
       <label for="contato">Nome do contato</label>
-      <input type="text" id="contato" placeholder="Ex.: Marina">
+      <input type="text" id="contato" placeholder="Ex.: Marina" autocomplete="off">
 
       <span class="lbl">Quem é o contato</span>
       <div class="chips" id="cargos"></div>
 
-      <label for="gancho">Algo que você notou sobre a empresa</label>
-      <input type="text" id="gancho" placeholder="Ex.: abriram uma nova unidade em Campinas">
-      <p class="hint">Vira a abertura da mensagem. Escreva como continuação de "Vi que…".</p>
+      <span class="lbl">Ponto de conexão</span>
+      <div class="chips" id="conexoes"></div>
+      <div id="conexaoCampo" hidden>
+        <label for="conexaoValor" id="conexaoLabel"></label>
+        <input type="text" id="conexaoValor" autocomplete="off">
+        <p class="hint" id="conexaoHint"></p>
+      </div>
+    </div>
 
+    <div class="secao">
       <label for="remetente">Seu nome</label>
-      <input type="text" id="remetente" placeholder="Ex.: Lucas Veiga">
-    </details>
+      <input type="text" id="remetente" placeholder="Ex.: Lucas Veiga" autocomplete="off">
+    </div>
 
     <button class="btn main" id="gerar">Gerar mensagens</button>
     <p class="note">Tudo roda no seu navegador. Nada é enviado para servidores.</p>
@@ -112,218 +128,360 @@ pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;font-size:14px
 
 <script>
 /* ---------- Momentos ----------
-   frio: sequência de prospecção fria, com o dia sugerido de envio */
+   seq: sequência para criar conexão com um contato novo, com o dia sugerido */
 const STAGES=[
-  {id:"primeiro",ico:"🟢",nome:"Primeiro contato",sub:"Dia 0 · abordagem a frio",frio:1},
-  {id:"fu1",ico:"🟡",nome:"Follow-up 1",sub:"Dia 3 · novo ângulo",frio:1},
-  {id:"fu2",ico:"🟡",nome:"Follow-up 2",sub:"Dia 7 · oferecer algo útil",frio:1},
-  {id:"aguardando",ico:"🔵",nome:"Aguardando retorno",sub:"Dia 14 · último toque",frio:1},
-  {id:"resposta",ico:"🟣",nome:"Após resposta",sub:"Lead respondeu, marcar conversa"},
-  {id:"proposta",ico:"🟠",nome:"Após envio de proposta",sub:"Destravar a decisão"},
-  {id:"reativacao",ico:"🔴",nome:"Reativação",sub:"Lead frio ou contato antigo"},
+  {id:"aquecimento",ico:"🤝",nome:"Aquecimento",sub:"Antes · seguir, curtir e conectar",seq:1},
+  {id:"primeiro",ico:"🟢",nome:"Primeiro contato",sub:"Dia 0 · se apresentar com conexão",seq:1},
+  {id:"fu1",ico:"🟡",nome:"Follow-up 1",sub:"Dia 3 · mandar uma dica útil",seq:1},
+  {id:"fu2",ico:"🟡",nome:"Follow-up 2",sub:"Dia 7 · convidar para um café",seq:1},
+  {id:"aguardando",ico:"🔵",nome:"Aguardando retorno",sub:"Dia 14 · deixar a porta aberta",seq:1},
+  {id:"resposta",ico:"🟣",nome:"Após resposta",sub:"Conhecer a empresa e marcar conversa"},
+  {id:"proposta",ico:"🟠",nome:"Após envio de proposta",sub:"Ajustar junto e destravar"},
+  {id:"reativacao",ico:"🔴",nome:"Reativação",sub:"Retomar um contato antigo"},
   {id:"relacionamento",ico:"⚪",nome:"Relacionamento",sub:"Manter proximidade"}
 ];
 const DICAS={
-  primeiro:"Envie o e-mail e, no mesmo dia, o convite no LinkedIn. WhatsApp a frio funciona melhor quando o número é comercial.",
-  fu1:"Responda na mesma conversa do primeiro e-mail. Este follow-up traz outra dor, não só \"retomando\".",
-  fu2:"Ofereça algo de valor sem pedir reunião. É o toque que mais gera resposta em leads frios.",
-  aguardando:"Último toque da sequência. Se não responder, mova para Reativação daqui a 60 a 90 dias.",
-  resposta:"Responda rápido (de preferência na mesma hora) e já ofereça dois horários.",
-  proposta:"Pergunte o que falta para decidir, não só se leu a proposta.",
-  reativacao:"Traga um motivo novo para voltar a falar. Nunca só \"lembra de mim?\".",
-  relacionamento:"Sem pedido de venda. O objetivo é ser lembrado quando surgir a necessidade."
+  aquecimento:"Antes de pedir atenção, apareça: siga, curta e comente algo real. Quando a mensagem chegar, seu nome já vai ser familiar.",
+  primeiro:"Fale da empresa do cliente antes de falar da sua e termine com uma pergunta fácil de responder.",
+  fu1:"Dê antes de pedir: uma dica útil, sem vender nada, gera confiança e costuma puxar resposta.",
+  fu2:"Convide para um café em vez de uma reunião. Se for perto, presencial é ainda melhor.",
+  aguardando:"Encerre deixando a porta aberta. Daqui a 60 ou 90 dias, use a Reativação.",
+  resposta:"Responda rápido e mostre curiosidade pela empresa antes de falar de TI.",
+  proposta:"Pergunte o que achou e ofereça ajustar junto. Proposta é conversa, não ultimato.",
+  reativacao:"Volte com interesse genuíno em como eles estão, não só no que você vende.",
+  relacionamento:"Sem pedido de venda. Uma dica útil de vez em quando faz você ser lembrado."
 };
 
 /* ---------- Quem é o contato ---------- */
 const CARGOS=[
   {id:"",nome:"Não sei"},
-  {id:"dono",nome:"Dono / Sócio"},
-  {id:"gestor",nome:"Gestor / Gerente"},
+  {id:"dono",nome:"Dono(a) / Sócio(a)"},
+  {id:"gestor",nome:"Gestor(a)"},
   {id:"ti",nome:"Responsável de TI"}
 ];
 
-/* ---------- Conhecimento por nicho ----------
-   dor: [situação do dia a dia, tema curto para assunto] · risco: o que está em jogo · oferta: o que a Techwave resolve */
-const NICHOS=[
- {k:["contab","contador","escritorio contabil","fiscal"],nome:"Contabilidade",
-  dor:[["arquivos sensíveis de clientes circulando por e-mail e WhatsApp","arquivos dos clientes"],["sistemas lentos ou fora do ar justo no fechamento","ti no fechamento"],["backup que ninguém tem certeza se funciona","backup do escritório"]],
-  risco:"vazamento de dados fiscais de clientes e atraso em obrigações",
-  oferta:"infraestrutura segura, backup monitorado e suporte rápido para o escritório não parar nos prazos"},
- {k:["advoc","juridic","escritorio de adv"],nome:"Advocacia",
-  dor:[["documentos de processos acessíveis por qualquer pessoa da equipe","sigilo dos processos"],["acesso remoto improvisado em audiências e home office","acesso remoto"],["arquivos de casos sem backup confiável","backup dos casos"]],
-  risco:"quebra de sigilo profissional e problemas com a LGPD",
-  oferta:"segurança da informação, controle de acesso e backup para proteger o sigilo dos clientes"},
- {k:["clinica","medic","saude","hospital","consultorio","laborat"],nome:"Saúde / Clínicas",
-  dor:[["prontuários em computadores sem proteção adequada","prontuários"],["sistema de agenda fora do ar no horário de pico","agenda fora do ar"],["adequação à LGPD para dados de pacientes","lgpd na clínica"]],
-  risco:"exposição de dados sensíveis de pacientes e atendimento parado",
-  oferta:"infraestrutura estável, proteção de dados sensíveis e suporte ágil para a clínica não parar"},
- {k:["odonto","dentist"],nome:"Odontologia",
-  dor:[["imagens e prontuários de pacientes sem backup","backup dos pacientes"],["sistema de agenda e radiologia lento","sistema lento"],["computadores da recepção expostos a vírus e ransomware","ransomware"]],
-  risco:"perda do histórico de pacientes e consultório parado",
-  oferta:"backup automático, proteção contra ransomware e suporte sem dor de cabeça"},
- {k:["varejo","loja","comercio","supermercado","mercado"],nome:"Varejo",
-  dor:[["PDV e internet caindo no horário de maior movimento","pdv caindo"],["câmeras, Wi-Fi e sistema sem ninguém monitorando","rede da loja"],["demora para alguém de TI resolver um problema","suporte na loja"]],
-  risco:"venda perdida a cada minuto de loja parada",
-  oferta:"rede estável, monitoramento proativo e suporte para o PDV nunca ser o gargalo"},
- {k:["ecommerce","e-commerce","loja virtual","marketplace"],nome:"E-commerce",
-  dor:[["site instável em campanhas e datas sazonais","black friday"],["dados de clientes e pagamentos expostos a ataques","segurança da loja"],["servidores e integrações sem monitoramento","monitoramento"]],
-  risco:"queda de vendas e reputação arranhada em picos de demanda",
-  oferta:"cloud bem dimensionada, segurança e monitoramento 24x7"},
- {k:["industr","fabrica","manufat","metalurg"],nome:"Indústria",
-  dor:[["ERP e rede da fábrica sem redundância","rede da fábrica"],["sistemas antigos difíceis de manter e proteger","sistemas legados"],["ransomware parando a produção","ransomware"]],
-  risco:"linha de produção parada e prejuízo por hora",
-  oferta:"infraestrutura resiliente, segurança e plano de continuidade de negócio"},
- {k:["constru","engenharia","incorpor","arquitet"],nome:"Construção / Engenharia",
-  dor:[["projetos e plantas compartilhados de forma desorganizada","arquivos de projeto"],["acesso remoto instável entre escritório e obras","acesso das obras"],["máquinas de projeto lentas e sem manutenção","máquinas lentas"]],
-  risco:"retrabalho, atraso de projeto e perda de arquivos críticos",
-  oferta:"servidor de arquivos, acesso remoto seguro e suporte que acompanha as obras"},
- {k:["escola","educa","faculdade","curso","ensino","universidade"],nome:"Educação",
-  dor:[["Wi-Fi que não aguenta todo mundo conectado","wi-fi da escola"],["dados de alunos e responsáveis sem proteção de LGPD","lgpd na escola"],["equipamentos de sala e laboratório sem gestão","equipamentos"]],
-  risco:"aula comprometida e exposição de dados de menores",
-  oferta:"rede robusta, gestão de equipamentos e adequação à LGPD"},
- {k:["logist","transport","frete","armazem"],nome:"Logística / Transporte",
-  dor:[["sistemas de roteirização e rastreio fora do ar","rastreio fora do ar"],["internet instável em galpões e pátios","rede do galpão"],["infraestrutura sem monitoramento","monitoramento"]],
-  risco:"entrega atrasada e cliente insatisfeito",
-  oferta:"conectividade estável, monitoramento contínuo e suporte para a operação não parar"},
- {k:["restaurante","bar","lanchonete","food","alimenta","padaria","hotel","pousada"],nome:"Alimentação / Hotelaria",
-  dor:[["sistema de comandas e caixa travando no pico","caixa travando"],["Wi-Fi de clientes misturado com a rede da operação","wi-fi dos clientes"],["falta de suporte técnico no fim de semana","suporte no fim de semana"]],
-  risco:"atendimento lento e faturamento perdido no horário de maior fluxo",
-  oferta:"rede segmentada, sistemas estáveis e suporte quando a operação mais precisa"},
- {k:["imobili","corretor"],nome:"Imobiliário",
-  dor:[["contratos e documentos espalhados em vários dispositivos","documentos dos clientes"],["corretores acessando sistemas de fora sem segurança","acesso dos corretores"],["CRM e portais lentos ou instáveis","sistemas lentos"]],
-  risco:"vazamento de dados de clientes e negócio perdido por falha de sistema",
-  oferta:"acesso remoto seguro, organização de documentos e suporte para o time de vendas"},
- {k:["agencia","marketing","publicidade","design","tecnologia","software","startup"],nome:"Agência / Tecnologia",
-  dor:[["licenças e máquinas sem nenhuma gestão","licenças e máquinas"],["senhas de clientes compartilhadas sem controle","senhas dos clientes"],["cada pessoa do time com um padrão de segurança","segurança do time"]],
-  risco:"perda de acessos de clientes e retrabalho por falha técnica",
-  oferta:"gestão de ativos, políticas de segurança e suporte para o time focar em entregar"},
- {k:["financ","banco","cooperativa","seguro","consorcio"],nome:"Financeiro / Seguros",
-  dor:[["exigências de segurança e auditoria de acessos","auditoria de acessos"],["dados financeiros de clientes sob risco de vazamento","dados dos clientes"],["sistemas críticos sem plano de contingência","contingência"]],
-  risco:"sanção regulatória e perda de confiança dos clientes",
-  oferta:"segurança da informação, controle de acessos e continuidade de negócio"}
+/* ---------- Ponto de conexão ---------- */
+const CONEXOES=[
+  {id:"",nome:"Ainda não tenho"},
+  {id:"indicacao",nome:"Indicação",campo:"Quem indicou?",ph:"Ex.: Carlos Lima (Contabilidade Alfa)",hint:"Entra como: \"Recebi seu contato por indicação de ___\"."},
+  {id:"comum",nome:"Contato em comum",campo:"Quem vocês conhecem em comum?",ph:"Ex.: Ana Souza",hint:"Entra como: \"Vi que a gente tem ___ como contato em comum\"."},
+  {id:"post",nome:"Post ou conteúdo",campo:"Sobre o que era a publicação?",ph:"Ex.: os 10 anos do escritório",hint:"Entra como: \"Vi a publicação sobre ___\"."},
+  {id:"evento",nome:"Evento ou grupo",campo:"Qual evento ou grupo?",ph:"Ex.: CDL Campinas",hint:"Entra como: \"Vi que temos algo em comum: ___\"."},
+  {id:"novidade",nome:"Novidade da empresa",campo:"O que aconteceu?",ph:"Ex.: vocês abriram uma nova unidade",hint:"Entra como: \"Vi que ___. Parabéns!\"."}
 ];
-const GENERICO={nome:"",
-  dor:[["demora para resolver chamados de TI no dia a dia","suporte de ti"],["dados importantes sem backup e proteção adequados","backup"],["rede e sistemas lentos atrapalhando a rotina","sistemas lentos"]],
-  risco:"parada inesperada e exposição de dados do negócio",
-  oferta:"infraestrutura, segurança e suporte para a TI deixar de ser dor de cabeça"};
+function textosConexao(t,x,E){
+  x=(x||"").trim().replace(/[.!]+$/,"");
+  if(!t||!x)return null;
+  const nov=x.replace(/^vi que\s+/i,"");
+  return {
+    indicacao:{
+      email:`Recebi seu contato por indicação de ${x} e queria muito conhecer melhor a ${E}.`,
+      wa:`Recebi seu contato por indicação de ${x} 😊`,
+      fala:`Recebi seu contato por indicação de ${x}.`,
+      assunto:`indicação de ${x}`,
+      convite:`Recebi seu contato por indicação de ${x} e adoraria me conectar com você.`,
+      origem:`Recebi seu contato por indicação de ${x}.`},
+    comum:{
+      email:`Vi que a gente tem ${x} como contato em comum e achei que valia me apresentar.`,
+      wa:`Vi que a gente tem ${x} como contato em comum 😊`,
+      fala:`Vi que a gente tem ${x} como contato em comum.`,
+      assunto:"contato em comum",
+      convite:`Vi que temos ${x} como contato em comum. Vamos nos conectar?`,
+      origem:`Vi que temos ${x} como contato em comum.`},
+    post:{
+      email:`Vi a publicação sobre ${x} e achei muito bacana.`,
+      wa:`Vi a publicação sobre ${x} e achei muito bacana 👏`,
+      fala:`Vi a publicação de vocês sobre ${x} e achei muito bacana.`,
+      assunto:`sobre ${x}`,
+      convite:`Vi a publicação sobre ${x} e achei muito bacana. Adoraria me conectar com você.`,
+      origem:`Vi a publicação de vocês sobre ${x}.`},
+    evento:{
+      email:`Vi que temos algo em comum: ${x}. Sempre gosto de conhecer melhor quem circula pelos mesmos lugares.`,
+      wa:`Vi que temos algo em comum: ${x} 😊`,
+      fala:`Vi que a gente tem ${x} em comum.`,
+      assunto:x,
+      convite:`Vi que temos ${x} em comum. Vamos nos conectar?`,
+      origem:`Vi que temos ${x} em comum.`},
+    novidade:{
+      email:`Vi que ${nov}. Parabéns pela conquista!`,
+      wa:`Vi que ${nov}, parabéns! 👏`,
+      fala:`Vi que ${nov}, parabéns!`,
+      assunto:"parabéns pela conquista",
+      convite:`Vi que ${nov}, parabéns! Adoraria me conectar com você.`,
+      origem:`Vi que ${nov} e quis me apresentar.`}
+  }[t]||null;
+}
+
+/* ---------- Clientes da Techwave usados como referência ----------
+   ramo: igual ao nome do nicho na lista abaixo (vazio = só referência por cidade) · em: cidade com a preposição */
+const CLIENTES=[
+  {nome:"Attual Contabilidade",ramo:"Contabilidade",cidade:"Saquarema",em:"em Saquarema"},
+  {nome:"Radio Mix",ramo:"Comunicação / Mídia",cidade:"Saquarema",em:"em Saquarema"},
+  {nome:"Talita Gloria",ramo:"",cidade:"Saquarema",em:"em Saquarema"},
+  {nome:"Sediver",ramo:"Indústria",cidade:"Rio de Janeiro",em:"no Rio de Janeiro"}
+];
+const lista=a=>a.length>1?a.slice(0,-1).join(", ")+" e "+a[a.length-1]:a[0];
+const emDe=c=>/^(em|no|na|nos|nas)\s/i.test(c)?c:"em "+c;
+/* Prioridade: clientes da mesma cidade (os do mesmo ramo primeiro); senão, clientes do mesmo ramo */
+function referencia(n,cidade,E){
+  const cid=norm(cidade);
+  const outros=CLIENTES.filter(r=>norm(r.nome)!==norm(E));
+  const local=cid.length>=3?outros.filter(r=>cid.includes(norm(r.cidade))||norm(r.cidade).includes(cid)):[];
+  if(local.length){
+    const daCidade=local.filter(r=>r.cidade===local[0].cidade).sort((a,b)=>(b.ramo===n.nome)-(a.ramo===n.nome));
+    const nomes=daCidade.map(r=>r.nome),em=daCidade[0].em;
+    return {
+      texto:`${cap(em)}, ${nomes.length>1?`${lista(nomes)} já confiam`:`a ${nomes[0]} já confia`} na gente.`,
+      quem:`${lista(nomes)} (${nomes.length>1?"clientes":"cliente"} ${em})`,
+      em,perto:true};
+  }
+  const ramo=outros.filter(r=>r.ramo&&r.ramo===n.nome);
+  if(ramo.length){
+    const nomes=ramo.map(r=>r.nome);
+    return {
+      texto:nomes.length>1?`${lista(nomes)} já confiam na gente.`:`A ${nomes[0]}, ${ramo[0].em}, já confia na gente.`,
+      quem:`${lista(nomes)} (mesmo ramo)`,
+      perto:false};
+  }
+  return null;
+}
+
+/* ---------- Temas de TI ----------
+   p: pergunta para puxar conversa · d: dica útil para dar antes de pedir */
+const CAT={
+  backup:{p:"como funciona o backup de vocês hoje?",d:"Um teste simples: peça para alguém restaurar um arquivo do backup de ontem. Se demorar ou ninguém souber como fazer, o backup provavelmente não está protegendo como deveria."},
+  arquivos:{p:"como vocês organizam e compartilham os arquivos hoje?",d:"Centralizar os arquivos num lugar só, com acesso por pessoa (em vez de e-mail e WhatsApp), já reduz muito o risco de vazamento e de alguém usar a versão errada."},
+  lentidao:{p:"os sistemas costumam dar trabalho nos dias mais corridos?",d:"Vale anotar por uma semana quantas vezes o sistema travou e quanto tempo durou. Multiplicando pelas pessoas paradas, o custo real costuma surpreender."},
+  acesso:{p:"como vocês controlam quem acessa cada pasta e sistema?",d:"Faça uma lista de quem tem acesso às pastas e sistemas mais sensíveis. Quase sempre aparece ex-funcionário ou alguém que não precisaria ver aquilo."},
+  remoto:{p:"como o time acessa os sistemas quando está fora?",d:"Se o acesso de fora é feito por programa gratuito com senha compartilhada, vale trocar por VPN com login individual. É simples e fecha uma porta enorme."},
+  seguranca:{p:"como vocês se protegem hoje contra vírus e ataques?",d:"Três cuidados evitam a maior parte dos sequestros de dados: Windows e antivírus atualizados, verificação em duas etapas no e-mail e uma cópia do backup fora da rede."},
+  lgpd:{p:"como está a adequação de vocês à LGPD?",d:"O primeiro passo da LGPD é mapear onde estão os dados pessoais (planilhas, sistemas, e-mails e papel). Só esse mapa já mostra a maior parte dos riscos."},
+  rede:{p:"a internet e a rede aí dão conta nos horários de pico?",d:"Separar a rede de visitantes da rede da operação e ter um segundo link de internet (mesmo um 4G de reserva) resolve boa parte das quedas."},
+  monitoramento:{p:"vocês ficam sabendo quando algo sai do ar antes de alguém reclamar?",d:"Um monitoramento simples avisa quando um servidor, link ou equipamento começa a dar problema, antes de alguém reclamar. Custa pouco e evita muita parada."},
+  suporte:{p:"quem cuida da TI de vocês hoje?",d:"Vale medir quanto tempo um problema de TI leva para ser resolvido, do pedido até a solução. Se passa de algumas horas, o suporte está saindo caro, mesmo parecendo barato."},
+  pico:{p:"o site costuma aguentar bem os picos de campanha?",d:"Antes da próxima campanha, vale simular o pico de acessos no site. Descobrir o limite antes custa bem menos do que descobrir no dia."},
+  contingencia:{p:"se o sistema principal parar, vocês têm um plano B?",d:"Pergunte para o time: se o servidor parar agora, em quanto tempo a gente volta? Se ninguém souber responder, vale montar um plano simples de contingência."},
+  legado:{p:"vocês ainda usam algum sistema mais antigo que dá trabalho de manter?",d:"Liste os equipamentos que rodam sistemas antigos sem atualização. Isolar essas máquinas da rede principal já reduz muito o risco, sem precisar trocar nada."},
+  maquinas:{p:"as máquinas aí dão conta dos programas mais pesados?",d:"Muitas vezes, trocar o HD por um SSD e fazer uma manutenção preventiva deixa a máquina como nova, por uma fração do preço de um computador novo."},
+  gestao:{p:"como vocês controlam as máquinas e licenças hoje?",d:"Uma planilha simples com todas as máquinas e licenças, quem usa e quando vencem, já evita compra desnecessária e surpresa na renovação."},
+  senhas:{p:"como vocês guardam e compartilham as senhas hoje?",d:"Um gerenciador de senhas da empresa acaba com senha em planilha e permite tirar o acesso de quem sai do time em um clique."},
+  duasEtapas:{p:"vocês já usam verificação em duas etapas nos acessos principais?",d:"Ativar a verificação em duas etapas nos acessos mais importantes (e-mail, sistemas e banco) é gratuito e bloqueia a grande maioria das invasões de conta."}
+};
+
+/* ---------- Conhecimento por nicho ----------
+   txt: como o segmento aparece no texto · dor: [situação do dia a dia, tema curto, tema de TI] · risco: o que está em jogo */
+const NICHOS=[
+ {k:["contab","contador","escritorio contabil","fiscal"],nome:"Contabilidade",txt:"escritórios de contabilidade",
+  dor:[["arquivos sensíveis de clientes circulando por e-mail e WhatsApp","arquivos dos clientes","arquivos"],["sistemas lentos ou fora do ar justo no fechamento","TI no fechamento","lentidao"],["backup que ninguém tem certeza se funciona","backup do escritório","backup"]],
+  risco:"vazamento de dados fiscais de clientes e atraso em obrigações"},
+ {k:["advoc","juridic","escritorio de adv"],nome:"Advocacia",txt:"escritórios de advocacia",
+  dor:[["documentos de processos acessíveis por qualquer pessoa da equipe","sigilo dos processos","acesso"],["acesso remoto improvisado em audiências e home office","acesso remoto","remoto"],["arquivos de casos sem backup confiável","backup dos casos","backup"]],
+  risco:"quebra de sigilo profissional e problemas com a LGPD"},
+ {k:["odonto","dentist"],nome:"Odontologia",txt:"clínicas odontológicas",
+  dor:[["imagens e prontuários de pacientes sem backup","backup dos pacientes","backup"],["sistema de agenda e radiologia lento","sistema lento","maquinas"],["computadores da recepção expostos a vírus e ransomware","proteção contra vírus","seguranca"]],
+  risco:"perda do histórico de pacientes e consultório parado"},
+ {k:["clinica","medic","saude","hospital","consultorio","laborat","radiolog"],nome:"Saúde / Clínicas",txt:"clínicas e consultórios",
+  dor:[["prontuários em computadores sem proteção adequada","proteção dos prontuários","seguranca"],["sistema de agenda fora do ar no horário de pico","agenda fora do ar","lentidao"],["adequação à LGPD para dados de pacientes","LGPD na clínica","lgpd"]],
+  risco:"exposição de dados sensíveis de pacientes e atendimento parado"},
+ {k:["ecommerce","e-commerce","loja virtual","marketplace"],nome:"E-commerce",txt:"lojas virtuais",
+  dor:[["site instável em campanhas e datas sazonais","Black Friday","pico"],["dados de clientes e pagamentos expostos a ataques","segurança da loja","duasEtapas"],["servidores e integrações sem monitoramento","monitoramento","monitoramento"]],
+  risco:"queda de vendas e reputação arranhada em picos de demanda"},
+ {k:["financ","banco","cooperativa","seguro","consorcio"],nome:"Financeiro / Seguros",txt:"empresas do mercado financeiro e de seguros",
+  dor:[["exigências de segurança e auditoria de acessos","auditoria de acessos","acesso"],["dados financeiros de clientes sob risco de vazamento","dados dos clientes","duasEtapas"],["sistemas críticos sem plano de contingência","contingência","contingencia"]],
+  risco:"sanção regulatória e perda de confiança dos clientes"},
+ {k:["varejo","loja","comercio","supermercado","mercado"],nome:"Varejo",txt:"lojas e empresas de varejo",
+  dor:[["PDV e internet caindo no horário de maior movimento","PDV caindo","rede"],["câmeras, Wi-Fi e sistema sem ninguém monitorando","rede da loja","monitoramento"],["demora para alguém de TI resolver um problema","suporte na loja","suporte"]],
+  risco:"venda perdida a cada minuto de loja parada"},
+ {k:["industr","fabrica","manufat","metalurg"],nome:"Indústria",txt:"indústrias",
+  dor:[["ERP e rede da fábrica sem redundância","rede da fábrica","contingencia"],["sistemas antigos difíceis de manter e proteger","sistemas antigos","legado"],["ransomware parando a produção","ransomware","seguranca"]],
+  risco:"linha de produção parada e prejuízo por hora"},
+ {k:["constru","engenharia","incorpor","arquitet"],nome:"Construção / Engenharia",txt:"construtoras e escritórios de engenharia",
+  dor:[["projetos e plantas compartilhados de forma desorganizada","arquivos de projeto","arquivos"],["acesso remoto instável entre escritório e obras","acesso das obras","remoto"],["máquinas de projeto lentas e sem manutenção","máquinas lentas","maquinas"]],
+  risco:"retrabalho, atraso de projeto e perda de arquivos críticos"},
+ {k:["escola","educa","faculdade","curso","ensino","universidade"],nome:"Educação",txt:"escolas e instituições de ensino",
+  dor:[["Wi-Fi que não aguenta todo mundo conectado","Wi-Fi da escola","rede"],["dados de alunos e responsáveis sem proteção de LGPD","LGPD na escola","lgpd"],["equipamentos de sala e laboratório sem gestão","equipamentos","gestao"]],
+  risco:"aula comprometida e exposição de dados de menores"},
+ {k:["logist","transport","frete","armazem"],nome:"Logística / Transporte",txt:"transportadoras e operações logísticas",
+  dor:[["sistemas de roteirização e rastreio fora do ar","rastreio fora do ar","contingencia"],["internet instável em galpões e pátios","rede do galpão","rede"],["infraestrutura sem monitoramento","monitoramento","monitoramento"]],
+  risco:"entrega atrasada e cliente insatisfeito"},
+ {k:["restaurante","bar","lanchonete","food","alimenta","padaria","hotel","pousada"],nome:"Alimentação / Hotelaria",txt:"restaurantes, bares e hotéis",
+  dor:[["sistema de comandas e caixa travando no pico","caixa travando","lentidao"],["Wi-Fi de clientes misturado com a rede da operação","Wi-Fi dos clientes","rede"],["falta de suporte técnico no fim de semana","suporte no fim de semana","suporte"]],
+  risco:"atendimento lento e faturamento perdido no horário de maior fluxo"},
+ {k:["imobili","corretor"],nome:"Imobiliário",txt:"imobiliárias",
+  dor:[["contratos e documentos espalhados em vários dispositivos","documentos dos clientes","arquivos"],["corretores acessando sistemas de fora sem segurança","acesso dos corretores","remoto"],["CRM e portais lentos ou instáveis","sistemas lentos","lentidao"]],
+  risco:"vazamento de dados de clientes e negócio perdido por falha de sistema"},
+ {k:["agencia","marketing","publicidade","design","tecnologia","software","startup"],nome:"Agência / Tecnologia",txt:"agências e empresas de tecnologia",
+  dor:[["licenças e máquinas sem nenhuma gestão","licenças e máquinas","gestao"],["senhas de clientes compartilhadas sem controle","senhas dos clientes","senhas"],["cada pessoa do time com um padrão de segurança","segurança do time","duasEtapas"]],
+  risco:"perda de acessos de clientes e retrabalho por falha técnica"},
+ {k:[" radio "," radios ","emissora","televis"," tv ","jornal","comunicac","midia","produtora"],nome:"Comunicação / Mídia",txt:"rádios e empresas de comunicação",
+  dor:[["transmissão e sistemas no ar sem plano B","transmissão no ar","contingencia"],["arquivos de áudio e vídeo pesados sem backup","backup do acervo","backup"],["computadores de edição e estúdio lentos","máquinas de edição","maquinas"]],
+  risco:"programação fora do ar e perda de acervo"}
+];
+const GENERICO={
+  dor:[["demora para resolver chamados de TI no dia a dia","suporte de TI","suporte"],["dados importantes sem backup e proteção adequados","backup","backup"],["rede e sistemas lentos atrapalhando a rotina","sistemas lentos","lentidao"]],
+  risco:"parada inesperada e exposição de dados do negócio"};
 
 /* ---------- Utilidades ---------- */
-const norm=s=>(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").trim();
+const semAcento=s=>(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const norm=s=>semAcento(s).trim();
 function acharNicho(txt){
   const t=" "+norm(txt)+" ";
-  return NICHOS.find(n=>n.k.some(k=>t.includes(norm(k))))||{...GENERICO,nome:txt.trim()};
+  /* a ordem importa: nichos mais específicos vêm antes; chave com espaço nas pontas casa só a palavra inteira */
+  const n=NICHOS.find(n=>n.k.some(k=>t.includes(semAcento(k))));
+  if(n)return n;
+  const nome=txt.trim();
+  return {...GENERICO,nome,txt:`empresas de ${nome.toLowerCase()}`};
 }
 const saud=()=>{const h=new Date().getHours();return h<12?"Bom dia":h<18?"Boa tarde":"Boa noite"};
-const lower1=s=>s.charAt(0).toLowerCase()+s.slice(1);
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const pick=(arr,v)=>arr[v%arr.length];
 
 /* ---------- Geração ---------- */
-function gerar(c,stageId,v){
-  const {empresa:E,contato,remetente,n,cargo,gancho}=c;
-  const eu=remetente||"[Seu nome]";
-  const [dor,tema]=pick(n.dor,v);
-  const [dor2]=pick(n.dor,v+1);
-  const nichoTxt=n.nome?`empresas de ${lower1(n.nome)}`:"empresas do seu segmento";
-  const olaE=contato?`Olá, ${contato}, tudo bem?`:"Olá, tudo bem?";
-  const oi=contato?`${saud()}, ${contato}! Tudo bem?`:`${saud()}! Tudo bem?`;
-  const ass=`${eu}\nTechwave IT Solutions`;
+function gerar(c,st,v){
+  const {empresa:E,n,cargo}=c;
+  const nome1=c.contato.split(/\s+/)[0];
+  const eu=c.remetente||"[Seu nome]";
+  const N=n.txt;
+  const [dor,tema,cat]=pick(n.dor,v);
+  const [,tema2,cat2]=pick(n.dor,v+1);
+  const P=CAT[cat].p,P2=CAT[cat2].p;
+  const cx=textosConexao(c.con.t,c.con.x,E);
+  const ref=referencia(n,c.cidade,E);
+  const prova=ref?" "+ref.texto:"";
+  const perto=!!ref&&ref.perto;
+  const cidadeEm=c.cidade?(ref&&ref.em)||emDe(c.cidade):"";
 
-  /* abertura: gancho do usuário, se houver; senão observação do segmento */
-  const abertura=gancho
-    ?`Vi que ${gancho.replace(/^vi que\s+/i,"").replace(/\.$/,"")}. Momentos assim costumam aumentar a pressão sobre a TI.`
-    :`Em ${nichoTxt}, um problema que aparece muito: ${dor}.`;
-  const gancho2=gancho?` Um ponto que costuma vir junto: ${dor}.`:"";
+  const olaE=nome1?`Olá, ${nome1}, tudo bem?`:"Olá, tudo bem?";
+  const oi=nome1?`Oi, ${nome1}, tudo bem?`:"Oi, tudo bem?";
+  const oiCurto=nome1?`Oi, ${nome1}!`:"Oi!";
+  const ass=`Um abraço,\n${eu}\nTechwave IT Solutions`;
+  const apres=`Sou ${eu}, da Techwave. Há 15 anos a gente cuida da TI de ${N}.${prova}`;
+  /* café presencial quando já temos cliente na cidade, virtual nos outros casos */
+  const cafe=perto?`um café aí na ${E}`:"um café virtual de 15 minutos";
+  const cafeConvite=perto?`tomar um café com você aí na ${E}`:"um café virtual de 15 minutos";
 
-  /* ângulo de acordo com quem recebe */
   const angulo={
-    dono:`Para quem é dono, o impacto é ${n.risco}, e quase sempre na hora mais cara.`,
-    gestor:`No dia a dia, isso vira retrabalho, equipe parada e cliente esperando.`,
-    ti:`A gente costuma entrar como reforço do time interno, não para substituir ninguém.`,
-    "":`O risco costuma ser ${n.risco}.`
+    dono:` Para quem toca o negócio, isso pesa no bolso e na cabeça: ${n.risco}.`,
+    gestor:" Para quem cuida da operação, isso costuma virar retrabalho e equipe esperando.",
+    ti:" E sei que quem cuida da TI raramente tem tempo para tudo. A gente costuma entrar como reforço, nunca para substituir ninguém.",
+    "":` Quando dá problema, o impacto costuma ser ${n.risco}.`
   }[cargo];
-
-  const prova=`A Techwave cuida há 15 anos de TI e segurança para ${nichoTxt}.`;
-  const cta=pick(["Faz sentido conversarmos sobre isso?","Isso é uma preocupação aí na "+E+" hoje?","Vale uma conversa rápida de 15 minutos?"],v);
+  const convite=`Olá${nome1?", "+nome1:""}! ${cx?cx.convite:`Conheci o trabalho da ${E} e adoraria me conectar com você.`}`;
 
   const T={
+  aquecimento:{
+    passos:[
+      `Siga a ${E}${nome1?` e ${nome1}`:""} no LinkedIn e no Instagram.`,
+      "Curta e comente um post recente. Use um dos comentários prontos, ajustando ao que foi publicado.",
+      "Mande o convite de conexão no LinkedIn, sem falar de venda.",
+      "Anote o que você descobrir (uma novidade, um post, um contato em comum) no campo \"Ponto de conexão\".",
+      "Depois de 2 ou 3 dias, vá para o Primeiro contato. A pessoa já vai ter visto seu nome."
+    ],
+    comentarios:[
+      ["Em um post da empresa",c.con.t==="novidade"&&cx?`Parabéns pela conquista, time da ${E}! Sucesso nessa nova fase 👏`:`Que bacana ver o trabalho de vocês! Parabéns ao time da ${E} 👏`],
+      ["Em um post com dica ou conteúdo","Ótimo conteúdo, faz muito sentido! Salvei aqui 👏"],
+      ["Em um post da equipe ou dos bastidores","Que time bonito! Dá pra ver o cuidado de vocês com cada detalhe 👏"],
+      ["Respondendo a um story","Que demais! Como vocês tiveram essa ideia?"]
+    ],
+    convite},
   primeiro:{
-    assunto:pick([tema,`ti na ${E}`,"pergunta rápida"],v),
-    email:`${olaE}\n\n${abertura}${gancho2} ${angulo}\n\n${prova} Nosso foco é ${n.oferta}.\n\n${cta}\n\n${ass}`,
-    wa:`${oi} Aqui é ${eu}, da Techwave IT Solutions.\n\n${abertura} Queria entender como isso está aí na ${E}. ${cta}`,
-    convite:`${contato?`Olá, ${contato}! `:"Olá! "}Trabalho com TI e segurança para ${nichoTxt} e gostaria de me conectar com você para trocar experiências. Abraço, ${eu}.`,
-    li:`Obrigado por aceitar, ${contato||"tudo bem"}!\n\n${abertura} Como isso está aí na ${E}? Se fizer sentido, posso te contar como outras empresas resolveram.`,
-    motivo:`Trabalho com TI e segurança para ${nichoTxt} e estou ligando porque um problema frequente no segmento é ${dor}.`},
+    assunto:cx?cx.assunto:perto?`TI ${ref.em}`:pick([`conhecendo a ${E}`,`uma ideia para a ${E}`,tema],v),
+    email:`${olaE}\n\n${cx?cx.email:`Estava conhecendo o trabalho da ${E} e quis me apresentar.`}\n\n${apres}\n\nUma coisa que vejo muito no segmento: ${dor}.${angulo}\n\n${pick([`Queria entender: ${P} Se fizer sentido, adoraria trocar uma ideia, sem compromisso nenhum.`,`Me conta: ${P} Se quiser, a gente marca ${cafe} para se conhecer.`,`Adoraria conhecer melhor a ${E}. Me conta: ${P}`],v)}\n\n${ass}`,
+    wa:`${oi} Aqui é ${eu}, da Techwave 🙂\n\n${cx?cx.wa:"Estava conhecendo o trabalho de vocês e quis me apresentar."} A gente cuida da TI de ${N} há 15 anos.${prova}\n\nQueria te perguntar uma coisa: ${P}`,
+    audio:`${oi} Aqui é ${eu}, da Techwave. ${cx?cx.fala+" ":""}Resolvi te mandar um áudio porque acho mais pessoal do que mensagem escrita. A gente cuida da TI de ${N} há 15 anos.${prova} E queria te perguntar uma coisa: ${P} Se fizer sentido, adoraria marcar ${cafe} pra gente se conhecer. Um abraço!`,
+    convite,
+    li:`Que bom que aceitou o convite${nome1?", "+nome1:""}! 🙂\n\nA gente cuida da TI de ${N} há 15 anos.${prova} Sempre gosto de entender como cada empresa se organiza. Me conta: ${P}`,
+    motivo:`A gente cuida da TI de ${N} há 15 anos.${prova} Liguei pra conhecer um pouco melhor a ${E}.`},
   fu1:{
-    assunto:pick([tema,`ti na ${E}`,"pergunta rápida"],v),thread:1,
-    email:`${olaE}\n\nUm outro ponto que vejo bastante em ${nichoTxt}: ${dor2}.\n\nNormalmente ninguém percebe até o dia em que dá problema. Como isso funciona hoje aí na ${E}?\n\nSe a resposta for "está tudo sob controle", ótimo, me avise e não insisto.\n\n${ass}`,
-    wa:`${oi} Mandei um e-mail há alguns dias, mas sei que a caixa de entrada é corrida. Pergunta direta: como a ${E} lida hoje com ${dor2}? Se já estiver resolvido, me avisa que não insisto 🙂`,
-    li:`${contato?contato+", u":"U"}ma pergunta rápida: como a ${E} lida hoje com ${dor2}? Tenho visto isso com frequência em ${nichoTxt}.`,
-    motivo:`Te mandei um e-mail essa semana sobre ${dor}. Liguei porque é mais rápido entender se isso é um ponto para vocês.`},
+    assunto:`uma dica sobre ${tema2}`,
+    email:`${olaE}\n\nLembrei ${nome1?"de você":"da "+E} essa semana e quis compartilhar uma dica rápida que tem ajudado bastante ${N}:\n\n${CAT[cat2].d}\n\nVocês já fazem algo assim aí? Se quiser trocar uma ideia sobre isso, é só me responder.\n\n${ass}`,
+    wa:`${oi} Lembrei de vocês e quis mandar uma dica rápida que tem ajudado muito ${N} 👇\n\n${CAT[cat2].d}\n\nVocês já fazem isso aí?`,
+    li:`${oiCurto} Uma dica rápida que tem ajudado muito ${N}:\n\n${CAT[cat2].d}\n\nVocês já fazem isso aí?`,
+    motivo:`Liguei pra compartilhar uma dica rápida que tem ajudado muito ${N}. Posso te contar em um minutinho?`,
+    pq:P2},
   fu2:{
-    assunto:`checklist para a ${E}`,
-    email:`${olaE}\n\nSem pedir reunião: montamos um checklist rápido de 10 itens que usamos para avaliar a TI de ${nichoTxt}, cobrindo ${dor} e outros pontos que costumam passar despercebidos.\n\nQuer que eu te envie? Se preferir, faço essa avaliação com você em 20 minutos, sem custo.\n\n${ass}`,
-    wa:`${oi} Montamos um checklist rápido para ${nichoTxt} avaliarem a própria TI (inclui ${dor}). Quer que eu te mande? É gratuito e sem compromisso.`,
-    li:`${contato?contato+", m":"M"}ontamos um checklist rápido para ${nichoTxt} avaliarem a própria TI. Quer que eu te envie? Sem compromisso.`,
-    motivo:`Te escrevi sobre ${dor}. Liguei para oferecer uma avaliação gratuita de 20 minutos da TI de vocês, sem compromisso.`},
+    assunto:"um café?",
+    email:`${olaE}\n\nQueria te fazer um convite sem compromisso: ${cafeConvite}.\n\nA ideia é conhecer melhor o trabalho de vocês e, se fizer sentido, mostrar dois ou três pontos de TI que costumam passar despercebidos em ${N}. Sem apresentação de vendas.\n\nQue tal na semana que vem? Me diz o melhor dia que eu me organizo.\n\n${ass}`,
+    wa:`${oi} Queria te fazer um convite sem compromisso: ${cafeConvite} ☕\n\nSó pra conhecer melhor o trabalho de vocês e trocar umas ideias sobre TI. Sem apresentação de vendas, prometo 😄\n\nQual dia fica bom pra você na semana que vem?`,
+    audio:`${oi} Aqui é ${eu}, da Techwave. Passando pra te fazer um convite sem compromisso: ${cafeConvite}. A ideia é só conhecer melhor o trabalho de vocês e trocar umas ideias, sem apresentação de vendas. Me fala qual dia fica bom pra você na semana que vem. Um abraço!`,
+    li:`${oiCurto} Queria te fazer um convite sem compromisso: ${cafeConvite}, só pra conhecer melhor o trabalho de vocês e trocar umas ideias sobre TI. Topa? ☕`,
+    motivo:`Liguei pra te fazer um convite: ${cafeConvite}, só pra conhecer melhor o trabalho de vocês. Sem apresentação de vendas.`},
   aguardando:{
-    assunto:`encerrando por aqui`,
-    email:`${olaE}\n\nComo não tive retorno, imagino que o momento não seja esse, e tudo bem.\n\nVou parar de escrever. Se em algum momento ${dor} ou qualquer outro tema de TI virar prioridade na ${E}, é só responder este e-mail.\n\nSucesso para vocês!\n\n${ass}`,
-    wa:`${oi} Último recado para não ser inconveniente: se TI ou segurança virarem prioridade na ${E}, é só me chamar aqui. Sucesso para vocês! 🙂`,
-    li:`${contato?contato+", ú":"Ú"}ltima mensagem para não incomodar: se TI ou segurança virarem pauta na ${E}, pode me chamar por aqui. Sucesso!`,
-    motivo:`Tentei contato algumas vezes e queria só confirmar se faz sentido falarmos em outro momento, para eu não ficar incomodando.`},
+    assunto:"fica o meu contato",
+    email:`${olaE}\n\nImagino que a rotina esteja corrida por aí, então vou parar de mandar mensagem por enquanto.\n\nFica o meu contato: se precisar de uma segunda opinião sobre TI, mesmo que seja uma dúvida rápida, pode me chamar. Vou gostar de ajudar.\n\nSucesso para vocês!\n\n${ass}`,
+    wa:`${oi} Imagino que a rotina esteja corrida, então não vou mais insistir 🙂\n\nFica meu contato: se precisar de uma segunda opinião sobre TI, mesmo que seja uma dúvida rápida, pode me chamar. Sucesso pra vocês!`,
+    li:`${oiCurto} Imagino que a rotina esteja corrida, então não vou mais insistir. Se precisar de uma segunda opinião sobre TI, pode me chamar por aqui. Sucesso!`,
+    motivo:"Tentei falar com você algumas vezes e não quero ser inconveniente. Liguei só pra deixar meu contato, caso um dia precisem de uma segunda opinião sobre TI.",
+    perguntas:[],
+    fechamento:"Posso te mandar meu contato no WhatsApp, pra quando precisar?"},
   resposta:{
-    assunto:tema,thread:1,
-    email:`${olaE}\n\nObrigado pelo retorno!\n\nPara a conversa render, me conta rapidinho: quantas pessoas usam computador na ${E}, quem cuida da TI hoje e qual é a maior dor no momento.\n\nTenho dois horários livres: [dia/hora 1] ou [dia/hora 2]. Qual fica melhor?\n\n${ass}`,
-    wa:`${oi} Obrigado pelo retorno! 🙌 Para eu já chegar com algo útil: quantas pessoas usam computador aí e quem cuida da TI hoje? Posso te ligar [dia/hora 1] ou [dia/hora 2]?`,
-    li:`Obrigado pelo retorno, ${contato||"tudo bem"}! Posso te ligar [dia/hora 1] ou [dia/hora 2]? São 20 minutos para entender o cenário da ${E}.`,
-    motivo:`Obrigado por ter respondido! Queria entender melhor o cenário da ${E} para ver se faz sentido seguirmos.`},
+    assunto:null,
+    email:`${olaE}\n\nQue bom ter seu retorno, agradeço muito!\n\nQueria conhecer melhor a ${E}: há quanto tempo vocês estão no mercado, como o time está organizado e o que mais tira o sono de vocês quando o assunto é tecnologia.\n\nQue tal ${cafe}? Tenho [dia/hora 1] ou [dia/hora 2], mas me adapto a você.\n\n${ass}`,
+    wa:`${oi} Que bom ter seu retorno, valeu! 🙌\n\nQueria conhecer melhor a ${E}: como o time está organizado hoje e o que mais dá dor de cabeça quando o assunto é tecnologia?\n\nQue tal ${cafe}? Pode ser [dia/hora 1] ou [dia/hora 2], mas me adapto a você.`,
+    audio:`${oi} Aqui é ${eu}, da Techwave. Que bom ter seu retorno! Queria muito conhecer melhor a ${E}, entender como o time está organizado e o que mais dá dor de cabeça em tecnologia. Que tal ${cafe}? Me fala o melhor dia pra você. Um abraço!`,
+    li:`Que bom ter seu retorno${nome1?", "+nome1:""}! Queria conhecer melhor a ${E}. Que tal ${cafe}? Pode ser [dia/hora 1] ou [dia/hora 2].`,
+    motivo:`Que bom que você respondeu! Liguei pra conhecer melhor a ${E} e entender se faz sentido a gente seguir conversando.`},
   proposta:{
-    assunto:`proposta ${E}`,
-    email:`${olaE}\n\nConseguiu olhar a proposta?\n\nEla foi montada para resolver ${dor} e reduzir o risco de ${n.risco}.\n\nO que falta para vocês decidirem? Se for escopo, prazo ou valor, eu ajusto. Se for outra pessoa que precisa ver, posso apresentar para ela também.\n\n${ass}`,
-    wa:`${oi} Conseguiu ver a proposta? O que falta para decidirem? Se for escopo, prazo ou valor, me fala que eu ajusto 😊`,
-    li:`${contato?contato+", c":"C"}onseguiu ver a proposta? Se tiver qualquer ponto para ajustar, me fala por aqui.`,
-    motivo:`Liguei para saber se ficou alguma dúvida na proposta e o que falta para vocês decidirem.`},
+    assunto:"sobre a proposta",
+    email:`${olaE}\n\nQueria saber o que você achou da proposta.\n\nMontei pensando no que conversamos, mas ela é um ponto de partida: se algo não encaixou (escopo, prazo ou valor), me fala que a gente ajusta junto.\n\nSe ajudar, posso explicar numa ligação rápida ou apresentar para mais alguém do time.\n\n${ass}`,
+    wa:`${oi} Conseguiu ver a proposta? Queria saber o que você achou 🙂\n\nSe algo não encaixou (escopo, prazo ou valor), me fala que a gente ajusta junto.`,
+    li:`${oiCurto} Conseguiu ver a proposta? Se algo não encaixou, me fala que a gente ajusta junto.`,
+    motivo:"Liguei pra saber o que você achou da proposta e se tem algo que a gente possa ajustar junto.",
+    perguntas:["O que você achou da proposta?","Tem algum ponto que não encaixou: escopo, prazo ou valor?","Quem mais participa da decisão aí?"],
+    fechamento:"Se eu ajustar esses pontos, a gente conversa de novo [dia/hora]?"},
   reativacao:{
-    assunto:`${tema}`,
-    email:`${olaE}\n\nFaz um tempo que conversamos. Lembrei da ${E} porque temos ajudado várias ${nichoTxt} com ${dor}.\n\nO cenário aí mudou desde a última vez? Se fizer sentido, te atualizo em 15 minutos.\n\n${ass}`,
-    wa:`${oi} Faz um tempo que conversamos! Lembrei da ${E} porque temos ajudado ${nichoTxt} com ${dor}. O cenário aí mudou?`,
-    li:`${contato?contato+", f":"F"}az um tempo! Temos ajudado ${nichoTxt} com ${dor}. Como está isso aí na ${E}?`,
-    motivo:`Conversamos um tempo atrás e liguei porque temos ajudado várias ${nichoTxt} com ${dor}.`},
+    assunto:"quanto tempo!",
+    email:`${olaE} Quanto tempo!\n\nLembrei ${nome1?"de você":"da "+E} essa semana e quis saber como andam as coisas por aí.\n\nPor aqui, temos ajudado ${N} com ${dor}, e pensei que poderia ser útil para vocês também.\n\nTopa colocar o papo em dia? Pode ser ${cafe}.\n\n${ass}`,
+    wa:`${oi} Quanto tempo! 😊 Lembrei de vocês essa semana e quis saber como andam as coisas aí na ${E}.\n\nTemos ajudado ${N} com ${dor}. Topa colocar o papo em dia?`,
+    audio:`${oi} Aqui é ${eu}, da Techwave. Quanto tempo! Lembrei de vocês essa semana e quis saber como andam as coisas aí na ${E}. A gente tem ajudado ${N} com ${dor}, e pensei que podia ser útil pra vocês. Topa colocar o papo em dia? Um abraço!`,
+    li:`${oiCurto} Quanto tempo! Lembrei de vocês e quis saber como andam as coisas aí na ${E}. Topa colocar o papo em dia?`,
+    motivo:`Faz tempo que a gente não conversa e lembrei de vocês. Queria saber como andam as coisas aí na ${E}.`},
   relacionamento:{
-    assunto:`dica sobre ${tema}`,
-    email:`${olaE}\n\nPassando só para compartilhar um alerta para ${nichoTxt}: ${dor} tem causado ${n.risco}.\n\nNão é oferta. Se quiser, faço uma revisão rápida do cenário da ${E} e indico pontos de melhoria, sem custo.\n\n${ass}`,
-    wa:`${oi} Passando só para compartilhar uma dica: ${dor} está bem em alta entre ${nichoTxt}. Se quiser trocar uma ideia sobre isso, estou por aqui 🙂`,
-    li:`${contato?contato+", c":"C"}ompartilhando um alerta: ${dor} tem sido comum em ${nichoTxt}. Se quiser trocar uma ideia, estou por aqui.`,
-    motivo:`Liguei só para manter contato e compartilhar um ponto de atenção que temos visto no segmento.`}
+    assunto:`uma dica sobre ${tema}`,
+    email:`${olaE}\n\nPassando só para saber como vocês estão e deixar uma dica que tem ajudado ${N}:\n\n${CAT[cat].d}\n\nSe precisar de qualquer coisa, pode contar comigo.\n\n${ass}`,
+    wa:`${oi} Passando só pra saber como vocês estão e deixar uma dica 👇\n\n${CAT[cat].d}\n\nSe precisar de qualquer coisa, pode contar comigo!`,
+    li:`${oiCurto} Passando pra deixar uma dica que tem ajudado ${N}:\n\n${CAT[cat].d}`,
+    motivo:"Liguei só pra saber como vocês estão. Não é nada de venda, é só pra manter contato mesmo.",
+    perguntas:[`Como estão as coisas aí na ${E}?`,"Teve alguma novidade na empresa nos últimos meses?"],
+    fechamento:"Se precisar de qualquer coisa, pode contar comigo!"}
   };
-  const m=T[stageId];
+  const m=T[st];
+  m.ref=ref;
 
-  /* roteiro de ligação (mesma estrutura em todos os momentos) */
+  if(st==="aquecimento"){m.abas=["passos","comentarios","li"];return m}
+  m.abas=["email","wa","li","ligacao","objecoes"];
+
+  /* roteiro de ligação: conhecer a empresa antes de falar de TI */
+  const perguntas=m.perguntas||[
+    `Há quanto tempo a ${E} está no mercado? Como começou?`,
+    "Quantas pessoas trabalham com vocês hoje?",
+    "Quem cuida da TI aí: alguém interno ou uma empresa?",
+    cap(m.pq||P)
+  ];
   m.ligacao=`ABERTURA
-"${saud()}! Falo com ${contato||"[nome]"}? Aqui é ${eu}, da Techwave. Te peguei em um momento ruim? Prometo ser rápido."
+"${saud()}! Falo com ${nome1||"[nome]"}? Aqui é ${eu}, da Techwave.${st==="primeiro"&&cx?" "+cx.fala:""} Você tem dois minutinhos agora ou prefere que eu ligue em outro horário?"
 
 MOTIVO
 "${m.motivo}"
-
-PERGUNTAS (escolha 1 ou 2, escute mais do que fala)
-• "Quem cuida da TI aí hoje: alguém interno ou uma empresa?"
-• "Quando dá problema de sistema ou internet, quanto tempo leva para resolver?"
-• "Como funciona o backup de vocês? Já testaram restaurar alguma vez?"
-
+${perguntas.length?`
+PERGUNTAS (escute mais do que fala)
+${perguntas.map(q=>`• "${q}"`).join("\n")}
+`:""}
 FECHAMENTO
-"Pelo que você contou, acho que vale uma conversa de 20 minutos para eu entender melhor. Fica melhor [dia/hora 1] ou [dia/hora 2]?"
+"${m.fechamento||`Gostei muito de conversar com você. Que tal ${cafe}? Fica bom [dia/hora 1] ou [dia/hora 2]?`}"
 
 SE NÃO PUDER FALAR
-"Sem problema! Qual o melhor horário para eu te ligar de novo? Posso mandar um resumo no WhatsApp enquanto isso?"`;
+"Imagina, sem problema! Qual o melhor horário pra eu te ligar? Posso te mandar uma mensagem no WhatsApp enquanto isso?"`;
 
-  /* respostas para objeções comuns após o primeiro contato */
+  /* respostas para quando o cliente responder com uma objeção */
   m.objecoes=[
-    ["\"Já temos TI\" / \"Já temos uma empresa\"",`Que bom, ${contato||"isso ajuda bastante"}! A ideia não é substituir ninguém. Muitas ${nichoTxt} usam a gente como segunda opinião ou reforço para o time. Topa uma avaliação rápida, sem compromisso, só para comparar?`],
-    ["\"Agora não é o momento\"","Entendo totalmente. Para eu não incomodar fora de hora: faz sentido eu voltar a falar com você em qual mês?"],
-    ["\"Está caro\" / \"Não temos orçamento\"",`Faz sentido. A conversa inicial não tem custo e muitas vezes encontramos ajustes que reduzem gastos com TI. Se não fizer sentido depois, sem problema nenhum.`],
-    ["\"Me manda por e-mail\"",`Claro! Para eu mandar algo útil e não genérico: hoje o maior incômodo aí é mais ${dor} ou outra coisa?`],
-    ["\"Não sou eu quem cuida disso\"",`Obrigado por avisar! Quem seria a melhor pessoa para falar sobre TI na ${E}? Posso citar que você me indicou?`],
-    ["\"Quem é você? De onde conseguiu meu contato?\"",`Desculpe se pareceu invasivo! Sou ${eu}, da Techwave IT Solutions. Encontrei a ${E} pesquisando ${nichoTxt} na região. Se preferir que eu não entre mais em contato, é só me dizer.`]
+    ["\"Do que se trata?\"",`Claro! Sou ${eu}, da Techwave. A gente cuida da TI de ${N}.${prova} Queria conhecer melhor a ${E}, sem compromisso. Você teria 5 minutinhos essa semana pra uma ligação rápida?`],
+    ["\"Já temos TI\" / \"Já temos uma empresa\"","Que bom! Ter alguém cuidando faz toda a diferença. A ideia não é substituir ninguém: muita empresa usa a gente como segunda opinião ou reforço em projetos. Se um dia quiser comparar ou só tirar uma dúvida, pode contar comigo 🙂"],
+    ["\"Agora não é o momento\"","Imagina, entendo totalmente! Posso te chamar de novo mais pra frente? Qual época costuma ser mais tranquila aí?"],
+    ["\"Está caro\" / \"Não temos orçamento\"","Faz todo sentido, ninguém quer gasto a mais. A conversa não tem custo nenhum e, muitas vezes, a gente encontra jeitos de reduzir o que vocês já gastam com TI. Se não fizer sentido, sem problema."],
+    ["\"Me manda por e-mail\"","Mando sim! Só pra eu não te mandar algo genérico: o que mais dá dor de cabeça aí hoje quando o assunto é TI?"],
+    ["\"Não sou eu quem cuida disso\"","Ah, valeu por avisar! Quem seria a melhor pessoa pra conversar sobre isso? Posso dizer que falei com você?"],
+    ["\"Quem é você? De onde conseguiu meu contato?\"",`Desculpe se pareceu invasivo! Sou ${eu}, da Techwave IT Solutions. ${cx?cx.origem:`Encontrei a ${E} pesquisando ${N}${cidadeEm?" "+cidadeEm:""}.`} Se preferir que eu não entre mais em contato, é só me dizer, tá?`]
   ];
   return m;
 }
@@ -332,73 +490,115 @@ SE NÃO PUDER FALAR
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
-let stageAtual="primeiro",cargoAtual="",variacao=0,abaAtual=store.get("tw_aba","email"),ultimo=null;
+let stageAtual="primeiro",cargoAtual="",conAtual="",variacao=0,abaAtual=store.get("tw_aba","email"),ultimo=null,ativo=false;
+const conValores={};
 
 $("nichos").innerHTML=NICHOS.map(n=>`<option value="${n.nome}">`).join("");
 $("remetente").value=store.get("tw_remetente","");
-$("remetente").addEventListener("change",e=>store.set("tw_remetente",e.target.value.trim()));
+$("remetente").addEventListener("input",e=>store.set("tw_remetente",e.target.value.trim()));
 
 function stageHTML(s){return`<label class="stage${s.id===stageAtual?" on":""}" data-id="${s.id}"><input type="radio" name="st" value="${s.id}"><span>${s.ico}</span><span>${s.nome}<small>${s.sub}</small></span></label>`}
-$("stages").innerHTML=`<div class="sep">Sequência de prospecção fria</div>`+STAGES.filter(s=>s.frio).map(stageHTML).join("")
-  +`<div class="sep">Depois do contato</div>`+STAGES.filter(s=>!s.frio).map(stageHTML).join("");
-function marcarStage(){document.querySelectorAll(".stage").forEach(x=>x.classList.toggle("on",x.dataset.id===stageAtual))}
+$("stages").innerHTML=`<div class="sep">Sequência para criar conexão</div>`+STAGES.filter(s=>s.seq).map(stageHTML).join("")
+  +`<div class="sep">Depois do contato</div>`+STAGES.filter(s=>!s.seq).map(stageHTML).join("");
+function marcar(id,valor){document.querySelectorAll(`#${id} [data-id]`).forEach(x=>x.classList.toggle("on",x.dataset.id===valor))}
 $("stages").addEventListener("click",e=>{
   const el=e.target.closest(".stage");if(!el)return;
-  e.preventDefault();stageAtual=el.dataset.id;variacao=0;marcarStage();
-  if(ultimo)render();
+  e.preventDefault();stageAtual=el.dataset.id;variacao=0;marcar("stages",stageAtual);
+  if(ativo)render();
 });
 
-$("cargos").innerHTML=CARGOS.map(c=>`<button type="button" class="chip${c.id===cargoAtual?" on":""}" data-id="${c.id}">${c.nome}</button>`).join("");
+const chipsHTML=lista=>lista.map(c=>`<button type="button" class="chip${c.id===""?" on":""}" data-id="${c.id}">${c.nome}</button>`).join("");
+$("cargos").innerHTML=chipsHTML(CARGOS);
 $("cargos").addEventListener("click",e=>{
   const b=e.target.closest(".chip");if(!b)return;
-  cargoAtual=b.dataset.id;
-  document.querySelectorAll("#cargos .chip").forEach(x=>x.classList.toggle("on",x===b));
-  if(ultimo)render();
+  cargoAtual=b.dataset.id;marcar("cargos",cargoAtual);
+  if(ativo)render();
 });
 
-const ABAS=[["email","✉️ E-mail"],["wa","💬 WhatsApp"],["li","🔗 LinkedIn"],["ligacao","📞 Ligação"],["objecoes","🛡️ Se responderem"]];
-const copyBtn=(key,txt="Copiar")=>`<button class="btn sec" data-copy="${key}">${txt}</button>`;
+$("conexoes").innerHTML=chipsHTML(CONEXOES);
+function aplicarConexao(id){
+  conValores[conAtual]=$("conexaoValor").value;
+  conAtual=id;marcar("conexoes",id);
+  const c=CONEXOES.find(x=>x.id===id);
+  $("conexaoCampo").hidden=!id;
+  if(!id)return;
+  $("conexaoLabel").textContent=c.campo;
+  $("conexaoValor").placeholder=c.ph;
+  $("conexaoHint").textContent=c.hint;
+  $("conexaoValor").value=conValores[id]||"";
+}
+$("conexoes").addEventListener("click",e=>{
+  const b=e.target.closest(".chip");if(!b)return;
+  aplicarConexao(b.dataset.id);
+  if(conAtual)$("conexaoValor").focus();
+  if(ativo)render();
+});
 
-function painel(m){
-  switch(abaAtual){
-    case "email":return`
-      <div class="block"><h3>Assunto ${copyBtn("assunto","Copiar assunto")}</h3><div class="subject">${esc(m.assunto)}</div>${m.thread?`<p class="hint">Envie como resposta ao e-mail anterior, na mesma conversa. O assunto fica igual.</p>`:""}</div>
-      <div class="block"><h3>Mensagem ${copyBtn("email","Copiar e-mail")}</h3><pre>${esc(m.email)}</pre>
-      <div class="row"><a class="btn sec" href="mailto:?subject=${encodeURIComponent(m.assunto)}&body=${encodeURIComponent(m.email)}">Abrir no e-mail</a></div></div>`;
-    case "wa":return`
-      <div class="block"><h3>Mensagem ${copyBtn("wa","Copiar mensagem")}</h3><pre>${esc(m.wa)}</pre>
-      <div class="row"><a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(m.wa)}">Abrir no WhatsApp</a></div></div>`;
+const ABAS={passos:"✅ Passo a passo",comentarios:"💬 Comentários",email:"✉️ E-mail",wa:"💬 WhatsApp",li:"🔗 LinkedIn",ligacao:"📞 Ligação",objecoes:"🛡️ Se responderem"};
+const copyBtn=(key,txt="Copiar")=>`<button class="btn sec" data-copy="${key}">${txt}</button>`;
+const bloco=(titulo,key,txt,botao)=>`<div class="block"><h3>${titulo} ${copyBtn(key,botao)}</h3><pre>${esc(txt)}</pre></div>`;
+
+function painel(m,aba){
+  switch(aba){
+    case "passos":return`<ol class="passos">${m.passos.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>`;
+    case "comentarios":return`<p class="hint" style="margin:-4px 0 12px">Ajuste ao que foi publicado. Comentário genérico demais parece robô.</p>`
+      +m.comentarios.map(([q,a],i)=>bloco(esc(q),"com:"+i,a)).join("");
+    case "email":return(m.assunto
+        ?`<div class="block"><h3>Assunto ${copyBtn("assunto","Copiar assunto")}</h3><div class="subject">${esc(m.assunto)}</div></div>`
+        :`<p class="hint" style="margin:-4px 0 12px">Responda na mesma conversa do e-mail do cliente. O assunto já vem preenchido.</p>`)
+      +`<div class="block"><h3>Mensagem ${copyBtn("email","Copiar e-mail")}</h3><pre>${esc(m.email)}</pre>
+      <div class="row"><a class="btn sec" href="mailto:?${m.assunto?`subject=${encodeURIComponent(m.assunto)}&`:""}body=${encodeURIComponent(m.email)}">Abrir no e-mail</a></div></div>`;
+    case "wa":return`<div class="block"><h3>Mensagem escrita ${copyBtn("wa","Copiar mensagem")}</h3><pre>${esc(m.wa)}</pre>
+      <div class="row"><a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(m.wa)}">Abrir no WhatsApp</a></div></div>`
+      +(m.audio?`<div class="block"><h3><span>🎙️ Versão em áudio <small>(≈ 30 segundos)</small></span> ${copyBtn("audio","Copiar roteiro")}</h3><pre>${esc(m.audio)}</pre>
+      <p class="hint">Áudio cria mais conexão do que texto. Fale com naturalidade, sem ler palavra por palavra.</p></div>`:"");
     case "li":{
-      const conv=m.convite?`<div class="block"><h3>Convite de conexão <span><small class="count${m.convite.length>300?" bad":""}">${m.convite.length}/300</small> ${copyBtn("convite","Copiar convite")}</span></h3><pre>${esc(m.convite)}</pre></div>`:"";
-      return conv+`<div class="block"><h3>${m.convite?"Mensagem depois que aceitar":"Mensagem"} ${copyBtn("li","Copiar mensagem")}</h3><pre>${esc(m.li)}</pre></div>`;}
-    case "ligacao":return`<div class="block"><h3>Roteiro (≈ 2 minutos) ${copyBtn("ligacao","Copiar roteiro")}</h3><pre>${esc(m.ligacao)}</pre></div>`;
+      let h="";
+      if(m.convite)h+=`<div class="block"><h3><span>Convite de conexão${m.li?" <small>(se ainda não estão conectados)</small>":""}</span><span><small class="count${m.convite.length>300?" bad":""}">${m.convite.length}/300</small> ${copyBtn("convite","Copiar convite")}</span></h3><pre>${esc(m.convite)}</pre></div>`;
+      if(m.li)h+=bloco(m.convite?"Mensagem depois que aceitar":"Mensagem","li",m.li,"Copiar mensagem");
+      return h;}
+    case "ligacao":return bloco("Roteiro (≈ 2 minutos)","ligacao",m.ligacao,"Copiar roteiro");
     case "objecoes":return`<p class="hint" style="margin:-4px 0 12px">Respostas curtas para as objeções mais comuns. Servem para WhatsApp, LinkedIn ou e-mail.</p>`
-      +m.objecoes.map(([q,a],i)=>`<div class="block"><h3>${esc(q)} ${copyBtn("obj"+i)}</h3><pre>${esc(a)}</pre></div>`).join("");
+      +m.objecoes.map(([q,a],i)=>bloco(esc(q),"obj:"+i,a)).join("");
   }
 }
 
+function contexto(){
+  return {
+    empresa:$("empresa").value.trim(),nicho:$("nicho").value.trim(),
+    cidade:$("cidade").value.trim(),contato:$("contato").value.trim(),remetente:$("remetente").value.trim(),
+    cargo:cargoAtual,con:{t:conAtual,x:$("conexaoValor").value.trim()}
+  };
+}
+
 function render(){
-  const empresa=$("empresa").value.trim(),nicho=$("nicho").value.trim();
-  if(!empresa||!nicho){
+  const c=contexto();
+  if(!c.empresa||!c.nicho){
     $("resultado").innerHTML=`<div class="card empty">Informe a <b>empresa</b> e o <b>nicho</b> para gerar as mensagens.</div>`;ultimo=null;return;
   }
-  const c={empresa,contato:$("contato").value.trim(),remetente:$("remetente").value.trim(),gancho:$("gancho").value.trim(),cargo:cargoAtual,n:acharNicho(nicho)};
+  c.n=acharNicho(c.nicho);
   const st=STAGES.find(s=>s.id===stageAtual);
   const m=gerar(c,stageAtual,variacao);
   ultimo=m;
+  const aba=m.abas.includes(abaAtual)?abaAtual:m.abas[0];
+  const semConexao=stageAtual==="primeiro"&&!(c.con.t&&c.con.x)&&!m.ref;
   $("resultado").innerHTML=`<div class="card">
     <div class="top">
-      <div><span class="tag">${st.ico} ${st.nome}</span> <span class="tag blue">${esc(c.n.nome||nicho)}</span></div>
-      <button class="btn sec" id="outra">🔄 Outra variação</button>
+      <div><span class="tag">${st.ico} ${st.nome}</span> <span class="tag blue">${esc(c.n.nome)}</span></div>
+      ${stageAtual==="aquecimento"?"":`<button class="btn sec" id="outra">🔄 Outra variação</button>`}
     </div>
     <p class="tip">${DICAS[stageAtual]}</p>
-    <div class="tabs">${ABAS.map(([id,t])=>`<button class="tab${id===abaAtual?" on":""}" data-aba="${id}">${t}</button>`).join("")}</div>
-    ${painel(m)}
+    ${m.ref&&stageAtual==="primeiro"?`<p class="tip">⭐ Referência citada: ${esc(m.ref.quem)}</p>`:""}
+    ${semConexao?`<p class="tip warn">💡 Sem ponto de conexão a mensagem fica mais fria. Faça o Aquecimento antes ou procure um post recente, uma novidade da empresa ou um contato em comum.</p>`:""}
+    <div class="tabs">${m.abas.map(id=>`<button class="tab${id===aba?" on":""}" data-aba="${id}">${ABAS[id]}</button>`).join("")}</div>
+    ${painel(m,aba)}
   </div>`;
 }
 
 function textoCopia(k){
-  if(k.startsWith("obj"))return ultimo.objecoes[+k.slice(3)][1];
+  const [tipo,i]=k.split(":");
+  if(tipo==="obj")return ultimo.objecoes[+i][1];
+  if(tipo==="com")return ultimo.comentarios[+i][1];
   return ultimo[k];
 }
 async function copiar(btn,txt){
@@ -416,31 +616,38 @@ $("resultado").addEventListener("click",e=>{
   const k=e.target.dataset.copy;if(k&&ultimo)copiar(e.target,textoCopia(k));
 });
 
+/* Depois de gerar, qualquer ajuste nos campos atualiza o texto na hora */
+["empresa","nicho","cidade","contato","conexaoValor","remetente"].forEach(id=>$(id).addEventListener("input",()=>{if(ativo)render()}));
+["empresa","nicho","cidade","contato","conexaoValor"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")$("gerar").click()}));
+
 /* Histórico (somente neste navegador) */
 function histRender(){
   const h=store.get("tw_hist",[]);
-  $("hist").innerHTML=h.length?`<b>Recentes</b>`+h.map((i,x)=>{const s=STAGES.find(s=>s.id===i.s)||STAGES[0];return`<button data-i="${x}">${s.ico} ${esc(i.e)} · ${esc(i.n)}</button>`}).join(""):"";
+  $("hist").innerHTML=h.length?`<b>Recentes</b>`+h.map((i,x)=>{const s=STAGES.find(s=>s.id===i.s)||STAGES[1];return`<button data-i="${x}">${s.ico} ${esc(i.e)} · ${esc(i.n)}</button>`}).join(""):"";
 }
 function histSalvar(){
-  const atual={e:$("empresa").value.trim(),n:$("nicho").value.trim(),s:stageAtual,c:$("contato").value.trim(),g:$("gancho").value.trim(),r:cargoAtual};
+  const c=contexto();
+  const atual={e:c.empresa,n:c.nicho,ci:c.cidade,s:stageAtual,c:c.contato,r:cargoAtual,ct:conAtual,cv:c.con.x};
   const h=store.get("tw_hist",[]).filter(i=>i.e!==atual.e);
   h.unshift(atual);store.set("tw_hist",h.slice(0,10));histRender();
 }
 $("hist").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
   const i=store.get("tw_hist",[])[b.dataset.i];if(!i)return;
-  $("empresa").value=i.e;$("nicho").value=i.n;$("contato").value=i.c||"";$("gancho").value=i.g||"";
-  stageAtual=i.s;cargoAtual=i.r||"";variacao=0;marcarStage();
-  document.querySelectorAll("#cargos .chip").forEach(x=>x.classList.toggle("on",x.dataset.id===cargoAtual));
-  render();
+  $("empresa").value=i.e;$("nicho").value=i.n;$("cidade").value=i.ci||"";$("contato").value=i.c||"";
+  stageAtual=STAGES.some(s=>s.id===i.s)?i.s:"primeiro";cargoAtual=i.r||"";variacao=0;
+  marcar("stages",stageAtual);marcar("cargos",cargoAtual);
+  /* entradas antigas guardavam a observação em "g" */
+  const ct=i.ct!=null?i.ct:(i.g?"novidade":""),cv=i.cv!=null?i.cv:(i.g||"");
+  aplicarConexao(ct);if(ct)$("conexaoValor").value=cv;
+  ativo=true;render();
 });
 
 $("gerar").addEventListener("click",()=>{
   variacao=0;render();if(!ultimo)return;
-  histSalvar();
+  ativo=true;histSalvar();
   if(window.innerWidth<=860)$("resultado").scrollIntoView({behavior:"smooth"});
 });
-["empresa","nicho","contato","gancho"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")$("gerar").click()}));
 histRender();
 </script>
 </body>

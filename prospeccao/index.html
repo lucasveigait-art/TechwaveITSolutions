@@ -246,27 +246,34 @@ function acharCidade(txt){
   const par=pares.find(([k])=>t.includes(k));
   return par?par[1]:null;
 }
-const infoCidade=nome=>CIDADES.find(c=>c.nome===nome)||{nome,em:emDe(nome),regiao:null};
 const emDe=c=>/^(em|no|na|nos|nas)\s/i.test(c)?c:"em "+c;
 
-/* ---------- Clientes da Techwave usados como referência ----------
-   sing: como o cliente aparece na frase · ramo: igual ao nome do nicho · cidade: igual à lista acima */
+/* ---------- Clientes da Techwave usados como referência (cases do site) ----------
+   quem: como o cliente aparece na frase · fez/resultado: o case, quando houver · ramo: igual ao nome do nicho */
 const CLIENTES=[
-  {nome:"Attual Contabilidade",sing:"a Attual Contabilidade",ramo:"Contabilidade",cidade:"Saquarema"},
-  {nome:"Radio Mix",sing:"a Radio Mix",ramo:"Comunicação / Mídia",cidade:"Saquarema"},
-  {nome:"Talita Gloria",sing:"o escritório Talita Gloria",ramo:"Advocacia",cidade:"Saquarema"},
-  {nome:"Sediver",sing:"a multinacional Sediver",ramo:"Indústria",cidade:"Rio de Janeiro"}
+  {nome:"Attual Contabilidade",ramo:"Contabilidade",quem:"a Attual Contabilidade, em Saquarema",
+   fez:"modernizamos a infraestrutura, levamos o sistema contábil para a nuvem e automatizamos os processos fiscais",
+   resultado:"o tempo de processamento caiu 80%"},
+  {nome:"Talita Gloria Advocacia",ramo:"Advocacia",quem:"o escritório Talita Gloria Advocacia, em Saquarema",
+   fez:"implantamos um sistema de gestão integrado ao jurídico e ao financeiro, com atendimento automatizado pelo WhatsApp",
+   resultado:"o controle de atendimento melhorou 95%"},
+  {nome:"Sediver",ramo:"Indústria",quem:"a Sediver, multinacional de isoladores",
+   fez:"assumimos a gestão de TI no Brasil, integrada ao time global, com suporte proativo e prazos de atendimento definidos",
+   resultado:"os chamados recorrentes caíram 60% e o tempo de resposta, 70%"},
+  {nome:"Radio Mix",ramo:"Comunicação / Mídia",quem:"a Radio Mix, rádio de Saquarema"}
 ];
-const lista=a=>a.length>1?a.slice(0,-1).join(", ")+" e "+a[a.length-1]:a[0];
-/* Cita só clientes do mesmo nicho (nunca a própria empresa prospectada) */
+const em_=s=>s.replace(/^a /,"na ").replace(/^o /,"no ");
+/* Só cita cliente do mesmo nicho (nunca a própria empresa prospectada) */
 function referencia(n,E){
-  const ramo=CLIENTES.filter(r=>r.ramo===n.nome&&norm(r.nome)!==norm(E));
-  if(!ramo.length)return null;
+  const e=norm(E);
+  const r=CLIENTES.find(r=>r.ramo===n.nome&&!(e.length>2&&(norm(r.nome).includes(e)||e.includes(norm(r.nome)))));
+  if(!r)return null;
   return {
-    texto:ramo.length>1
-      ?`${cap(lista(ramo.map(r=>r.sing)))} já confiam na gente.`
-      :`${cap(ramo[0].sing)}, ${infoCidade(ramo[0].cidade).em}, já confia na gente.`,
-    quem:lista(ramo.map(r=>r.nome))};
+    nome:r.nome,temCaso:!!r.fez,
+    longo:r.fez?`Um exemplo é ${r.quem}: ${r.fez}. Resultado: ${r.resultado}.`:`Um cliente nosso do mesmo ramo é ${r.quem}.`,
+    historia:r.fez?`${cap(em_(r.quem))}, ${r.fez}. Resultado: ${r.resultado}.`:"",
+    curto:`Um cliente nosso do mesmo ramo é ${r.quem}${r.resultado?`: lá, ${r.resultado}`:""}.`
+  };
 }
 
 /* ---------- Temas de TI ----------
@@ -304,13 +311,13 @@ const NICHOS=[
   dor:[["imagens e prontuários de pacientes sem backup","backup dos pacientes","backup"],["sistema de agenda e radiologia lento","sistema lento","maquinas"],["computadores da recepção expostos a vírus e ransomware","proteção contra vírus","seguranca"]],
   risco:"perda do histórico de pacientes e consultório parado"},
  {k:["clinica","medic","saude","hospital","consultorio","laborat","radiolog"],nome:"Saúde / Clínicas",txt:"clínicas e consultórios",
-  dor:[["prontuários em computadores sem proteção adequada","proteção dos prontuários","seguranca"],["sistema de agenda fora do ar no horário de pico","agenda fora do ar","lentidao"],["adequação à LGPD para dados de pacientes","LGPD na clínica","lgpd"]],
+  dor:[["prontuários em computadores sem proteção adequada","proteção dos prontuários","seguranca"],["sistema de agenda fora do ar no horário de pico","agenda fora do ar","lentidao"],["dados de pacientes guardados sem os cuidados que a LGPD exige","LGPD na clínica","lgpd"]],
   risco:"exposição de dados sensíveis de pacientes e atendimento parado"},
  {k:["ecommerce","e-commerce","loja virtual","marketplace"],nome:"E-commerce",txt:"lojas virtuais",
   dor:[["site instável em campanhas e datas sazonais","Black Friday","pico"],["dados de clientes e pagamentos expostos a ataques","segurança da loja","duasEtapas"],["servidores e integrações sem monitoramento","monitoramento","monitoramento"]],
   risco:"queda de vendas e reputação arranhada em picos de demanda"},
  {k:["financ","banco","cooperativa","seguro","consorcio"],nome:"Financeiro / Seguros",txt:"empresas do mercado financeiro e de seguros",
-  dor:[["exigências de segurança e auditoria de acessos","auditoria de acessos","acesso"],["dados financeiros de clientes sob risco de vazamento","dados dos clientes","duasEtapas"],["sistemas críticos sem plano de contingência","contingência","contingencia"]],
+  dor:[["acessos a sistemas sem controle nem registro para auditoria","auditoria de acessos","acesso"],["dados financeiros de clientes sob risco de vazamento","dados dos clientes","duasEtapas"],["sistemas críticos sem plano de contingência","contingência","contingencia"]],
   risco:"sanção regulatória e perda de confiança dos clientes"},
  {k:["varejo","loja","comercio","supermercado","mercado"],nome:"Varejo",txt:"lojas e empresas de varejo",
   dor:[["PDV e internet caindo no horário de maior movimento","PDV caindo","rede"],["câmeras, Wi-Fi e sistema sem ninguém monitorando","rede da loja","monitoramento"],["demora para alguém de TI resolver um problema","suporte na loja","suporte"]],
@@ -356,27 +363,39 @@ function gerar(c,st,v){
   const cx=textosConexao(c.con.t,c.con.x,E);
   const local=acharCidade(c.cidade);
   const ref=referencia(n,E);
-  const prova=ref?" "+ref.texto:"";
   const perto=!!local;
   const cidadeEm=local?local.em:(c.cidade?emDe(c.cidade):"");
+  const par=(...p)=>p.filter(Boolean).join("\n\n");
 
   const olaE=nome1?`Olá, ${nome1}, tudo bem?`:"Olá, tudo bem?";
   const oi=nome1?`Oi, ${nome1}, tudo bem?`:"Oi, tudo bem?";
   const oiCurto=nome1?`Oi, ${nome1}!`:"Oi!";
-  const ass=`Um abraço,\n${eu}\nTechwave IT Solutions`;
-  const apres=`Sou ${eu}, da Techwave. Há 15 anos a gente cuida da TI de ${N}.${prova}`;
+  const ass=`Um abraço,\n${eu}\nTechwave IT Solutions\nwww.techwave.tec.br`;
+  const eSou=`Sou ${eu}, da Techwave IT Solutions.`;
+  /* a Techwave tem 15 anos de mercado atendendo vários segmentos (nunca "15 anos no nicho") */
+  const sobre="Em 15 anos de mercado, já atendemos mais de 50 empresas de diferentes segmentos, cuidando de infraestrutura, segurança da informação e suporte.";
+  const sobreCurto="Temos 15 anos de mercado e já atendemos mais de 50 empresas de vários segmentos.";
+  const caso=ref?" "+ref.longo:"",casoCurto=ref?" "+ref.curto:"";
+  const comum=`em ${N}, é comum ver ${dor}`;
+  /* por que estamos escrevendo: a conexão, se houver; senão, como encontramos a empresa */
+  const achei=`Conheci a ${E} pesquisando ${N}${cidadeEm?" "+cidadeEm:""}`;
+  const abertura=cx?cx.email:`${achei} e resolvi escrever.`;
+  const aberturaWa=cx?cx.wa:`${achei} e resolvi te chamar.`;
+  const aberturaFala=cx?cx.fala:`${achei}.`;
   /* café presencial onde a Techwave atende presencialmente, virtual nos outros casos */
-  const cafe=perto?`um café aí na ${E}`:"um café virtual de 15 minutos";
-  const cafeConvite=perto?`tomar um café com você aí na ${E}`:"um café virtual de 15 minutos";
-
-  const angulo={
-    dono:` Para quem toca o negócio, isso pesa no bolso e na cabeça: ${n.risco}.`,
-    gestor:" Para quem cuida da operação, isso costuma virar retrabalho e equipe esperando.",
-    ti:" E sei que quem cuida da TI raramente tem tempo para tudo. A gente costuma entrar como reforço, nunca para substituir ninguém.",
-    "":` Quando dá problema, o impacto costuma ser ${n.risco}.`
+  const cafe=perto?"um café aí com vocês":"um café virtual de 15 minutos";
+  const cafeConvite=perto?"passar aí para tomar um café com você":"um café virtual de 15 minutos";
+  const lembrei=nome1?"de você":"da "+E;
+  const anguloCargo={
+    dono:` Para quem toca o negócio, isso pesa no bolso e na cabeça, porque o risco é ${n.risco}.`,
+    gestor:" Para quem cuida da operação, isso vira retrabalho, equipe parada e cliente esperando.",
+    ti:" E sei que quem cuida da TI raramente tem tempo para tudo. A ideia nunca é substituir ninguém, e sim somar ao time.",
+    "":""
   }[cargo];
-  const convite=`Olá${nome1?", "+nome1:""}! ${cx?cx.convite:`Conheci o trabalho da ${E} e adoraria me conectar com você.`}`;
+  const angulo=anguloCargo||` Quando isso dá problema, o impacto costuma ser ${n.risco}.`;
+  const convite=`Olá${nome1?", "+nome1:""}! ${cx?cx.convite:`Conheci o trabalho da ${E} e adoraria me conectar com você.`} ${eSou}`;
 
+  /* cada momento tem variações completas; "Outra variação" alterna entre elas e entre as dores do nicho */
   const T={
   aquecimento:{
     passos:[
@@ -394,68 +413,128 @@ function gerar(c,st,v){
     ],
     convite},
   primeiro:{
-    assunto:cx?cx.assunto:perto?`TI ${local.em}`:pick([`conhecendo a ${E}`,`uma ideia para a ${E}`,tema],v),
-    email:`${olaE}\n\n${cx?cx.email:`Estava conhecendo o trabalho da ${E} e quis me apresentar.`}\n\n${apres}\n\nUma coisa que vejo muito no segmento: ${dor}.${angulo}\n\n${pick([`Queria entender: ${P} Se fizer sentido, adoraria trocar uma ideia, sem compromisso nenhum.`,`Me conta: ${P} Se quiser, a gente marca ${cafe} para se conhecer.`,`Adoraria conhecer melhor a ${E}. Me conta: ${P}`],v)}\n\n${ass}`,
-    wa:`${oi} Aqui é ${eu}, da Techwave 🙂\n\n${cx?cx.wa:"Estava conhecendo o trabalho de vocês e quis me apresentar."} A gente cuida da TI de ${N} há 15 anos.${prova}\n\nQueria te perguntar uma coisa: ${P}`,
-    audio:`${oi} Aqui é ${eu}, da Techwave. ${cx?cx.fala+" ":""}Resolvi te mandar um áudio porque acho mais pessoal do que mensagem escrita. A gente cuida da TI de ${N} há 15 anos.${prova} E queria te perguntar uma coisa: ${P} Se fizer sentido, adoraria marcar ${cafe} pra gente se conhecer. Um abraço!`,
+    assunto:cx?[cx.assunto]:[`uma ideia para a ${E}`,perto?`TI ${local.em}`:`conhecendo a ${E}`,ref&&ref.temCaso?`o que fizemos na ${ref.nome}`:tema],
+    email:[
+      par(olaE,abertura,`${eSou} ${sobre}${caso}`,`Sei que, ${comum}.${angulo} Por isso, queria entender: ${P}`,
+        `Se fizer sentido, adoraria marcar ${cafe} para nos conhecermos. Sem apresentação de vendas, só uma boa conversa.`,ass),
+      par(olaE,`${abertura} Uma pergunta rápida: ${P}`,`Pergunto porque, ${comum}, e isso costuma aparecer só quando já virou problema.${anguloCargo}`,
+        `${eSou} ${sobre}${caso}`,"Se quiser trocar uma ideia, é só responder este e-mail.",ass),
+      ref&&ref.temCaso
+        ?par(olaE,abertura,`${eSou} Queria compartilhar uma experiência que talvez faça sentido para vocês. ${ref.historia} E esse é só um dos mais de 100 projetos que entregamos em 15 anos de mercado.`,
+          `Fiquei com uma curiosidade sobre a ${E}: ${P}`,`Se quiser, a gente marca ${cafe} e eu te conto como foi esse projeto.`,ass)
+        :par(olaE,abertura,`${eSou} ${sobreCurto}${casoCurto} Antes de qualquer coisa, deixo uma dica que vale muito para ${N}:`,CAT[cat].d,
+          `Se quiser conversar sobre isso ou sobre qualquer outro ponto de TI, é só responder. Vou gostar de conhecer melhor a ${E}.`,ass)],
+    wa:[
+      par(`${oi} Aqui é ${eu}, da Techwave IT Solutions 🙂`,`${aberturaWa} ${sobreCurto}${casoCurto}`,`Queria te perguntar uma coisa: ${P}`),
+      par(`${oiCurto} Tudo bem? Sou ${eu}, da Techwave IT Solutions.`,`${aberturaWa} Pergunta rápida: ${P}`,
+        `Pergunto porque, ${comum}.${casoCurto} Se fizer sentido, a gente marca ${cafe} pra trocar uma ideia 😊`)],
+    audio:`${oi} Aqui é ${eu}, da Techwave IT Solutions. ${aberturaFala} Resolvi mandar um áudio porque acho mais pessoal do que mensagem escrita. ${sobreCurto}${casoCurto} Eu queria te perguntar uma coisa: ${P} Se fizer sentido, adoraria marcar ${cafe} pra gente se conhecer. Um abraço!`,
     convite,
-    li:`Que bom que aceitou o convite${nome1?", "+nome1:""}! 🙂\n\nA gente cuida da TI de ${N} há 15 anos.${prova} Sempre gosto de entender como cada empresa se organiza. Me conta: ${P}`,
-    motivo:`A gente cuida da TI de ${N} há 15 anos.${prova} Liguei pra conhecer um pouco melhor a ${E}.`},
+    li:par(`Que bom que aceitou o convite${nome1?", "+nome1:""}! 🙂`,`${sobreCurto}${casoCurto} Sempre gosto de entender como cada empresa se organiza, então te pergunto: ${P}`),
+    motivo:`${sobreCurto}${casoCurto} Liguei pra conhecer um pouco melhor a ${E}.`},
   fu1:{
-    assunto:`uma dica sobre ${tema2}`,
-    email:`${olaE}\n\nLembrei ${nome1?"de você":"da "+E} essa semana e quis compartilhar uma dica rápida que tem ajudado bastante ${N}:\n\n${CAT[cat2].d}\n\nVocês já fazem algo assim aí? Se quiser trocar uma ideia sobre isso, é só me responder.\n\n${ass}`,
-    wa:`${oi} Lembrei de vocês e quis mandar uma dica rápida que tem ajudado muito ${N} 👇\n\n${CAT[cat2].d}\n\nVocês já fazem isso aí?`,
-    li:`${oiCurto} Uma dica rápida que tem ajudado muito ${N}:\n\n${CAT[cat2].d}\n\nVocês já fazem isso aí?`,
-    motivo:`Liguei pra compartilhar uma dica rápida que tem ajudado muito ${N}. Posso te contar em um minutinho?`,
+    assunto:[`uma dica sobre ${tema2}`],
+    email:[
+      par(olaE,`Lembrei ${lembrei} essa semana e quis compartilhar uma dica rápida, que vale muito para ${N}:`,CAT[cat2].d,
+        "É simples, mas faz diferença. Vocês já fazem algo assim aí? Se quiser, te explico com calma como colocar isso em prática.",ass),
+      par(olaE,"Te escrevi há alguns dias e, em vez de só \"retomar o contato\", quis te mandar algo útil:",CAT[cat2].d,
+        `Se fizer sentido para a ${E}, posso te ajudar a colocar isso em prática. E se já estiver tudo resolvido por aí, melhor ainda!`,ass)],
+    wa:[
+      par(`${oi} Lembrei de vocês e quis mandar uma dica rápida, que vale muito pra ${N} 👇`,CAT[cat2].d,"Vocês já fazem isso aí?"),
+      par(`${oi} Em vez de só retomar o contato, quis te mandar algo útil 👇`,CAT[cat2].d,"Se quiser, te explico como colocar isso em prática.")],
+    li:par(`${oiCurto} Uma dica rápida, que vale muito pra ${N}:`,CAT[cat2].d,"Vocês já fazem isso aí?"),
+    motivo:`Liguei pra compartilhar uma dica rápida, que vale muito pra ${N}. Posso te contar em um minutinho?`,
     pq:P2},
   fu2:{
-    assunto:"um café?",
-    email:`${olaE}\n\nQueria te fazer um convite sem compromisso: ${cafeConvite}.\n\nA ideia é conhecer melhor o trabalho de vocês e, se fizer sentido, mostrar dois ou três pontos de TI que costumam passar despercebidos em ${N}. Sem apresentação de vendas.\n\nQue tal na semana que vem? Me diz o melhor dia que eu me organizo.\n\n${ass}`,
-    wa:`${oi} Queria te fazer um convite sem compromisso: ${cafeConvite} ☕\n\nSó pra conhecer melhor o trabalho de vocês e trocar umas ideias sobre TI. Sem apresentação de vendas, prometo 😄\n\nQual dia fica bom pra você na semana que vem?`,
-    audio:`${oi} Aqui é ${eu}, da Techwave. Passando pra te fazer um convite sem compromisso: ${cafeConvite}. A ideia é só conhecer melhor o trabalho de vocês e trocar umas ideias, sem apresentação de vendas. Me fala qual dia fica bom pra você na semana que vem. Um abraço!`,
+    assunto:["um café?",`30 minutos sobre a TI da ${E}`],
+    email:[
+      par(olaE,`Queria te fazer um convite sem compromisso: ${cafeConvite}.`,
+        "A ideia é conhecer melhor o trabalho de vocês, entender como funciona a rotina e, se fizer sentido, mostrar dois ou três pontos de TI que costumam passar despercebidos. Sem apresentação de vendas.",
+        "Que tal na semana que vem? Me diz o melhor dia que eu me organizo.",ass),
+      par(olaE,`Uma ideia: que tal uma conversa de descoberta${perto?" presencial":""}, sem compromisso?`,
+        `Em uns 30 minutos, eu entendo como a TI da ${E} funciona hoje e quais são os desafios do dia a dia, e te digo com sinceridade onde vejo oportunidades de melhoria. Se não fizer sentido seguir, tudo bem: a conversa já vale pela troca.`,
+        "Qual dia fica bom para você na semana que vem?",ass)],
+    wa:[
+      par(`${oi} Queria te fazer um convite sem compromisso: ${cafeConvite} ☕`,"Só pra conhecer melhor o trabalho de vocês e trocar umas ideias sobre TI. Sem apresentação de vendas, prometo 😄","Qual dia fica bom pra você na semana que vem?"),
+      par(`${oi} Que tal uma conversa${perto?" presencial":""} de 30 minutos, sem compromisso? A ideia é entender os desafios da ${E} e te dizer com sinceridade onde vejo oportunidades na TI de vocês.`,"Qual dia fica bom pra você?")],
+    audio:`${oi} Aqui é ${eu}, da Techwave IT Solutions. Passando pra te fazer um convite sem compromisso: ${cafeConvite}. A ideia é só conhecer melhor o trabalho de vocês e trocar umas ideias, sem apresentação de vendas. Me fala qual dia fica bom pra você na semana que vem. Um abraço!`,
     li:`${oiCurto} Queria te fazer um convite sem compromisso: ${cafeConvite}, só pra conhecer melhor o trabalho de vocês e trocar umas ideias sobre TI. Topa? ☕`,
     motivo:`Liguei pra te fazer um convite: ${cafeConvite}, só pra conhecer melhor o trabalho de vocês. Sem apresentação de vendas.`},
   aguardando:{
-    assunto:"fica o meu contato",
-    email:`${olaE}\n\nImagino que a rotina esteja corrida por aí, então vou parar de mandar mensagem por enquanto.\n\nFica o meu contato: se precisar de uma segunda opinião sobre TI, mesmo que seja uma dúvida rápida, pode me chamar. Vou gostar de ajudar.\n\nSucesso para vocês!\n\n${ass}`,
-    wa:`${oi} Imagino que a rotina esteja corrida, então não vou mais insistir 🙂\n\nFica meu contato: se precisar de uma segunda opinião sobre TI, mesmo que seja uma dúvida rápida, pode me chamar. Sucesso pra vocês!`,
+    assunto:["fica o meu contato","última mensagem por enquanto"],
+    email:[
+      par(olaE,"Imagino que a rotina esteja corrida por aí, então vou parar de mandar mensagem por enquanto.",
+        "Fica o meu contato: se em algum momento vocês precisarem de uma segunda opinião sobre TI, mesmo que seja uma dúvida rápida, pode me chamar. Vou gostar de ajudar, sem compromisso.",
+        `Sucesso para a ${E}!`,ass),
+      par(olaE,"Não quero lotar sua caixa de entrada, então esta é minha última mensagem por enquanto.",
+        `Se TI ou segurança virarem prioridade aí na ${E}, é só responder este e-mail. E se não for com você que eu deveria falar sobre isso, agradeço muito se puder me indicar a pessoa certa.`,ass)],
+    wa:[
+      par(`${oi} Imagino que a rotina esteja corrida, então não vou mais insistir 🙂`,"Fica meu contato: se precisar de uma segunda opinião sobre TI, mesmo que seja uma dúvida rápida, pode me chamar. Sucesso pra vocês!"),
+      par(`${oi} Pra não ficar insistindo, essa é minha última mensagem por enquanto 🙂`,"Se TI virar prioridade aí, é só me chamar. E se não for com você que eu deveria falar, me indica a pessoa certa? Agradeço muito!")],
     li:`${oiCurto} Imagino que a rotina esteja corrida, então não vou mais insistir. Se precisar de uma segunda opinião sobre TI, pode me chamar por aqui. Sucesso!`,
     motivo:"Tentei falar com você algumas vezes e não quero ser inconveniente. Liguei só pra deixar meu contato, caso um dia precisem de uma segunda opinião sobre TI.",
     perguntas:[],
     fechamento:"Posso te mandar meu contato no WhatsApp, pra quando precisar?"},
   resposta:{
-    assunto:null,
-    email:`${olaE}\n\nQue bom ter seu retorno, agradeço muito!\n\nQueria conhecer melhor a ${E}: há quanto tempo vocês estão no mercado, como o time está organizado e o que mais tira o sono de vocês quando o assunto é tecnologia.\n\nQue tal ${cafe}? Tenho [dia/hora 1] ou [dia/hora 2], mas me adapto a você.\n\n${ass}`,
-    wa:`${oi} Que bom ter seu retorno, valeu! 🙌\n\nQueria conhecer melhor a ${E}: como o time está organizado hoje e o que mais dá dor de cabeça quando o assunto é tecnologia?\n\nQue tal ${cafe}? Pode ser [dia/hora 1] ou [dia/hora 2], mas me adapto a você.`,
-    audio:`${oi} Aqui é ${eu}, da Techwave. Que bom ter seu retorno! Queria muito conhecer melhor a ${E}, entender como o time está organizado e o que mais dá dor de cabeça em tecnologia. Que tal ${cafe}? Me fala o melhor dia pra você. Um abraço!`,
+    assunto:[null],
+    email:[
+      par(olaE,"Que bom ter seu retorno, agradeço muito!",
+        `Para a nossa conversa render, queria conhecer um pouco mais da ${E}: há quanto tempo vocês estão no mercado, como o time está organizado hoje e o que mais tira o sono de vocês quando o assunto é tecnologia.`,
+        `Que tal ${cafe}? Tenho disponibilidade [dia/hora 1] ou [dia/hora 2], mas me adapto a você.`,ass),
+      par(olaE,"Muito bom ter notícias suas!",
+        `Para eu chegar na nossa conversa já com algo útil, me conta rapidinho: quantas pessoas usam computador aí na ${E} e quem cuida da TI hoje?`,
+        `Com isso, já consigo te mostrar algumas ideias. Que tal ${cafe}? Pode ser [dia/hora 1] ou [dia/hora 2].`,ass)],
+    wa:[
+      par(`${oi} Que bom ter seu retorno, valeu! 🙌`,`Queria conhecer melhor a ${E}: como o time está organizado hoje e o que mais dá dor de cabeça quando o assunto é tecnologia?`,`Que tal ${cafe}? Pode ser [dia/hora 1] ou [dia/hora 2], mas me adapto a você.`),
+      par(`${oi} Que bom ter notícias suas! 😊`,"Pra eu já chegar com algo útil: quantas pessoas usam computador aí e quem cuida da TI hoje?",`Que tal ${cafe}? Pode ser [dia/hora 1] ou [dia/hora 2].`)],
+    audio:`${oi} Aqui é ${eu}, da Techwave IT Solutions. Que bom ter seu retorno! Queria muito conhecer melhor a ${E}, entender como o time está organizado e o que mais dá dor de cabeça em tecnologia. Que tal ${cafe}? Me fala o melhor dia pra você. Um abraço!`,
     li:`Que bom ter seu retorno${nome1?", "+nome1:""}! Queria conhecer melhor a ${E}. Que tal ${cafe}? Pode ser [dia/hora 1] ou [dia/hora 2].`,
     motivo:`Que bom que você respondeu! Liguei pra conhecer melhor a ${E} e entender se faz sentido a gente seguir conversando.`},
   proposta:{
-    assunto:"sobre a proposta",
-    email:`${olaE}\n\nQueria saber o que você achou da proposta.\n\nMontei pensando no que conversamos, mas ela é um ponto de partida: se algo não encaixou (escopo, prazo ou valor), me fala que a gente ajusta junto.\n\nSe ajudar, posso explicar numa ligação rápida ou apresentar para mais alguém do time.\n\n${ass}`,
-    wa:`${oi} Conseguiu ver a proposta? Queria saber o que você achou 🙂\n\nSe algo não encaixou (escopo, prazo ou valor), me fala que a gente ajusta junto.`,
+    assunto:["sobre a proposta","dúvidas sobre a proposta?"],
+    email:[
+      par(olaE,"Queria saber o que você achou da proposta.",
+        "Ela foi montada a partir do que conversamos, mas é um ponto de partida: se algo não encaixou (escopo, prazo ou valor), me fala que a gente ajusta junto.",
+        "Se ajudar, posso apresentar para mais alguém do time ou tirar dúvidas numa ligação rápida.",ass),
+      par(olaE,"Passando para saber se ficou alguma dúvida na proposta.",
+        `Uma coisa que costuma ajudar: se quiser, converso diretamente com quem mais participa da decisão aí na ${E}, para explicar os detalhes técnicos e o que muda no dia a dia de vocês.`,
+        "Fico no aguardo!",ass)],
+    wa:[
+      par(`${oi} Conseguiu ver a proposta? Queria saber o que você achou 🙂`,"Se algo não encaixou (escopo, prazo ou valor), me fala que a gente ajusta junto."),
+      `${oi} Ficou alguma dúvida na proposta? Se quiser, explico os detalhes pra quem mais participa da decisão aí 🙂`],
     li:`${oiCurto} Conseguiu ver a proposta? Se algo não encaixou, me fala que a gente ajusta junto.`,
     motivo:"Liguei pra saber o que você achou da proposta e se tem algo que a gente possa ajustar junto.",
     perguntas:["O que você achou da proposta?","Tem algum ponto que não encaixou: escopo, prazo ou valor?","Quem mais participa da decisão aí?"],
     fechamento:"Se eu ajustar esses pontos, a gente conversa de novo [dia/hora]?"},
   reativacao:{
-    assunto:"quanto tempo!",
-    email:`${olaE} Quanto tempo!\n\nLembrei ${nome1?"de você":"da "+E} essa semana e quis saber como andam as coisas por aí.\n\nPor aqui, temos ajudado ${N} com ${dor}, e pensei que poderia ser útil para vocês também.\n\nTopa colocar o papo em dia? Pode ser ${cafe}.\n\n${ass}`,
-    wa:`${oi} Quanto tempo! 😊 Lembrei de vocês essa semana e quis saber como andam as coisas aí na ${E}.\n\nTemos ajudado ${N} com ${dor}. Topa colocar o papo em dia?`,
-    audio:`${oi} Aqui é ${eu}, da Techwave. Quanto tempo! Lembrei de vocês essa semana e quis saber como andam as coisas aí na ${E}. A gente tem ajudado ${N} com ${dor}, e pensei que podia ser útil pra vocês. Topa colocar o papo em dia? Um abraço!`,
+    assunto:["quanto tempo!",`uma dica sobre ${tema}`],
+    email:[
+      par(`${olaE} Quanto tempo!`,`Lembrei ${lembrei} essa semana e quis saber como andam as coisas por aí. Muita coisa muda em pouco tempo, e às vezes o que não era prioridade passou a ser.`,
+        `Topa colocar o papo em dia? Pode ser ${cafe}.`,ass),
+      par(`${olaE} Quanto tempo!`,`Passando para retomar nosso contato e deixar uma dica que vale muito para ${N}:`,CAT[cat].d,
+        "Se quiser conversar sobre isso ou sobre qualquer outro ponto de TI, estou por aqui.",ass)],
+    wa:[
+      `${oi} Quanto tempo! 😊 Lembrei de vocês essa semana e quis saber como andam as coisas aí na ${E}. Topa colocar o papo em dia?`,
+      par(`${oi} Quanto tempo! Passando pra deixar uma dica que vale muito pra ${N} 👇`,CAT[cat].d,"Se quiser conversar sobre isso, estou por aqui!")],
+    audio:`${oi} Aqui é ${eu}, da Techwave IT Solutions. Quanto tempo! Lembrei de vocês essa semana e quis saber como andam as coisas aí na ${E}. Topa colocar o papo em dia? Pode ser ${cafe}. Um abraço!`,
     li:`${oiCurto} Quanto tempo! Lembrei de vocês e quis saber como andam as coisas aí na ${E}. Topa colocar o papo em dia?`,
     motivo:`Faz tempo que a gente não conversa e lembrei de vocês. Queria saber como andam as coisas aí na ${E}.`},
   relacionamento:{
-    assunto:`uma dica sobre ${tema}`,
-    email:`${olaE}\n\nPassando só para saber como vocês estão e deixar uma dica que tem ajudado ${N}:\n\n${CAT[cat].d}\n\nSe precisar de qualquer coisa, pode contar comigo.\n\n${ass}`,
-    wa:`${oi} Passando só pra saber como vocês estão e deixar uma dica 👇\n\n${CAT[cat].d}\n\nSe precisar de qualquer coisa, pode contar comigo!`,
-    li:`${oiCurto} Passando pra deixar uma dica que tem ajudado ${N}:\n\n${CAT[cat].d}`,
+    assunto:[`uma dica sobre ${tema}`,"como andam as coisas?"],
+    email:[
+      par(olaE,`Passando só para saber como vocês estão e deixar uma dica que vale para ${N}:`,CAT[cat].d,"Se precisar de qualquer coisa, pode contar comigo.",ass),
+      par(olaE,`Faz um tempo que não nos falamos e lembrei de vocês. Como andam as coisas aí na ${E}? Alguma novidade?`,
+        "Se surgir qualquer demanda de TI, ou só uma dúvida, pode me chamar. Vai ser um prazer ajudar.",ass)],
+    wa:[
+      par(`${oi} Passando só pra saber como vocês estão e deixar uma dica 👇`,CAT[cat].d,"Se precisar de qualquer coisa, pode contar comigo!"),
+      `${oi} Faz um tempo que a gente não se fala! Como andam as coisas aí na ${E}? Alguma novidade? 😊`],
+    li:par(`${oiCurto} Passando pra deixar uma dica que vale para ${N}:`,CAT[cat].d),
     motivo:"Liguei só pra saber como vocês estão. Não é nada de venda, é só pra manter contato mesmo.",
     perguntas:[`Como estão as coisas aí na ${E}?`,"Teve alguma novidade na empresa nos últimos meses?"],
     fechamento:"Se precisar de qualquer coisa, pode contar comigo!"}
   };
-  const m=T[st];
-  m.ref=ref;
+  const m={...T[st],ref};
+  for(const k of ["assunto","email","wa"])if(Array.isArray(m[k]))m[k]=pick(m[k],v);
 
   if(st==="aquecimento"){m.abas=["passos","comentarios","li"];return m}
   m.abas=["email","wa","li","ligacao","objecoes"];
@@ -468,7 +547,7 @@ function gerar(c,st,v){
     cap(m.pq||P)
   ];
   m.ligacao=`ABERTURA
-"${saud()}! Falo com ${nome1||"[nome]"}? Aqui é ${eu}, da Techwave.${st==="primeiro"&&cx?" "+cx.fala:""} Você tem dois minutinhos agora ou prefere que eu ligue em outro horário?"
+"${saud()}! Falo com ${nome1||"[nome]"}? Aqui é ${eu}, da Techwave IT Solutions.${st==="primeiro"?" "+aberturaFala:""} Você tem dois minutinhos agora ou prefere que eu ligue em outro horário?"
 
 MOTIVO
 "${m.motivo}"
@@ -484,16 +563,19 @@ SE NÃO PUDER FALAR
 
   /* respostas para quando o cliente responder com uma objeção */
   m.objecoes=[
-    ["\"Do que se trata?\"",`Claro! Sou ${eu}, da Techwave. A gente cuida da TI de ${N}.${prova} Queria conhecer melhor a ${E}, sem compromisso. Você teria 5 minutinhos essa semana pra uma ligação rápida?`],
+    ["\"Do que se trata?\"",`Claro! Sou ${eu}, da Techwave IT Solutions. ${sobreCurto}${casoCurto} Queria conhecer melhor a ${E}, sem compromisso. Você teria 5 minutinhos essa semana pra uma ligação rápida?`],
+    ["\"Vocês têm experiência no nosso ramo?\"",ref
+      ?`Temos sim! ${ref.temCaso?ref.historia:ref.curto} Se quiser, te conto mais sobre esse trabalho.`
+      :"No ramo de vocês especificamente, ainda não tenho um case pra te mostrar. Mas em 15 anos atendemos mais de 50 empresas de vários segmentos, e uma TI bem cuidada segue os mesmos princípios: estabilidade, segurança e suporte rápido. A gente sempre começa entendendo como vocês trabalham."],
     ["\"Vocês atendem aqui?\" / \"Vocês são de onde?\"",local
-      ?`A gente atende toda a Região dos Lagos e o Rio de Janeiro, então dá pra ir até vocês sempre que precisar.${prova}`
+      ?"A gente atende toda a Região dos Lagos e o Rio de Janeiro, então dá pra ir até vocês sempre que precisar."
       :`A gente atende a Região dos Lagos, o Rio de Janeiro e também empresas de outros estados. Muita coisa se resolve de forma remota, então a distância não costuma ser problema.${c.cidade?"":" Onde vocês ficam?"}`],
-    ["\"Já temos TI\" / \"Já temos uma empresa\"","Que bom! Ter alguém cuidando faz toda a diferença. A ideia não é substituir ninguém: muita empresa usa a gente como segunda opinião ou reforço em projetos. Se um dia quiser comparar ou só tirar uma dúvida, pode contar comigo 🙂"],
+    ["\"Já temos TI\" / \"Já temos uma empresa\"","Que bom! Ter alguém cuidando faz toda a diferença. A ideia não é substituir ninguém: a gente pode somar como segunda opinião ou reforço em projetos. Se um dia quiser comparar ou só tirar uma dúvida, pode contar comigo 🙂"],
     ["\"Agora não é o momento\"","Imagina, entendo totalmente! Posso te chamar de novo mais pra frente? Qual época costuma ser mais tranquila aí?"],
-    ["\"Está caro\" / \"Não temos orçamento\"","Faz todo sentido, ninguém quer gasto a mais. A conversa não tem custo nenhum e, muitas vezes, a gente encontra jeitos de reduzir o que vocês já gastam com TI. Se não fizer sentido, sem problema."],
+    ["\"Está caro\" / \"Não temos orçamento\"","Faz todo sentido, ninguém quer gasto a mais. A conversa não tem custo nenhum e pode ser que a gente encontre jeitos de reduzir o que vocês já gastam com TI. Se não fizer sentido, sem problema."],
     ["\"Me manda por e-mail\"","Mando sim! Só pra eu não te mandar algo genérico: o que mais dá dor de cabeça aí hoje quando o assunto é TI?"],
     ["\"Não sou eu quem cuida disso\"","Ah, valeu por avisar! Quem seria a melhor pessoa pra conversar sobre isso? Posso dizer que falei com você?"],
-    ["\"Quem é você? De onde conseguiu meu contato?\"",`Desculpe se pareceu invasivo! Sou ${eu}, da Techwave IT Solutions. ${cx?cx.origem:`Encontrei a ${E} pesquisando ${N}${cidadeEm?" "+cidadeEm:""}.`} Se preferir que eu não entre mais em contato, é só me dizer, tá?`]
+    ["\"Quem é você? De onde conseguiu meu contato?\"",`Desculpe se pareceu invasivo! Sou ${eu}, da Techwave IT Solutions, empresa de TI com 15 anos de mercado. ${cx?cx.origem:`${achei}.`} Se preferir que eu não entre mais em contato, é só me dizer, tá?`]
   ];
   return m;
 }
@@ -601,7 +683,7 @@ function render(){
       ${stageAtual==="aquecimento"?"":`<button class="btn sec" id="outra">🔄 Outra variação</button>`}
     </div>
     <p class="tip">${DICAS[stageAtual]}</p>
-    ${m.ref&&stageAtual==="primeiro"?`<p class="tip">⭐ Cliente do mesmo nicho citado como referência: ${esc(m.ref.quem)}</p>`:""}
+    ${m.ref&&stageAtual==="primeiro"?`<p class="tip">⭐ ${m.ref.temCaso?"Case do mesmo nicho citado":"Cliente do mesmo nicho citado"}: ${esc(m.ref.nome)}</p>`:""}
     ${semConexao?`<p class="tip warn">💡 Sem ponto de conexão a mensagem fica mais fria. Faça o Aquecimento antes ou procure um post recente, uma novidade da empresa ou um contato em comum.</p>`:""}
     <div class="tabs">${m.abas.map(id=>`<button class="tab${id===aba?" on":""}" data-aba="${id}">${ABAS[id]}</button>`).join("")}</div>
     ${painel(m,aba)}

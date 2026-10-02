@@ -84,6 +84,7 @@ ol.passos{padding-left:22px;display:grid;gap:10px;font-size:14px}
     <label for="nicho">Nicho</label>
     <input type="text" id="nicho" placeholder="Ex.: Contabilidade" list="nichos" autocomplete="off">
     <datalist id="nichos"></datalist>
+    <p class="hint">Se já temos cliente no mesmo nicho, ele é citado como referência.</p>
 
     <span class="lbl">Momento da prospecção</span>
     <div class="stages" id="stages"></div>
@@ -95,7 +96,7 @@ ol.passos{padding-left:22px;display:grid;gap:10px;font-size:14px}
       <label for="cidade">Cidade do cliente</label>
       <input type="text" id="cidade" placeholder="Ex.: Saquarema" list="cidades" autocomplete="off">
       <datalist id="cidades"></datalist>
-      <p class="hint">Cita clientes nossos da mesma cidade, região ou ramo. Na Região dos Lagos e no Rio, o convite vira café presencial.</p>
+      <p class="hint">Na Região dos Lagos e no Rio, o convite vira café presencial.</p>
 
       <label for="contato">Nome do contato</label>
       <input type="text" id="contato" placeholder="Ex.: Marina" autocomplete="off">
@@ -257,33 +258,15 @@ const CLIENTES=[
   {nome:"Sediver",sing:"a multinacional Sediver",ramo:"Indústria",cidade:"Rio de Janeiro"}
 ];
 const lista=a=>a.length>1?a.slice(0,-1).join(", ")+" e "+a[a.length-1]:a[0];
-const de=s=>s.replace(/^a /,"da ").replace(/^o /,"do ");
-/* a) clientes da mesma cidade (ou, se não houver, da mesma região), com os do mesmo ramo primeiro;
-   b) clientes do mesmo ramo que ainda não foram citados */
-function referencia(n,local,E){
-  const outros=CLIENTES.filter(r=>norm(r.nome)!==norm(E)).map(r=>({...r,c:infoCidade(r.cidade)}));
-  const doRamo=r=>r.ramo===n.nome;
-  let perto=[];
-  if(local){
-    perto=outros.filter(r=>r.c.nome===local.nome);
-    if(!perto.length)perto=outros.filter(r=>r.c.regiao===local.regiao);
-    perto.sort((a,b)=>doRamo(b)-doRamo(a));
-    if(perto.length)perto=perto.filter(r=>r.c.nome===perto[0].c.nome);
-  }
-  const ramo=outros.filter(r=>doRamo(r)&&!perto.includes(r));
-  const frases=[],quem=[];
-  if(perto.length){
-    frases.push(`${cap(perto[0].c.em)}, ${lista(perto.map(r=>r.sing))} já ${perto.length>1?"confiam":"confia"} na gente.`);
-    quem.push(`${lista(perto.map(r=>r.nome))} (${perto[0].c.nome})`);
-  }
-  if(ramo.length){
-    const um=ramo.length===1;
-    frases.push(perto.length
-      ?`Também cuidamos da TI ${um?`${de(ramo[0].sing)}, ${ramo[0].c.em}`:lista(ramo.map(r=>de(r.sing)))}.`
-      :um?`${cap(ramo[0].sing)}, ${ramo[0].c.em}, já confia na gente.`:`${cap(lista(ramo.map(r=>r.sing)))} já confiam na gente.`);
-    quem.push(`${lista(ramo.map(r=>r.nome))} (mesmo ramo)`);
-  }
-  return frases.length?{texto:frases.join(" "),quem:quem.join(" · ")}:null;
+/* Cita só clientes do mesmo nicho (nunca a própria empresa prospectada) */
+function referencia(n,E){
+  const ramo=CLIENTES.filter(r=>r.ramo===n.nome&&norm(r.nome)!==norm(E));
+  if(!ramo.length)return null;
+  return {
+    texto:ramo.length>1
+      ?`${cap(lista(ramo.map(r=>r.sing)))} já confiam na gente.`
+      :`${cap(ramo[0].sing)}, ${infoCidade(ramo[0].cidade).em}, já confia na gente.`,
+    quem:lista(ramo.map(r=>r.nome))};
 }
 
 /* ---------- Temas de TI ----------
@@ -372,7 +355,7 @@ function gerar(c,st,v){
   const P=CAT[cat].p,P2=CAT[cat2].p;
   const cx=textosConexao(c.con.t,c.con.x,E);
   const local=acharCidade(c.cidade);
-  const ref=referencia(n,local,E);
+  const ref=referencia(n,E);
   const prova=ref?" "+ref.texto:"";
   const perto=!!local;
   const cidadeEm=local?local.em:(c.cidade?emDe(c.cidade):"");
@@ -618,7 +601,7 @@ function render(){
       ${stageAtual==="aquecimento"?"":`<button class="btn sec" id="outra">🔄 Outra variação</button>`}
     </div>
     <p class="tip">${DICAS[stageAtual]}</p>
-    ${m.ref&&stageAtual==="primeiro"?`<p class="tip">⭐ Referência citada: ${esc(m.ref.quem)}</p>`:""}
+    ${m.ref&&stageAtual==="primeiro"?`<p class="tip">⭐ Cliente do mesmo nicho citado como referência: ${esc(m.ref.quem)}</p>`:""}
     ${semConexao?`<p class="tip warn">💡 Sem ponto de conexão a mensagem fica mais fria. Faça o Aquecimento antes ou procure um post recente, uma novidade da empresa ou um contato em comum.</p>`:""}
     <div class="tabs">${m.abas.map(id=>`<button class="tab${id===aba?" on":""}" data-aba="${id}">${ABAS[id]}</button>`).join("")}</div>
     ${painel(m,aba)}

@@ -403,34 +403,51 @@ function acharCidade(txt){
 }
 const emDe=c=>/^(em|no|na|nos|nas)\s/i.test(c)?c:"em "+c;
 
-/* ---------- Clientes da Techwave usados como referência (cases do site) ----------
-   marca: trecho do nome que identifica o cliente · quem: como ele aparece na frase
-   fez/resultado: o case, quando houver · ramo: igual ao nome do nicho */
+/* ---------- Clientes da Techwave usados como referência (faixa de clientes e cases do site) ----------
+   marca: trechos do nome que identificam o cliente · ramos: nichos em que ele vale como referência
+   quem: como ele aparece na frase · fez/resultado: o case publicado no site, quando houver */
 const CLIENTES=[
-  {nome:"Attual Contabilidade",marca:"attual",ramo:"Contabilidade",quem:"a Attual Contabilidade, em Saquarema",
-   fez:"modernizamos a infraestrutura, levamos o sistema contábil para a nuvem e automatizamos os processos fiscais",
-   resultado:"o tempo de processamento caiu 80%"},
-  {nome:"Talita Gloria Advocacia",marca:"talita gloria",ramo:"Advocacia",quem:"o escritório Talita Gloria Advocacia, em Saquarema",
-   fez:"implantamos um sistema de gestão integrado ao jurídico e ao financeiro, com atendimento automatizado pelo WhatsApp",
-   resultado:"o controle de atendimento melhorou 95%"},
-  {nome:"Sediver",marca:"sediver",ramo:"Indústria",quem:"a Sediver, multinacional de isoladores",
-   fez:"assumimos a gestão de TI no Brasil, integrada ao time global, com suporte proativo e prazos de atendimento definidos",
-   resultado:"os chamados recorrentes caíram 60% e o tempo de resposta, 70%"},
-  {nome:"Radio Mix",marca:"radio mix",ramo:"Comunicação / Mídia",quem:"a Radio Mix, rádio de Saquarema"}
+  {nome:"Attual Contabilidade",marca:["attual"],ramos:["Contabilidade"],quem:"a Attual Contabilidade, em Saquarema",
+   fez:"conduzimos a transformação digital do escritório, com automação fiscal",
+   resultado:"os processos manuais caíram 92% e a conformidade fiscal melhorou 88%"},
+  {nome:"Sediver Isoladores",marca:["sediver"],ramos:["Indústria","Multinacionais"],quem:"a Sediver, multinacional de isoladores",
+   fez:"assumimos a gestão estratégica de TI no Brasil, integrada ao time global",
+   resultado:"os chamados recorrentes caíram 80% e o tempo de resposta, 90%"},
+  {nome:"Sinergas GNV",marca:["sinergas"],ramos:["Energia / Combustíveis"],quem:"a Sinergas GNV, do setor de energia e combustíveis",
+   fez:"fizemos a migração completa de um ERP de alta complexidade",
+   resultado:"o retrabalho caiu 85% e 100% dos usuários se adaptaram ao novo sistema"},
+  {nome:"Radio Mix",marca:["radio mix"],ramos:["Comunicação / Mídia"],quem:"a Radio Mix, rádio de Saquarema",
+   fez:"preparamos a infraestrutura para uma operação que não pode parar",
+   resultado:"as paralisações operacionais caíram 90%"},
+  {nome:"TG Advocacia e Consultoria Jurídica",marca:["tg advocacia","talita gloria"],ramos:["Advocacia"],quem:"a TG Advocacia e Consultoria Jurídica"},
+  {nome:"Lourenço e Vieira Advogados",marca:["lourenco e vieira"],ramos:["Advocacia"],quem:"a Lourenço e Vieira Advogados"},
+  {nome:"Transporte Generoso",marca:["transporte generoso"],ramos:["Logística / Transporte"],quem:"a Transporte Generoso"},
+  {nome:"VGL Log",marca:["vgl"],ramos:["Logística / Transporte"],quem:"a VGL Log"},
+  {nome:"FR Transportes",marca:["fr transportes"],ramos:["Logística / Transporte"],quem:"a FR Transportes"},
+  {nome:"R.O. Logística",marca:["r.o. logistica","ro logistica"],ramos:["Logística / Transporte"],quem:"a R.O. Logística"},
+  {nome:"Distribuidora São Jorge",marca:["distribuidora sao jorge"],ramos:["Logística / Transporte"],quem:"a Distribuidora São Jorge"},
+  {nome:"Fernandes Alimentos",marca:["fernandes alimentos"],ramos:["Alimentos e Bebidas"],quem:"a Fernandes Alimentos"},
+  {nome:"Doce Afeto",marca:["doce afeto"],ramos:["Alimentos e Bebidas"],quem:"a Doce Afeto"},
+  {nome:"Italtel",marca:["italtel"],ramos:["Multinacionais"],quem:"a Italtel"}
 ];
 const em_=s=>s.replace(/^a /,"na ").replace(/^o /,"no ");
 const lista=a=>a.length>1?a.slice(0,-1).join(", ")+" e "+a[a.length-1]:a[0];
-/* Só cita cliente do mesmo nicho (nunca a própria empresa prospectada) */
+/* Só cita clientes do mesmo nicho (nunca a própria empresa prospectada); o case com resultado vem primeiro */
 function referencia(n,E){
   const e=norm(E);
-  const r=CLIENTES.find(r=>r.ramo===n.nome&&!e.includes(r.marca));
-  if(!r)return null;
+  const doRamo=CLIENTES.filter(r=>r.ramos.includes(n.nome)&&!r.marca.some(m=>e.includes(m))).sort((a,b)=>!!b.fez-!!a.fez);
+  if(!doRamo.length)return null;
+  const r=doRamo[0],outros=doRamo.slice(1),quems=doRamo.map(x=>x.quem);
+  const caso=r.fez?`${cap(em_(r.quem))}, ${r.fez}. Resultado: ${r.resultado}.`:"";
+  const tambem=outros.length?` Também atendemos ${lista(outros.slice(0,3).map(x=>x.quem))}.`:"";
+  const varios=quems.length>1?`Entre nossos clientes do mesmo ramo estão ${lista(quems.slice(0,3))}.`:`Um cliente nosso do mesmo ramo é ${r.quem}.`;
   return {
-    nome:r.nome,quem:r.quem,temCaso:!!r.fez,
-    conte:r.fez?`como foi o projeto ${em_(r.quem)}, onde ${r.resultado}`:`como é o nosso trabalho com ${r.quem}`,
-    longo:r.fez?`Um exemplo é ${r.quem}: ${r.fez}. Resultado: ${r.resultado}.`:`Um cliente nosso do mesmo ramo é ${r.quem}.`,
-    historia:r.fez?`${cap(em_(r.quem))}, ${r.fez}. Resultado: ${r.resultado}.`:"",
-    curto:`Um cliente nosso do mesmo ramo é ${r.quem}${r.resultado?`: lá, ${r.resultado}`:""}.`
+    nome:r.nome,nomes:doRamo.map(x=>x.nome),quem:r.quem,temCaso:!!r.fez,caso,
+    como:lista(quems.slice(0,2)),
+    conte:r.fez?`como foi o projeto ${em_(r.quem)}, onde ${r.resultado}`:`como é o nosso trabalho com ${lista(quems.slice(0,2))}`,
+    longo:r.fez?`Um exemplo é ${r.quem}: ${r.fez}. Resultado: ${r.resultado}.${tambem}`:varios,
+    historia:r.fez?caso+tambem:varios,
+    curto:r.fez?`Um cliente nosso do mesmo ramo é ${r.quem}: lá, ${r.resultado}.`:varios
   };
 }
 
@@ -477,6 +494,15 @@ const NICHOS=[
  {k:["financ","banco","cooperativa","seguro","consorcio"],nome:"Financeiro / Seguros",txt:"empresas do mercado financeiro e de seguros",
   dor:[["acessos a sistemas sem controle nem registro para auditoria","auditoria de acessos","acesso"],["dados financeiros de clientes sob risco de vazamento","dados dos clientes","duasEtapas"],["sistemas críticos sem plano de contingência","contingência","contingencia"]],
   risco:"sanção regulatória e perda de confiança dos clientes"},
+ {k:["multinac","subsidiaria","grupo internacional","empresa global"],nome:"Multinacionais",txt:"operações de multinacionais no Brasil",
+  dor:[["suporte local sem processos nem prazos definidos","suporte local","suporte"],["acessos e políticas do Brasil fora do padrão da matriz","padrão da matriz","acesso"],["sistemas corporativos sem monitoramento local","monitoramento local","monitoramento"]],
+  risco:"chamados acumulados, falhas de conformidade e cobrança da matriz"},
+ {k:["energia","combustiv","gnv","gas natural"," gas ","posto de gasolina","postos de gasolina","solar","petrol"],nome:"Energia / Combustíveis",txt:"empresas de energia e combustíveis",
+  dor:[["ERP antigo travando processos e relatórios","ERP e relatórios","legado"],["automação e caixa sem plano de contingência","contingência da operação","contingencia"],["várias unidades sem monitoramento central","monitoramento das unidades","monitoramento"]],
+  risco:"operação parada, retrabalho e erro em processos críticos"},
+ {k:["alimentos","bebida","frigorific","laticin","doceria","confeitaria","doces","chocolat","cervejar","distribuidora de alimentos"],nome:"Alimentos e Bebidas",txt:"empresas de alimentos e bebidas",
+  dor:[["produção e estoque dependendo de sistemas sem redundância","produção e estoque","contingencia"],["pedidos e notas fiscais travando nos dias de pico","pedidos travando","lentidao"],["dados de clientes e fornecedores sem backup confiável","backup dos pedidos","backup"]],
+  risco:"pedido atrasado, produto parado e prejuízo no caixa"},
  {k:["varejo","loja","comercio","supermercado","mercado"],nome:"Varejo",txt:"lojas e empresas de varejo",
   dor:[["PDV e internet caindo no horário de maior movimento","PDV caindo","rede"],["câmeras, Wi-Fi e sistema sem ninguém monitorando","rede da loja","monitoramento"],["demora para alguém de TI resolver um problema","suporte na loja","suporte"]],
   risco:"venda perdida a cada minuto de loja parada"},
@@ -489,7 +515,7 @@ const NICHOS=[
  {k:["escola","educa","faculdade","curso","ensino","universidade"],nome:"Educação",txt:"escolas e instituições de ensino",
   dor:[["Wi-Fi que não aguenta todo mundo conectado","Wi-Fi da escola","rede"],["dados de alunos e responsáveis sem proteção de LGPD","LGPD na escola","lgpd"],["equipamentos de sala e laboratório sem gestão","equipamentos","gestao"]],
   risco:"aula comprometida e exposição de dados de menores"},
- {k:["logist","transport","frete","armazem"],nome:"Logística / Transporte",txt:"transportadoras e operações logísticas",
+ {k:["logist","transport","frete","armazem","distribuidora"],nome:"Logística / Transporte",txt:"transportadoras e operações logísticas",
   dor:[["sistemas de roteirização e rastreio fora do ar","rastreio fora do ar","contingencia"],["internet instável em galpões e pátios","rede do galpão","rede"],["infraestrutura sem monitoramento","monitoramento","monitoramento"]],
   risco:"entrega atrasada e cliente insatisfeito"},
  {k:["restaurante","bar","lanchonete","food","alimenta","padaria","hotel","pousada"],nome:"Alimentação / Hotelaria",txt:"restaurantes, bares e hotéis",
@@ -530,9 +556,9 @@ function gerar(c,st,v){
   const oiCurto=nome1?`Oi, ${nome1}!`:"Oi!";
   const ass=`Um abraço,\n${eu}\nTechwave IT Solutions\nwww.techwave.tec.br`;
   const eSou=`Sou ${eu}, da Techwave IT Solutions.`;
-  /* a Techwave tem 15 anos de mercado atendendo vários segmentos (nunca "15 anos no nicho") */
-  const sobre="Em 15 anos de mercado, já atendemos mais de 50 empresas de diferentes segmentos, cuidando de infraestrutura, segurança da informação e suporte.";
-  const sobreCurto="Temos 15 anos de mercado e já atendemos mais de 50 empresas de vários segmentos.";
+  /* números do site: mais de 15 anos de mercado em vários segmentos (nunca "15 anos no nicho"), 100+ projetos, 98% de retenção */
+  const sobre="São mais de 15 anos de mercado e mais de 100 projetos entregues, cuidando de infraestrutura, segurança da informação e suporte de empresas de diferentes segmentos.";
+  const sobreCurto="Temos mais de 15 anos de mercado, mais de 100 projetos entregues e 98% de retenção de clientes.";
   const caso=ref?" "+ref.longo:"",casoCurto=ref?" "+ref.curto:"";
   const comum=`em ${N}, é comum ver ${dor}`;
   /* por que estamos escrevendo: a conexão, se houver; senão, como encontramos a empresa */
@@ -578,7 +604,7 @@ function gerar(c,st,v){
       par(olaE,`${abertura} Uma pergunta rápida: ${P}`,`Pergunto porque, ${comum}, e isso costuma aparecer só quando já virou problema.${anguloCargo}`,
         `${eSou} ${sobre}${caso}`,"Se quiser trocar uma ideia, é só responder este e-mail.",ass),
       ref&&ref.temCaso
-        ?par(olaE,abertura,`${eSou} Queria compartilhar uma experiência que talvez faça sentido para vocês. ${ref.historia} E esse é só um dos mais de 100 projetos que entregamos em 15 anos de mercado.`,
+        ?par(olaE,abertura,`${eSou} Queria compartilhar uma experiência que talvez faça sentido para vocês. ${ref.historia} E esse é só um dos mais de 100 projetos que entregamos em mais de 15 anos de mercado.`,
           `Fiquei com uma curiosidade sobre a ${E}: ${P}`,`Se quiser, a gente marca ${cafe} e eu te conto como foi esse projeto.`,ass)
         :par(olaE,abertura,`${eSou} ${sobreCurto}${casoCurto} Antes de qualquer coisa, deixo uma dica que vale muito para ${N}:`,CAT[cat].d,
           `Se quiser conversar sobre isso ou sobre qualquer outro ponto de TI, é só responder. Vou gostar de conhecer melhor a ${E}.`,ass)],
@@ -604,17 +630,17 @@ function gerar(c,st,v){
     motivo:`Liguei pra compartilhar uma dica rápida, que vale muito pra ${N}. Posso te contar em um minutinho?`,
     pq:P2},
   fu2:{
-    assunto:["um café?",`30 minutos sobre a TI da ${E}`],
+    assunto:["um café?","diagnóstico gratuito da TI"],
     email:[
       par(olaE,`Queria te fazer um convite sem compromisso: ${cafeConvite}.`,
         `A ideia é conhecer melhor o trabalho de vocês, entender como funciona a rotina e, se fizer sentido, mostrar dois ou três pontos de TI que costumam passar despercebidos. Sem apresentação de vendas.${ref?` Se quiser, aproveito para te contar ${ref.conte}.`:""}`,
         "Que tal na semana que vem? Me diz o melhor dia que eu me organizo.",ass),
-      par(olaE,`Uma ideia: que tal uma conversa de descoberta${perto?" presencial":""}, sem compromisso?`,
-        `Em uns 30 minutos, eu entendo como a TI da ${E} funciona hoje e quais são os desafios do dia a dia, e te digo com sinceridade onde vejo oportunidades de melhoria. Se não fizer sentido seguir, tudo bem: a conversa já vale pela troca.`,
+      par(olaE,`Uma ideia: que tal um diagnóstico gratuito da TI da ${E}${perto?", presencial":""}?`,
+        "É uma reunião técnica, sem custo e sem compromisso: a gente avalia infraestrutura, segurança, suporte e processos, e você sai com uma visão clara dos principais riscos, oportunidades e próximos passos. Se não fizer sentido seguir, tudo bem: o diagnóstico já fica com vocês.",
         "Qual dia fica bom para você na semana que vem?",ass)],
     wa:[
       par(`${oi} Queria te fazer um convite sem compromisso: ${cafeConvite}.`,`Só pra conhecer melhor o trabalho de vocês e trocar umas ideias sobre TI. Sem apresentação de vendas, prometo.${ref?` Se quiser, aproveito pra te contar ${ref.conte}.`:""}`,"Qual dia fica bom pra você na semana que vem?"),
-      par(`${oi} Que tal uma conversa${perto?" presencial":""} de 30 minutos, sem compromisso? A ideia é entender os desafios da ${E} e te dizer com sinceridade onde vejo oportunidades na TI de vocês.`,"Qual dia fica bom pra você?")],
+      par(`${oi} Que tal um diagnóstico gratuito da TI da ${E}${perto?", presencial":""}? É uma reunião técnica, sem custo e sem compromisso, e vocês saem com uma visão clara dos principais riscos e próximos passos.`,"Qual dia fica bom pra você?")],
     audio:`${oi} Aqui é ${eu}, da Techwave IT Solutions. Passando pra te fazer um convite sem compromisso: ${cafeConvite}. A ideia é só conhecer melhor o trabalho de vocês e trocar umas ideias, sem apresentação de vendas. Me fala qual dia fica bom pra você na semana que vem. Um abraço!`,
     li:`${oiCurto} Queria te fazer um convite sem compromisso: ${cafeConvite}, só pra conhecer melhor o trabalho de vocês e trocar umas ideias sobre TI. Topa?`,
     motivo:`Liguei pra te fazer um convite: ${cafeConvite}, só pra conhecer melhor o trabalho de vocês. Sem apresentação de vendas.`},
@@ -669,7 +695,7 @@ function gerar(c,st,v){
     assunto:["quanto tempo!",`uma dica sobre ${tema}`],
     email:[
       par(`${olaE} Quanto tempo!`,`Lembrei ${lembrei} essa semana e quis saber como andam as coisas por aí. Muita coisa muda em pouco tempo, e às vezes o que não era prioridade passou a ser.`,
-        ref?`Nesse tempo, seguimos cuidando da TI de empresas do seu ramo, como ${ref.quem}.`:"",
+        ref?`Nesse tempo, seguimos cuidando da TI de empresas do seu ramo, como ${ref.como}.`:"",
         `Topa colocar o papo em dia? Pode ser ${cafe}.`,ass),
       par(`${olaE} Quanto tempo!`,`Passando para retomar nosso contato e deixar uma dica que vale muito para ${N}:`,CAT[cat].d,
         "Se quiser conversar sobre isso ou sobre qualquer outro ponto de TI, estou por aqui.",ass)],
@@ -726,7 +752,7 @@ SE NÃO PUDER FALAR
     ["\"Do que se trata?\"",`Claro! Sou ${eu}, da Techwave IT Solutions. ${sobreCurto}${casoCurto} Queria conhecer melhor a ${E}, sem compromisso. Você teria 5 minutinhos essa semana pra uma ligação rápida?`],
     ["\"Vocês têm experiência no nosso ramo?\"",ref
       ?`Temos sim! ${ref.temCaso?ref.historia:ref.curto} Se quiser, te conto mais sobre esse trabalho.`
-      :"No ramo de vocês especificamente, ainda não tenho um case pra te mostrar. Mas em 15 anos atendemos mais de 50 empresas de vários segmentos, e uma TI bem cuidada segue os mesmos princípios: estabilidade, segurança e suporte rápido. A gente sempre começa entendendo como vocês trabalham."],
+      :"No ramo de vocês especificamente, ainda não tenho um cliente pra te mostrar. Mas são mais de 15 anos de mercado, mais de 100 projetos entregues em vários segmentos e 98% de retenção de clientes. Uma TI bem cuidada segue os mesmos princípios: estabilidade, segurança e suporte rápido. E a gente sempre começa entendendo como vocês trabalham, com um diagnóstico gratuito."],
     ["\"Vocês atendem aqui?\" / \"Vocês são de onde?\"",local
       ?"A gente atende toda a Região dos Lagos e o Rio de Janeiro, então dá pra ir até vocês sempre que precisar."
       :`A gente atende a Região dos Lagos, o Rio de Janeiro e também empresas de outros estados. Muita coisa se resolve de forma remota, então a distância não costuma ser problema.${c.cidade?"":" Onde vocês ficam?"}`],
@@ -735,23 +761,24 @@ SE NÃO PUDER FALAR
     ["\"Está caro\" / \"Não temos orçamento\"","Faz todo sentido, ninguém quer gasto a mais. A conversa não tem custo nenhum e pode ser que a gente encontre jeitos de reduzir o que vocês já gastam com TI. Se não fizer sentido, sem problema."],
     ["\"Me manda por e-mail\"","Mando sim! Só pra eu não te mandar algo genérico: o que mais dá dor de cabeça aí hoje quando o assunto é TI?"],
     ["\"Não sou eu quem cuida disso\"","Ah, valeu por avisar! Quem seria a melhor pessoa pra conversar sobre isso? Posso dizer que falei com você?"],
-    ["\"Quem é você? De onde conseguiu meu contato?\"",`Desculpe se pareceu invasivo! Sou ${eu}, da Techwave IT Solutions, empresa de TI com 15 anos de mercado. ${cx?cx.origem:`${achei}.`} Se preferir que eu não entre mais em contato, é só me dizer, tá?`]
+    ["\"Quem é você? De onde conseguiu meu contato?\"",`Desculpe se pareceu invasivo! Sou ${eu}, da Techwave IT Solutions, empresa de TI com mais de 15 anos de mercado. ${cx?cx.origem:`${achei}.`} Se preferir que eu não entre mais em contato, é só me dizer, tá?`]
   ];
   return m;
 }
 
 
 /* ---------- Fatos e regras usados pela IA ---------- */
-const FATOS_TECHWAVE=`- 15 anos de mercado; mais de 50 empresas atendidas, de vários segmentos; mais de 100 projetos entregues.
-- Serviços: segurança da informação (monitoramento 24/7 e adequação à LGPD), infraestrutura de TI (gestão e modernização), consultoria em tecnologia e suporte técnico ágil.
-- Forma de trabalho: diagnóstico, planejamento personalizado, implementação e evolução contínua. O primeiro passo é uma conversa de descoberta, sem compromisso.
-- Atendimento presencial na Região dos Lagos e no Rio de Janeiro; outros estados com atendimento remoto.
+const FATOS_TECHWAVE=`- Mais de 15 anos de experiência; mais de 100 projetos entregues; 98% de taxa de retenção de clientes; suporte premium 24/7; nota 5,0 nas avaliações do Google.
+- Atende de empresas em crescimento a operações multinacionais, de forma remota, presencial ou híbrida. Presencial na Região dos Lagos e no Rio de Janeiro; outros estados de forma remota.
+- Serviços: segurança da informação (proteção contra ransomware e invasões, auditorias periódicas, monitoramento 24/7 e adequação à LGPD), infraestrutura de TI (alta disponibilidade, nuvem escalável e redes), consultoria em TI (alinhamento estratégico, gestão de ativos e ROI, transformação digital) e suporte premium (terceirização com SLAs e central de chamados organizada).
+- Método: diagnóstico completo, plano estratégico, implementação com governança e evolução contínua.
+- Oferta de entrada: Diagnóstico Gratuito, uma reunião técnica inicial, sem custo e sem compromisso, que avalia infraestrutura, segurança, suporte e processos; no fim, o cliente recebe uma visão dos principais riscos, oportunidades e próximos passos.
 - Site: www.techwave.tec.br`;
 const OBJETIVO={
   aquecimento:"Aquecimento, antes da primeira mensagem: criar familiaridade sem vender nada.",
   primeiro:"Primeiro contato: gerar curiosidade e conseguir a primeira resposta. Apresente-se em uma frase, abra pelo gancho, mostre que entende uma dor, use a prova social e termine com uma pergunta fácil de responder.",
   fu1:"Follow-up 1, três dias depois e sem resposta: trazer um ângulo novo e dar valor antes de pedir. Inclua uma dica prática ligada a uma das dores, sem vender, e termine perguntando se já fazem algo assim.",
-  fu2:"Follow-up 2, sete dias depois: convite leve para uma conversa de descoberta de 30 minutos ou um café, sem apresentação de vendas.",
+  fu2:"Follow-up 2, sete dias depois: convite leve para o Diagnóstico Gratuito (reunião técnica sem custo e sem compromisso, que avalia infraestrutura, segurança, suporte e processos e entrega uma visão dos riscos e próximos passos) ou para um café, sem apresentação de vendas.",
   aguardando:"Último toque, catorze dias depois: encerrar com elegância, deixar a porta aberta e pedir a indicação da pessoa certa, caso não seja com o contato.",
   resposta:"O cliente respondeu: agradecer, mostrar curiosidade pela empresa, fazer uma ou duas perguntas de diagnóstico e propor dois horários, escritos como [dia/hora 1] e [dia/hora 2].",
   proposta:"A proposta já foi enviada: perguntar o que achou, oferecer ajustar escopo, prazo ou valor junto e se oferecer para explicar a quem mais participa da decisão.",
@@ -791,7 +818,8 @@ const assinatura=()=>JSON.stringify([ficha(),est.stage,est.tom]);
 function montarFicha(){
   $("listaNichos").innerHTML=NICHOS.map(n=>`<option value="${esc(n.nome)}">`).join("");
   $("listaCidades").innerHTML=CIDADES.filter(c=>c.nome!=="Região dos Lagos").map(c=>`<option value="${esc(c.nome)}">`).join("");
-  $("dicaNicho").textContent=`Com case de cliente: ${lista([...new Set(CLIENTES.map(r=>r.ramo))])}.`;
+  const comCase=[...new Set(CLIENTES.filter(r=>r.fez).flatMap(r=>r.ramos))],soClientes=[...new Set(CLIENTES.flatMap(r=>r.ramos))].filter(x=>!comCase.includes(x));
+  $("dicaNicho").textContent=`Com case: ${lista(comCase)}. Com clientes do ramo: ${lista(soClientes)}.`;
   $("cargos").innerHTML=CARGOS.map(c=>`<button type="button" class="chip" data-id="${c.id}" aria-pressed="${c.id===est.cargo}">${esc(c.nome)}</button>`).join("");
   $("conexoes").innerHTML=CONEXOES.map(c=>`<button type="button" class="chip" data-id="${c.id}" aria-pressed="${c.id===est.con}">${esc(c.nome)}</button>`).join("");
   const op=s=>`<button type="button" class="etapa-op" data-id="${s.id}" aria-pressed="${s.id===est.stage}"><span class="ponto" style="--c:var(${COR_ETAPA[s.id]})"></span><span><b>${esc(s.nome)}</b><small>${esc(s.sub)}</small></span></button>`;
@@ -853,9 +881,10 @@ function adicionarPrints(files){
 
 /* ---------- Chamadas à IA ---------- */
 function caseParaIA(ref){
-  if(!ref)return "Nenhum. A Techwave não tem case no nicho deste cliente: não diga nem insinue que já atendeu empresas desse ramo. Como prova, use os 15 anos de mercado e as mais de 50 empresas atendidas de vários segmentos.";
-  return ref.temCaso?`${ref.nome}, mesmo nicho do cliente. ${ref.historia} Use exatamente estes números, sem arredondar nem inventar outros.`
-    :`${ref.nome} é cliente da Techwave no mesmo nicho, mas não há case publicado: cite apenas como cliente, sem números.`;
+  if(!ref)return "Nenhum. A Techwave não tem cliente nem case no nicho deste cliente: não diga nem insinue que já atendeu empresas desse ramo. Como prova, use os números gerais (mais de 15 anos de mercado, mais de 100 projetos entregues, 98% de retenção de clientes, nota 5,0 no Google).";
+  const nomes=`Clientes da Techwave neste nicho, que podem ser citados pelo nome: ${lista(ref.nomes)}.`;
+  return ref.temCaso?`${nomes} Case publicado no site: ${ref.caso} Use exatamente estes números, sem arredondar nem inventar outros.`
+    :`${nomes} Não há case publicado para este nicho: cite os nomes, sem números.`;
 }
 function blocoCliente(f,n,local){
   const cx=textosConexao(f.con.t,f.con.x,f.empresa);
@@ -928,12 +957,13 @@ ${contexto}
 ${f.material?`\nTRECHO DO MATERIAL DA PESQUISA:\n"""\n${f.material.slice(0,3000)}\n"""\n`:""}
 REMETENTE: ${eu}. ${nome1?`Chame o contato de ${nome1}.`:`Não há nome do contato: comece com "Olá, tudo bem?" no e-mail e "Oi, tudo bem?" no WhatsApp.`}
 TOM: ${tom.nome}, ${tom.desc}.
-${local?"O cliente está na área de atendimento presencial: se fizer um convite, pode ser um café presencial.":"Se fizer um convite, sugira um café virtual de 15 minutos ou uma conversa de descoberta de 30 minutos."}
+${local?"O cliente está na área de atendimento presencial: o convite pode ser um café ou o Diagnóstico Gratuito presencial.":"O convite pode ser um café virtual de 15 minutos ou o Diagnóstico Gratuito por vídeo."}
 
 COMO ESCREVER (persuasivo e honesto)
 - Abra pelo mundo do cliente: o gancho escolhido ou o ponto de conexão. Nunca comece com "Meu nome é" nem com "Prezado".
 - Mostre que entende a rotina do cliente com uma dor concreta. O que é hipótese vira pergunta ou "é comum", nunca afirmação.
-- Prova social: com case do mesmo nicho, cite o resultado com o número exato. Sem case, use os 15 anos de mercado e as mais de 50 empresas atendidas de vários segmentos, sem dizer que conhece o ramo.
+- Prova social: com case do mesmo nicho, cite o resultado com o número exato; com clientes do mesmo nicho sem case, cite os nomes; sem nenhum dos dois, use os números gerais (mais de 15 anos de mercado, mais de 100 projetos entregues, 98% de retenção de clientes), sem dizer que conhece o ramo.
+- Quando fizer sentido convidar, ofereça o Diagnóstico Gratuito (reunião técnica sem custo e sem compromisso) ou um café.
 - Termine com uma única chamada para ação, fácil de responder.
 - Fale mais do cliente ("você", "vocês") do que da Techwave.
 - Sem emojis, sem jargão ("sinergia", "alavancar", "solução completa"), sem urgência falsa e sem promessas.
@@ -1074,8 +1104,8 @@ function renderAnalise(){
       ${a.ganchos.map((g,i)=>`<label class="item"><input type="checkbox" data-gancho="${i}" ${est.ganchos.includes(i)?"checked":""}><span class="txt">${esc(g)}</span></label>`).join("")||`<p class="vazio">Sem ganchos: cole mais material da pesquisa.</p>`}
     </section>
     <section class="bloco"><h3>Prova social</h3>
-      ${ref?`<p><span class="pill case">${ref.temCaso?"Case":"Cliente"} do mesmo nicho</span></p><p>${esc(ref.temCaso?ref.historia:ref.curto)}</p>${a.usoCase?`<p class="perg">${esc(a.usoCase)}</p>`:""}`
-        :`<p><span class="pill neutro">Sem case neste nicho</span></p><p>Use os 15 anos de mercado e as mais de 50 empresas atendidas de vários segmentos. Não diga que conhece o ramo.</p>`}
+      ${ref?`<p><span class="pill case">${ref.temCaso?"Case do mesmo nicho":"Clientes do mesmo nicho"}</span></p><p>${esc(ref.historia)}</p>${a.usoCase?`<p class="perg">${esc(a.usoCase)}</p>`:""}`
+        :`<p><span class="pill neutro">Sem clientes neste nicho</span></p><p>Use os números gerais: mais de 15 anos de mercado, mais de 100 projetos entregues e 98% de retenção de clientes. Não diga que conhece o ramo.</p>`}
     </section>
     <section class="bloco"><h3>Sinais encontrados</h3>
       <ul class="lista">${a.sinais.map(s=>`<li>${esc(s.texto)}${fonte(s.fonte)}</li>`).join("")||"<li>Nenhum sinal.</li>"}</ul>

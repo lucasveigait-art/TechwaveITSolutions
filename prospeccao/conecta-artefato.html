@@ -109,6 +109,10 @@ a{color:var(--brand)}
 .aviso.erro{background:var(--bad-soft);color:var(--bad)}
 .aviso.info{background:var(--warn-soft);color:var(--warn)}
 .vazio{color:var(--muted);font-size:14px}
+.ajuda{border:1px solid var(--warn);background:var(--warn-soft);border-radius:var(--r);padding:14px 16px;display:grid;gap:8px;font-size:14px;margin-bottom:16px}
+.ajuda b{color:var(--warn)}
+.ajuda ol{margin:0;padding-left:20px;display:grid;gap:4px}
+.ajuda .dica{color:var(--ink)}
 .vazio-grande{border:1.5px dashed var(--line);border-radius:var(--r);padding:22px;display:grid;gap:10px;color:var(--muted);font-size:14px}
 .vazio-grande ul{margin:0;padding-left:18px;display:grid;gap:4px}
 
@@ -228,6 +232,7 @@ a{color:var(--brand)}
     </aside>
 
     <div class="trabalho">
+      <div class="ajuda" id="ajudaIA" role="status" hidden></div>
       <section class="painel" aria-labelledby="t1">
         <div class="passo-topo">
           <div class="passo-titulo"><span class="num">1</span><div><h2 id="t1">Pesquisa</h2><p>Abra os atalhos, leia em dois minutos e traga o que importa.</p></div></div>
@@ -806,7 +811,7 @@ const arr=v=>Array.isArray(v)?v:[];
 const val=id=>$(id).value.trim();
 
 const est={stage:"primeiro",cargo:"",con:"",conValores:{},tom:"consultivo",analise:null,dores:[],ganchos:[],msgs:null,origem:null,aba:null,variacao:0,imagens:[],fichaDaMsg:""};
-let sample=null,limites=null,ctl=null,iaPronta=false;
+let sample=null,limites=null,ctl=null,iaPronta=false,permissoes=null,motivoIA="verificando";
 
 /* ---------- Ficha ---------- */
 function ficha(){
@@ -1020,8 +1025,8 @@ async function analisar(){
     est.dores=est.analise.dores.slice(0,2).map((_,i)=>i);est.ganchos=est.analise.ganchos.length?[0]:[];
     est.analiseDe=f.empresa;salvarHistorico();
   }catch(e){
-    if(e?.code!=="cancelled")aviso("avisoPesquisa",textoErro(e?.code));
-    if(SEM_IA.has(e?.code))desligarIA();
+    if(SEM_IA.has(e?.code)||e?.code==="session_expired")desligarIA(motivoDoErro(e.code));
+    else if(e?.code!=="cancelled")aviso("avisoPesquisa",textoErro(e?.code));
   }finally{prog.fim();bloquearIA(!iaPronta);renderAnalise()}
 }
 async function escrever(nova){
@@ -1038,8 +1043,8 @@ async function escrever(nova){
     est.msgs=normalizarMsgs(r,est.stage);est.origem="ia";est.fichaDaMsg=assinatura();est.aba=null;
     salvarHistorico();
   }catch(e){
-    if(e?.code!=="cancelled")aviso("avisoMensagens",textoErro(e?.code));
-    if(SEM_IA.has(e?.code))desligarIA();
+    if(SEM_IA.has(e?.code)||e?.code==="session_expired")desligarIA(motivoDoErro(e.code));
+    else if(e?.code!=="cancelled")aviso("avisoMensagens",textoErro(e?.code));
   }finally{prog.fim();bloquearIA(!iaPronta);renderMensagens()}
 }
 function normalizarAnalise(r){
@@ -1083,7 +1088,7 @@ function renderAnalise(){
   const a=est.analise,f=ficha();
   $("acoesAnalise").hidden=!a;
   if(!a){
-    $("analiseCorpo").innerHTML=`<div class="vazio-grande"><p>${iaPronta?"Preencha a ficha, cole o que encontrou na pesquisa e clique em <b>Analisar com IA</b>. A análise traz:":"A análise usa a IA do Claude e aparece aqui quando a página é aberta no claude.ai. Ela traz:"}</p>
+    $("analiseCorpo").innerHTML=`<div class="vazio-grande"><p>${iaPronta?"Preencha a ficha, cole o que encontrou na pesquisa e clique em <b>Analisar com IA</b>. A análise traz:":"A análise usa a IA do Claude. Veja acima como liberar. Quando estiver disponível, ela traz:"}</p>
       <ul><li>Resumo da empresa e quanto a análise se apoia em fatos</li><li>Dores prováveis, cada uma com a pergunta para confirmar</li><li>Ganchos de abertura e o case do mesmo nicho, se houver</li><li>Objeções prováveis com respostas e a abordagem recomendada</li></ul></div>`;
     return;
   }
@@ -1248,16 +1253,55 @@ function ligarEventos(){
 }
 
 /* ---------- IA: disponibilidade ---------- */
+/* A IA roda na conta do Claude de quem abre a página: explica o motivo quando ela não está disponível */
+const AJUDA_IA={
+  fora:{status:"IA só funciona no claude.ai",titulo:"A IA só funciona com a página aberta no Claude",
+    passos:["Abra pelo link claude.ai/artifact, e não por uma cópia salva no computador.","Entre no claude.ai com a sua conta do Claude.","Clique em Permitir quando a página pedir para usar o Claude."]},
+  semAcesso:{status:"IA indisponível: entre no claude.ai",titulo:"Para usar a IA, entre no claude.ai com a sua conta",
+    passos:["A IA desta página usa a conta do Claude de quem abre o link. Sem login, ela não aparece.","Entre no claude.ai com a sua conta e abra este mesmo link de novo, no mesmo navegador.","Clique em Permitir quando a página pedir para usar o Claude."],
+    extra:"Se você já está logado e continua sem IA, a sua organização pode ter bloqueado esse recurso. Fale com quem administra o Claude na empresa."},
+  negada:{status:"IA recusada nesta página",titulo:"O uso da IA foi recusado nesta página",
+    passos:["Clique em Liberar a IA e ative o Claude nas permissões desta página.","Se o botão não abrir nada, use o menu Permissões do artefato e recarregue a página."],botao:true},
+  conta:{status:"Conta sem acesso à IA",titulo:"Esta conta não tem acesso à IA do Claude",
+    passos:["A IA usa o plano do Claude de quem abre a página.","Use uma conta com acesso ou peça ao administrador para liberar."]},
+  sessao:{status:"Sessão do Claude expirada",titulo:"Sua sessão no Claude expirou",
+    passos:["Entre de novo no claude.ai e recarregue esta página."]}
+};
+const motivoDoErro=code=>({not_granted:"negada",sampling_disabled:"conta",session_expired:"sessao"})[code]||"semAcesso";
 function statusIA(on,txt){const s=$("statusIA");s.className="status "+(on?"on":"off");s.querySelector("span").textContent=txt}
-function desligarIA(){iaPronta=false;bloquearIA(true);statusIA(false,"IA indisponível: mensagens sem IA");renderAnalise()}
+function renderAjudaIA(){
+  const box=$("ajudaIA"),a=AJUDA_IA[motivoIA];
+  box.hidden=iaPronta||!a;
+  if(box.hidden)return;
+  box.innerHTML=`<b>${esc(a.titulo)}</b><ol>${a.passos.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>${a.extra?`<p class="dica">${esc(a.extra)}</p>`:""}
+    <p class="dica">Enquanto isso, o botão <b>Gerar mensagens sem IA</b> continua funcionando.</p>
+    ${a.botao&&permissoes?`<div class="acoes"><button class="btn pri peq" type="button" id="btnLiberar">Liberar a IA</button></div>`:""}`;
+  $("btnLiberar")?.addEventListener("click",liberarIA);
+}
+async function liberarIA(){
+  try{await permissoes.manage()}catch{aviso("avisoPesquisa","Não deu para abrir as permissões daqui. Use o menu Permissões do artefato e recarregue a página.","info");return}
+  const st=await permissoes.state("sample").catch(()=>null);
+  if(st==="granted"||st==="prompt")ligarIA();
+}
+function desligarIA(motivo){
+  if(motivo)motivoIA=motivo;
+  iaPronta=false;bloquearIA(true);statusIA(false,AJUDA_IA[motivoIA]?.status||"IA indisponível");renderAjudaIA();renderAnalise();
+}
+async function ligarIA(){
+  limites=await sample.limits().catch(()=>null);
+  iaPronta=true;motivoIA="ok";bloquearIA(false);statusIA(true,"IA pronta");
+  $("blocoPrints").hidden=!limites?.images;
+  renderAjudaIA();renderAnalise();
+}
 async function iniciarIA(){
   bloquearIA(true);
-  try{sample=window.claude?.use?await window.claude.use("sample"):null}catch{sample=null}
-  if(!sample){desligarIA();return}
-  limites=await sample.limits().catch(()=>null);
-  iaPronta=true;bloquearIA(false);statusIA(true,"IA pronta");
-  $("blocoPrints").hidden=!limites?.images;
-  renderAnalise();
+  if(!window.claude?.use){desligarIA("fora");return}
+  try{sample=await window.claude.use("sample")}catch{sample=null}
+  try{permissoes=await window.claude.use("permissions")}catch{permissoes=null}
+  const st=permissoes?await permissoes.state("sample").catch(()=>null):null;
+  if(!sample||st==="unavailable"){desligarIA("semAcesso");return}
+  if(st==="denied"){desligarIA("negada");return}
+  ligarIA();
 }
 
 /* ---------- Início ---------- */

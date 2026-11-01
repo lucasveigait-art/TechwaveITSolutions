@@ -16,6 +16,7 @@ Use **Exportar JSON** para compartilhar a tabela com a equipe, ou edite o objeto
 - Preços de mão de obra × fator da região (capital 1,00 · interior 0,85)
 - Plano bruto = usuários × R$/usuário + servidores × R$/servidor + (unidades − 1) × R$/unidade extra, respeitando o mínimo mensal do plano
 - − desconto por volume (faixa de usuários) − desconto por prazo (12/24/36 meses)
+- + deslocamento: visitas do plano × (taxa fixa + km × 2 × R$/km)
 - \+ adicionais − desconto comercial extra = **mensalidade**
 - Implantação = máx(setup mínimo, usuários × setup/usuário), podendo ser isentada
 - Valor global = mensalidade × prazo + implantação

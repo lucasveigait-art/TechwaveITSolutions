@@ -106,6 +106,8 @@
         <div><label>Servidores</label><input type="number" min="0" id="servidores" value="1"></div>
         <div><label>Unidades (matriz + filiais)</label><input type="number" min="1" id="unidades" value="1"></div>
         <div><label>Prazo de contrato</label><select id="prazo"></select></div>
+        <div><label>Região do cliente</label><select id="regiao"></select></div>
+        <div id="kmBox"><label>Distância da base (km, ida)</label><input type="number" min="0" id="km" value="0"></div>
       </div>
     </div>
 
@@ -134,6 +136,9 @@
         <p class="note">Os valores ficam salvos neste navegador. Use “Exportar” para compartilhar a tabela com a equipe e “Importar” para carregar.</p>
         <h3>Planos</h3>
         <div style="overflow-x:auto"><table id="cfgPlans"></table></div>
+        <h3>Regiões</h3>
+        <p class="note">Fator multiplica os preços de mão de obra (1,00 = preço cheio). Deslocamento por visita = taxa fixa + km × 2 × R$/km.</p>
+        <div style="overflow-x:auto"><table id="cfgRegioes"></table></div>
         <h3>Adicionais</h3>
         <div style="overflow-x:auto"><table id="cfgAddons"></table></div>
         <h3>Descontos</h3>
@@ -154,7 +159,7 @@
   <aside>
     <div class="card sum">
       <h2>Resumo</h2>
-      <div class="warn noprint" id="placeholderWarn">Os valores são exemplos. Ajuste em “Configurar tabela de preços” com os valores da proposta oficial.</div>
+      <div class="warn noprint" id="placeholderWarn">Valores sugeridos com base no mercado. Valide contra seus custos em “Configurar tabela de preços” com os valores da proposta oficial.</div>
       <div class="note">Mensalidade</div>
       <div class="big" id="sMensal">R$ 0,00</div>
       <div id="sRows" style="margin-top:10px"></div>
@@ -176,30 +181,39 @@ const $ = id => document.getElementById(id);
 const DEFAULT = {
   placeholder: true,
   imposto: 0,
+  /* Preços-base = CAPITAL / região metropolitana. A região aplica um fator sobre os
+     serviços de mão de obra e soma o deslocamento das visitas presenciais. */
   plans: [
-    { id:'essencial', nome:'Essencial', usuario:89,  servidor:290, unidade:190, minimo:990,  setupPorUsuario:40, setupMin:500,
-      itens:['Service desk remoto (horário comercial)','Monitoramento de estações','Gestão de antivírus','Gestão de atualizações (patches)','Inventário de ativos'] },
-    { id:'pro', nome:'Pro', usuario:139, servidor:450, unidade:290, minimo:1890, setupPorUsuario:60, setupMin:900, destaque:true,
-      itens:['Tudo do Essencial','Suporte remoto estendido','Monitoramento de servidores e rede','Gestão Microsoft 365 / Google Workspace','Visita técnica mensal','Relatório mensal'] },
-    { id:'enterprise', nome:'Enterprise', usuario:199, servidor:690, unidade:390, minimo:3490, setupPorUsuario:90, setupMin:1800,
-      itens:['Tudo do Pro','Suporte 24x7 para incidentes críticos','Gestão de segurança e firewall','Backup gerenciado com testes','Gerente de contas dedicado','Planejamento estratégico de TI (vCIO)'] },
+    { id:'essencial', nome:'Essencial', usuario:119, servidor:390, unidade:190, minimo:1190, setupPorUsuario:50, setupMin:600, visitasMes:0,
+      itens:['Service desk remoto ilimitado (horário comercial)','Monitoramento e alertas das estações (RMM)','Gestão de antivírus','Gestão de atualizações (patches)','Inventário de ativos'] },
+    { id:'pro', nome:'Pro', usuario:179, servidor:590, unidade:290, minimo:2490, setupPorUsuario:70, setupMin:1200, visitasMes:1, destaque:true,
+      itens:['Tudo do Essencial','Monitoramento de servidores e rede','Gestão Microsoft 365 / Google Workspace','Backup gerenciado (licença à parte)','1 visita técnica preventiva por mês','Relatório mensal e SLA de 4h'] },
+    { id:'enterprise', nome:'Enterprise', usuario:259, servidor:790, unidade:390, minimo:4900, setupPorUsuario:100, setupMin:2500, visitasMes:2,
+      itens:['Tudo do Pro','Suporte 24x7 para incidentes críticos','Gestão de segurança, firewall e EDR','Testes de restauração de backup','2 visitas técnicas por mês','Gerente de contas e planejamento de TI (vCIO)'] },
+  ],
+  /* fator: multiplica preços de mão de obra (planos e horas presenciais).
+     taxaVisita: valor fixo por visita presencial. precoKm: R$ por km rodado (ida e volta). */
+  regioes: [
+    { id:'capital',  nome:'Capital / Região Metropolitana', fator:1.00, taxaVisita:0,   precoKm:0 },
+    { id:'interior', nome:'Interior (até 100 km)',            fator:0.85, taxaVisita:90,  precoKm:0 },
+    { id:'distante', nome:'Interior distante (+100 km)',      fator:0.85, taxaVisita:150, precoKm:1.60 },
   ],
   addons: [
     { id:'backup', nome:'Backup em nuvem', desc:'Por GB armazenado', unidade:'GB', preco:0.35, qtdPadrao:500 },
     { id:'edr',    nome:'EDR / Antivírus avançado', desc:'Por endpoint', unidade:'endpoint', preco:25, qtdDe:'usuarios' },
-    { id:'firewall', nome:'Firewall gerenciado', desc:'Por unidade', unidade:'unidade', preco:390, qtdDe:'unidades' },
+    { id:'firewall', nome:'Firewall gerenciado', desc:'Por unidade', unidade:'unidade', preco:390, qtdDe:'unidades', regional:true },
     { id:'m365',   nome:'Licenças Microsoft 365 (gestão)', desc:'Por licença', unidade:'licença', preco:15, qtdDe:'usuarios' },
-    { id:'presencial', nome:'Banco de horas presenciais', desc:'Horas/mês', unidade:'hora', preco:180, qtdPadrao:4 },
+    { id:'presencial', nome:'Banco de horas presenciais', desc:'Horas/mês (ajustado pela região)', unidade:'hora', preco:180, qtdPadrao:4, regional:true },
   ],
   prazos: [ {meses:12, desc:0}, {meses:24, desc:5}, {meses:36, desc:10} ],
-  volume: [ {de:1, desc:0}, {de:21, desc:5}, {de:51, desc:8}, {de:101, desc:12} ],
+  volume: [ {de:1, desc:0}, {de:21, desc:5}, {de:51, desc:10}, {de:101, desc:15} ],
 };
 
-const KEY='techwave-calc-config-v1';
+const KEY='techwave-calc-config-v2';
 let cfg = load();
 let state = { plano:'pro', addons:{} };
 
-function load(){ try{ const s=localStorage.getItem(KEY); if(s) return JSON.parse(s);}catch(e){} return structuredClone(DEFAULT); }
+function load(){ try{ const s=localStorage.getItem(KEY); if(s){ const c=JSON.parse(s); if(c.regioes) return c; } }catch(e){} return structuredClone(DEFAULT); }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(cfg)); }catch(e){} }
 
 /* ====== RENDER ====== */
@@ -208,13 +222,20 @@ function renderPrazo(){
   sel.innerHTML = cfg.prazos.map(p=>`<option value="${p.meses}">${p.meses} meses${p.desc?` (−${p.desc}%)`:''}</option>`).join('');
   if(cur && cfg.prazos.some(p=>p.meses==cur)) sel.value=cur;
 }
+function renderRegiao(){
+  const sel=$('regiao'), cur=sel.value;
+  sel.innerHTML = cfg.regioes.map(r=>`<option value="${r.id}">${r.nome}</option>`).join('');
+  if(cur && cfg.regioes.some(r=>r.id===cur)) sel.value=cur;
+}
+function regiaoAtual(){ return cfg.regioes.find(r=>r.id===$('regiao').value)||cfg.regioes[0]; }
 function renderPlans(){
+  const f=regiaoAtual().fator;
   $('plans').innerHTML = cfg.plans.map(p=>`
     <div class="plan ${state.plano===p.id?'sel':''}" data-id="${p.id}">
       ${p.destaque?'<span class="tag">Mais escolhido</span>':''}
       <h3>${p.nome}</h3>
-      <div class="price">${BRL(p.usuario)} <small>/usuário/mês</small></div>
-      <div class="note">Servidor ${BRL(p.servidor)} · mín. ${BRL(p.minimo)}</div>
+      <div class="price">${BRL(p.usuario*f)} <small>/usuário/mês</small></div>
+      <div class="note">Servidor ${BRL(p.servidor*f)} · mín. ${BRL(p.minimo*f)}${p.visitasMes?` · ${p.visitasMes} visita(s)/mês`:''}</div>
       <ul>${p.itens.map(i=>`<li>${i}</li>`).join('')}</ul>
     </div>`).join('');
   document.querySelectorAll('.plan').forEach(el=>el.onclick=()=>{state.plano=el.dataset.id;renderPlans();calc();});
@@ -232,8 +253,10 @@ function renderAddons(){
 }
 function cell(path,val,type='number',step='0.01'){ return `<input type="${type}" step="${step}" data-cfg="${path}" value="${String(val).replace(/"/g,'&quot;')}">`; }
 function renderCfg(){
-  $('cfgPlans').innerHTML = `<tr><th>Plano</th><th>R$/usuário</th><th>R$/servidor</th><th>R$/unid. extra</th><th>Mínimo mensal</th><th>Setup/usuário</th><th>Setup mínimo</th><th>Itens (separe com ;)</th></tr>` +
-    cfg.plans.map((p,i)=>`<tr><td>${cell(`plans.${i}.nome`,p.nome,'text')}</td><td>${cell(`plans.${i}.usuario`,p.usuario)}</td><td>${cell(`plans.${i}.servidor`,p.servidor)}</td><td>${cell(`plans.${i}.unidade`,p.unidade)}</td><td>${cell(`plans.${i}.minimo`,p.minimo)}</td><td>${cell(`plans.${i}.setupPorUsuario`,p.setupPorUsuario)}</td><td>${cell(`plans.${i}.setupMin`,p.setupMin)}</td><td>${cell(`plans.${i}.itens`,p.itens.join('; '),'text')}</td></tr>`).join('');
+  $('cfgPlans').innerHTML = `<tr><th>Plano</th><th>R$/usuário</th><th>R$/servidor</th><th>R$/unid. extra</th><th>Mínimo mensal</th><th>Setup/usuário</th><th>Setup mínimo</th><th>Visitas/mês</th><th>Itens (separe com ;)</th></tr>` +
+    cfg.plans.map((p,i)=>`<tr><td>${cell(`plans.${i}.nome`,p.nome,'text')}</td><td>${cell(`plans.${i}.usuario`,p.usuario)}</td><td>${cell(`plans.${i}.servidor`,p.servidor)}</td><td>${cell(`plans.${i}.unidade`,p.unidade)}</td><td>${cell(`plans.${i}.minimo`,p.minimo)}</td><td>${cell(`plans.${i}.setupPorUsuario`,p.setupPorUsuario)}</td><td>${cell(`plans.${i}.setupMin`,p.setupMin)}</td><td>${cell(`plans.${i}.visitasMes`,p.visitasMes||0,'number','1')}</td><td>${cell(`plans.${i}.itens`,p.itens.join('; '),'text')}</td></tr>`).join('');
+  $('cfgRegioes').innerHTML = `<tr><th>Região</th><th>Fator de preço</th><th>Taxa fixa/visita</th><th>R$/km</th></tr>` +
+    cfg.regioes.map((r,i)=>`<tr><td>${cell(`regioes.${i}.nome`,r.nome,'text')}</td><td>${cell(`regioes.${i}.fator`,r.fator)}</td><td>${cell(`regioes.${i}.taxaVisita`,r.taxaVisita)}</td><td>${cell(`regioes.${i}.precoKm`,r.precoKm)}</td></tr>`).join('');
   $('cfgAddons').innerHTML = `<tr><th>Adicional</th><th>Preço</th><th>Unidade</th></tr>` +
     cfg.addons.map((a,i)=>`<tr><td>${cell(`addons.${i}.nome`,a.nome,'text')}</td><td>${cell(`addons.${i}.preco`,a.preco)}</td><td>${cell(`addons.${i}.unidade`,a.unidade,'text')}</td></tr>`).join('');
   $('cfgPrazo').innerHTML = `<tr><th>Prazo (meses)</th><th>Desconto (%)</th></tr>` +
@@ -248,22 +271,25 @@ function renderCfg(){
     cfg.placeholder=false; save(); renderAll();
   });
 }
-function renderAll(){ renderPrazo(); renderPlans(); renderAddons(); calc(); }
+function renderAll(){ renderPrazo(); renderRegiao(); renderPlans(); renderAddons(); calc(); }
 
 /* ====== CÁLCULO ====== */
 function calc(){
   const u=+$('usuarios').value||0, s=+$('servidores').value||0, un=Math.max(1,+$('unidades').value||1);
   const prazo=+$('prazo').value, descExtra=Math.min(100,Math.max(0,+$('descExtra').value||0));
   const p=cfg.plans.find(x=>x.id===state.plano)||cfg.plans[0];
+  const reg=regiaoAtual(), f=reg.fator||1, km=Math.max(0,+$('km').value||0);
+  $('kmBox').style.display = reg.precoKm ? '' : 'none';
   const linhas=[];
+  const pu=p.usuario*f, ps=p.servidor*f, pun=p.unidade*f, pmin=p.minimo*f;
 
-  const vU=u*p.usuario, vS=s*p.servidor, vUn=(un-1)*p.unidade;
-  linhas.push({d:`Plano ${p.nome} — ${u} usuário(s) × ${BRL(p.usuario)}`, v:vU});
-  if(s) linhas.push({d:`Servidores — ${s} × ${BRL(p.servidor)}`, v:vS});
-  if(un>1) linhas.push({d:`Unidades adicionais — ${un-1} × ${BRL(p.unidade)}`, v:vUn});
+  const vU=u*pu, vS=s*ps, vUn=(un-1)*pun;
+  linhas.push({d:`Plano ${p.nome} — ${u} usuário(s) × ${BRL(pu)}`, v:vU});
+  if(s) linhas.push({d:`Servidores — ${s} × ${BRL(ps)}`, v:vS});
+  if(un>1) linhas.push({d:`Unidades adicionais — ${un-1} × ${BRL(pun)}`, v:vUn});
   let base=vU+vS+vUn;
   let ajusteMin=0;
-  if(base<p.minimo){ ajusteMin=p.minimo-base; linhas.push({d:`Ajuste ao mínimo do plano (${BRL(p.minimo)})`, v:ajusteMin}); base=p.minimo; }
+  if(base<pmin){ ajusteMin=pmin-base; linhas.push({d:`Ajuste ao mínimo do plano (${BRL(pmin)})`, v:ajusteMin}); base=pmin; }
 
   const vol=[...cfg.volume].sort((a,b)=>b.de-a.de).find(v=>u>=v.de)?.desc||0;
   const pz=cfg.prazos.find(x=>x.meses===prazo)?.desc||0;
@@ -274,21 +300,29 @@ function calc(){
   for(const a of cfg.addons){
     const st=state.addons[a.id]; if(!st?.on) continue;
     const q = st.qtd ?? (a.qtdDe==='usuarios'?u : a.qtdDe==='unidades'?un : a.qtdDe==='servidores'?s : (a.qtdPadrao||1));
-    const v=q*a.preco; totAdd+=v; adds.push({d:`${a.nome} — ${q} ${a.unidade}(s) × ${BRL(a.preco)}`, v});
+    const pr=a.preco*(a.regional?f:1);
+    const v=q*pr; totAdd+=v; adds.push({d:`${a.nome} — ${q} ${a.unidade}(s) × ${BRL(pr)}`, v});
+  }
+  const custoVisita=(reg.taxaVisita||0)+2*km*(reg.precoKm||0);
+  const visitas=(p.visitasMes||0)*un;
+  if(visitas && custoVisita){
+    const v=visitas*custoVisita; totAdd+=v;
+    adds.push({d:`Deslocamento — ${visitas} visita(s)/mês × ${BRL(custoVisita)}`, v});
   }
   const subtotal=planoLiq+totAdd;
   const dExtra=subtotal*descExtra/100;
   const mensal=subtotal-dExtra;
-  const setup = $('isentaSetup').value==='1' ? 0 : Math.max(p.setupMin, u*p.setupPorUsuario);
+  const setup = $('isentaSetup').value==='1' ? 0 : Math.max(p.setupMin, u*p.setupPorUsuario) + (custoVisita||0);
   const contrato = mensal*prazo + setup;
   const imp = mensal*(cfg.imposto||0)/100;
 
-  const r={p,u,s,un,prazo,linhas,base,vol,dVol,pz,dPz,adds,totAdd,descExtra,dExtra,mensal,setup,contrato,imp};
+  const r={p,reg,km,custoVisita,u,s,un,prazo,linhas,base,vol,dVol,pz,dPz,adds,totAdd,descExtra,dExtra,mensal,setup,contrato,imp};
   window._r=r;
 
   $('sMensal').textContent=BRL(mensal);
   const R=(a,b,c='')=>`<div class="row ${c}"><span>${a}</span><span>${b}</span></div>`;
   $('sRows').innerHTML =
+    R('Região', reg.nome + (f!==1?` (×${f.toLocaleString('pt-BR')})`:'')) +
     R(`Plano ${p.nome} (bruto)`, BRL(base)) +
     (dVol?R(`Desc. volume (${vol}%)`,'− '+BRL(dVol),'neg'):'') +
     (dPz?R(`Desc. prazo ${prazo}m (${pz}%)`,'− '+BRL(dPz),'neg'):'') +
@@ -298,6 +332,7 @@ function calc(){
     R('Implantação (única)',BRL(setup)) +
     R(`Valor total do contrato (${prazo}m)`,BRL(contrato)) +
     R('Custo por usuário/mês', u?BRL(mensal/u):'—') +
+    (custoVisita?R('Visita avulsa: deslocamento', BRL(custoVisita)):'') +
     (cfg.imposto?R(`Impostos estimados (${cfg.imposto}%)`,BRL(imp)):'');
   $('placeholderWarn').style.display = cfg.placeholder ? '' : 'none';
 }
@@ -314,7 +349,7 @@ function buildProposta(){
   <h2>Cliente</h2>
   <div>${$('cliEmpresa').value||'—'} ${$('cliCnpj').value?'· CNPJ '+$('cliCnpj').value:''}<br>A/C: ${$('cliContato').value||'—'} ${$('cliEmail').value?'· '+$('cliEmail').value:''}</div>
   <h2>Escopo — Plano ${r.p.nome}</h2>
-  <div>Ambiente: ${r.u} usuário(s), ${r.s} servidor(es), ${r.un} unidade(s).</div>
+  <div>Ambiente: ${r.u} usuário(s), ${r.s} servidor(es), ${r.un} unidade(s) · Região: ${r.reg.nome}${r.km&&r.reg.precoKm?` (${r.km} km)`:''}.</div>
   <ul>${r.p.itens.map(i=>`<li>${i}</li>`).join('')}</ul>
   <h2>Investimento mensal</h2>
   <table><tr><th>Descrição</th><th style="text-align:right">Valor</th></tr>
@@ -329,6 +364,7 @@ function buildProposta(){
   <table>
     ${tr('Taxa de implantação (pagamento único)', r.setup?BRL(r.setup):'Isenta')}
     ${tr('Prazo contratual', r.prazo+' meses')}
+    ${r.custoVisita?tr('Deslocamento por visita avulsa', BRL(r.custoVisita)):''}
     ${tr('Valor global do contrato', BRL(r.contrato))}
   </table>
   <p style="font-size:12px;margin-top:12px">Valores em reais (BRL), reajustados anualmente pelo IPCA. Faturamento mensal com vencimento a combinar. Proposta válida até ${fmt(val)}.</p>
@@ -336,7 +372,8 @@ function buildProposta(){
 }
 
 /* ====== EVENTOS ====== */
-['usuarios','servidores','unidades','prazo','descExtra','isentaSetup'].forEach(id=>$(id).addEventListener('input',calc));
+['usuarios','servidores','unidades','prazo','descExtra','isentaSetup','km'].forEach(id=>$(id).addEventListener('input',calc));
+$('regiao').addEventListener('input',()=>{renderPlans();calc();});
 $('cfgImposto').onchange=e=>{cfg.imposto=+e.target.value||0;save();calc();};
 $('btnPrint').onclick=()=>{buildProposta();window.print();};
 $('btnCopy').onclick=()=>{

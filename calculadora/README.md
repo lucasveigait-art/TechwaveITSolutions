@@ -9,10 +9,11 @@ Calculadora estática (HTML único, sem dependências) para os planos **Essencia
 4. Clique em **Gerar proposta (PDF)** e salve como PDF na janela de impressão.
 
 ## Tabela de preços
-Os valores padrão são **exemplos**. Abra "⚙️ Configurar tabela de preços" e substitua pelos valores oficiais.
+Os valores padrão são uma **sugestão baseada em mercado** (ver `docs/estrategia-precificacao.md`). Valide contra seus custos em "⚙️ Configurar tabela de preços".
 Use **Exportar JSON** para compartilhar a tabela com a equipe, ou edite o objeto `DEFAULT` em `index.html` para torná-la o padrão.
 
 ## Regra de cálculo
+- Preços de mão de obra × fator da região (capital 1,00 · interior 0,85)
 - Plano bruto = usuários × R$/usuário + servidores × R$/servidor + (unidades − 1) × R$/unidade extra, respeitando o mínimo mensal do plano
 - − desconto por volume (faixa de usuários) − desconto por prazo (12/24/36 meses)
 - \+ adicionais − desconto comercial extra = **mensalidade**
